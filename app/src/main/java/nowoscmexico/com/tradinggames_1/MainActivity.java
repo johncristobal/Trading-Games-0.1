@@ -9,10 +9,14 @@ import nowoscmexico.com.tradinggames_1.tuto.TutorialActivity;
 
 public class MainActivity extends AppCompatActivity {
 
+    int variable;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        variable = 0;
     }
 
     public void showTuto(View v){
