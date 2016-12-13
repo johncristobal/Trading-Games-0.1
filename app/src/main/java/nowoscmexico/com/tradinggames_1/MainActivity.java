@@ -17,7 +17,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void showTuto(View v){
 
-        Intent i = new Intent(this, TutorialActivity.class);
+        Intent i = new Intent(this, TrendsGames.class);
         startActivity(i);
 
     }

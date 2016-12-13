@@ -15,5 +15,15 @@
 
     <string name="slide_3_title">Sube...</string>
     <string name="slide_3_desc">tus propios juegos para compartir e intercambiar!</string>
+    <string name="title_activity_trending">trending</string>
+    <string name="title_activity_simple_game">SimpleGame</string>
+    <string name="title_activity_trends_games">TrendsGames</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_simple_view_game">SimpleViewGame</string>
+    <string name="title_activity_simple_view_g">SimpleViewG</string>
 
 </resources>
