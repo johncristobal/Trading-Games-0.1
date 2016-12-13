@@ -17,6 +17,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         variable = 0;
+        
+        variable++;
     }
 
     public void showTuto(View v){
