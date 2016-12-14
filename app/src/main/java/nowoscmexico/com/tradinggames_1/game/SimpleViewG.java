@@ -109,6 +109,10 @@ public class SimpleViewG extends AppCompatActivity
 
         /*
         Add a comment random
+
+        XD
+
+        
          */
     }
 }
