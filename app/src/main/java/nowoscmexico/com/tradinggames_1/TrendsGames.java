@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.GridView;
+import android.widget.Toast;
 
 public class TrendsGames extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -47,7 +48,6 @@ public class TrendsGames extends AppCompatActivity
 
         grid = (GridView)findViewById(R.id.gridView);
         grid.setAdapter(new CustomAdapterGrid(this,elements));
-
     }
 
     @Override
@@ -97,5 +97,10 @@ public class TrendsGames extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    //Inicar sesion launch activity
+    public void startUser(View v){
+        Toast.makeText(this,"Start session",Toast.LENGTH_SHORT).show();
     }
 }

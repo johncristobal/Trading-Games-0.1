@@ -23,6 +23,7 @@ import android.widget.TextView;
 
 import nowoscmexico.com.tradinggames_1.MainActivity;
 import nowoscmexico.com.tradinggames_1.R;
+import nowoscmexico.com.tradinggames_1.TrendsGames;
 
 public class TutorialActivity extends AppCompatActivity {
 
@@ -135,8 +136,10 @@ public class TutorialActivity extends AppCompatActivity {
 
     private void launchHomeScreen() {
         prefManager.setFirstTimeLaunch(false);
-        startActivity(new Intent(TutorialActivity.this, MainActivity.class));
-        finish();
+        //startActivity(new Intent(TutorialActivity.this, MainActivity.class));
+        startActivity(new Intent(TutorialActivity.this, TrendsGames.class));
+        overridePendingTransition(R.anim.slide_in_up,R.anim.slide_out_up);
+        //finish();
     }
 
     //  viewpager change listener

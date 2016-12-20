@@ -112,7 +112,6 @@ public class SimpleViewG extends AppCompatActivity
 
         XD
 
-        
          */
     }
 }

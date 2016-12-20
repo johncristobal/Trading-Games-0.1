@@ -45,7 +45,8 @@ public class CustomAdapterGrid extends BaseAdapter{
     }
 
     public class Holder{
-        TextView text;
+        TextView textGame;
+        TextView textAutor;
     }
 
     @Override
@@ -58,11 +59,10 @@ public class CustomAdapterGrid extends BaseAdapter{
         View rowView;
 
         rowView = layi.inflate(R.layout.listitem,null);
-        holder.text = (TextView)rowView.findViewById(R.id.gameLabel);
+        holder.textGame = (TextView)rowView.findViewById(R.id.gameLabel);
+        holder.textGame.setText(result[i]);
 
-        holder.text.setText(result[i]);
-
-        rowView.setOnClickListener(new View.OnClickListener() {
+        holder.textGame.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
             Toast.makeText(context,"Clicked: "+result[pos],Toast.LENGTH_SHORT).show();
@@ -85,4 +85,5 @@ public class CustomAdapterGrid extends BaseAdapter{
 
         return rowView;
     }
+
 }
