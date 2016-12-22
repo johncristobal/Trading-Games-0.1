@@ -1,5 +1,9 @@
 package nowoscmexico.com.tradinggames_1;
 
+/*
+* Splash activity....
+* */
+
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;

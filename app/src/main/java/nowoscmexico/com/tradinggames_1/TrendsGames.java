@@ -1,5 +1,8 @@
 package nowoscmexico.com.tradinggames_1;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -14,6 +17,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.GridView;
 import android.widget.Toast;
+
+import nowoscmexico.com.tradinggames_1.user.UserActivity;
 
 public class TrendsGames extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -46,6 +51,17 @@ public class TrendsGames extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        //Check sesion...if logged, then show elements
+        SharedPreferences sharedPreferences =getApplicationContext().getSharedPreferences(getString(R.string.sharedName), Context.MODE_PRIVATE);
+        String sesion = sharedPreferences.getString("sesion","null");
+        if(sesion.equals("1")){
+            navigationView.getMenu().findItem(R.id.startsesion).setVisible(false);
+            navigationView.getMenu().findItem(R.id.mismatch).setVisible(true);
+        }else if(sesion.equals("null")){
+            navigationView.getMenu().findItem(R.id.mismatch).setVisible(false);
+        }
+
+        //Launch grid with elements of trends....
         grid = (GridView)findViewById(R.id.gridView);
         grid.setAdapter(new CustomAdapterGrid(this,elements));
     }
@@ -88,10 +104,14 @@ public class TrendsGames extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
+        if (id == R.id.trend) {
             // Handle the camera action
-        } else if (id == R.id.nav_share) {
+        } else if (id == R.id.searchgame) {
 
+        } else if(id == R.id.startsesion) {
+            Intent intent = new Intent(this, UserActivity.class);
+            intent.putExtra("activity","trends");
+            startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -102,5 +122,8 @@ public class TrendsGames extends AppCompatActivity
     //Inicar sesion launch activity
     public void startUser(View v){
         Toast.makeText(this,"Start session",Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(this, UserActivity.class);
+        intent.putExtra("activity","trends");
+        startActivity(intent);
     }
 }

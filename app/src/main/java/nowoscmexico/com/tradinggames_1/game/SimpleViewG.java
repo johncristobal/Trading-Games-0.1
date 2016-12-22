@@ -13,12 +13,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import nowoscmexico.com.tradinggames_1.R;
+import nowoscmexico.com.tradinggames_1.user.UserActivity;
 
 public class SimpleViewG extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    public LinearLayout contactar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +56,8 @@ public class SimpleViewG extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);*/
+
+        contactar = (LinearLayout)findViewById(R.id.contactarDueno);
     }
 
     @Override
@@ -97,9 +103,9 @@ public class SimpleViewG extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
+        if (id == R.id.trend) {
             // Handle the camera action
-        } else if (id == R.id.nav_share) {
+        } else if (id == R.id.searchgame) {
 
         }
 
@@ -107,11 +113,13 @@ public class SimpleViewG extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
 
-        /*
-        Add a comment random
+    }
 
-        XD
+    //Contactaar dueño
+    public void contacto(View v){
+        Intent intent = new Intent(this, UserActivity.class);
+        //intent.putExtra("nombre",result[pos]);
+        startActivity(intent);
 
-         */
     }
 }

@@ -47,8 +47,7 @@
             android:src="@android:drawable/btn_star"
             android:layout_marginRight="10dp"
             android:layout_centerVertical="true"
-            android:layout_alignParentEnd="true"
-            android:onClick="saveInMatchs" />
+            android:layout_alignParentEnd="true" />
     </RelativeLayout>
 
 </RelativeLayout>

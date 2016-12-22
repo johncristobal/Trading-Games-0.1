@@ -20,7 +20,9 @@
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/nav_header_trends_games"
-        app:menu="@menu/activity_trends_games_drawer" />
+        app:menu="@menu/activity_trends_games_drawer"
+        android:visibility="visible" />
+
 
 </android.support.v4.widget.DrawerLayout>
 

@@ -6,11 +6,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import nowoscmexico.com.tradinggames_1.game.SimpleViewG;
+import nowoscmexico.com.tradinggames_1.user.UserActivity;
 
 /**
  * Created by vera_john on 12/12/16.
@@ -47,6 +49,8 @@ public class CustomAdapterGrid extends BaseAdapter{
     public class Holder{
         TextView textGame;
         TextView textAutor;
+        ImageView match;
+        ImageView game;
     }
 
     @Override
@@ -60,7 +64,22 @@ public class CustomAdapterGrid extends BaseAdapter{
 
         rowView = layi.inflate(R.layout.listitem,null);
         holder.textGame = (TextView)rowView.findViewById(R.id.gameLabel);
+        holder.textAutor = (TextView)rowView.findViewById(R.id.autorLabel);
+        holder.match = (ImageView)rowView.findViewById(R.id.imageViewUser);
+        holder.game = (ImageView)rowView.findViewById(R.id.imageViewgame);
+
         holder.textGame.setText(result[i]);
+
+        holder.game.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(context,"Activity: "+result[pos],Toast.LENGTH_SHORT).show();
+
+                launchSimpleView(pos);
+
+            }
+        });
+
 
         holder.textGame.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,13 +96,33 @@ public class CustomAdapterGrid extends BaseAdapter{
             gridRel.setVisibility(View.INVISIBLE);
             simpleRel.setVisibility(View.VISIBLE);*/
 
-            Intent intent = new Intent(context, SimpleViewG.class);
-            intent.putExtra("nombre",result[pos]);
-            context.startActivity(intent);
+            launchSimpleView(pos);
             }
         });
 
+        holder.match.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(context,"Activity: "+result[pos],Toast.LENGTH_SHORT).show();
+
+                //When click in ,atch =>verify if sesion active
+                //IF sesion => save in matches
+                //else => start sesion
+                Intent intent = new Intent(context, UserActivity.class);
+                intent.putExtra("nombre",result[pos]);
+                intent.putExtra("activity","match");
+                context.startActivity(intent);
+            }
+        });
+
+
         return rowView;
+    }
+
+    public void launchSimpleView(int p){
+        Intent intent = new Intent(context, SimpleViewG.class);
+        intent.putExtra("nombre",result[p]);
+        context.startActivity(intent);
     }
 
 }
