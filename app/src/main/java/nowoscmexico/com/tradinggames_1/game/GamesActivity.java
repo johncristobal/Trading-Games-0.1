@@ -1,11 +1,8 @@
-package nowoscmexico.com.tradinggames_1;
+package nowoscmexico.com.tradinggames_1.game;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -15,22 +12,21 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.GridView;
-import android.widget.Toast;
+import android.widget.ListView;
 
-import nowoscmexico.com.tradinggames_1.user.UserActivity;
+import java.util.ArrayList;
 
-public class TrendsGames extends AppCompatActivity {
+import nowoscmexico.com.tradinggames_1.R;
+import nowoscmexico.com.tradinggames_1.menuClass;
 
-    //These elements will come from WS
-    public static String [] elements = {"uno","dos","tres","cuatro","cinco","seis","siete"};
-    public GridView grid;
-    public NavigationView navigationView;
+public class GamesActivity extends AppCompatActivity {
+
+    public ListView lista;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_trends_games);
+        setContentView(R.layout.activity_games);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -38,8 +34,10 @@ public class TrendsGames extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                Intent intent = new Intent(getApplicationContext(), AddGame.class);
+                intent.putExtra("activity","games");
+                startActivity(intent);
             }
         });
 
@@ -49,20 +47,25 @@ public class TrendsGames extends AppCompatActivity {
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        navigationView = (NavigationView) findViewById(R.id.nav_view);
-        //navigationView.setNavigationItemSelectedListener(menu.onNavigationItemSelected());
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        //navigationView.setNavigationItemSelectedListener(this);
 
         //Check sesion...if logged, then show elements
         menuClass menu = new menuClass(this,navigationView,drawer);
         menu.showMenu();
 
-        //Use sharedpreferences to save session
-        SharedPreferences sharedPreferences =getSharedPreferences(getString(R.string.sharedName), Context.MODE_PRIVATE);
-        String sesion = sharedPreferences.getString("sesion","null");
+        lista = (ListView)findViewById(R.id.listViewgames);
 
-        //Launch grid with elements of trends....
-        grid = (GridView)findViewById(R.id.gridView);
-        grid.setAdapter(new CustomAdapterGrid(this,elements,sesion));
+        //Cargar de la base de datos mis games y lanzarlos al view
+        //DBaseMethods.ThreadDBRead read = new DBaseMethods.ThreadDBRead();
+        //ArrayList<Object> elements = read.execute(modelBase.FeedEntryPlatillo.TABLE_NAME).get();
+        ArrayList<Object> elements = new ArrayList<>();
+        elements.add("game1");
+        elements.add("game2");
+        elements.add("game3");
+
+        GamesAdapter adapter = new GamesAdapter(this,elements);
+        lista.setAdapter(adapter);
     }
 
     @Override
@@ -78,7 +81,7 @@ public class TrendsGames extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.trends_games, menu);
+        getMenuInflater().inflate(R.menu.games, menu);
         return true;
     }
 
@@ -95,13 +98,5 @@ public class TrendsGames extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    //Inicar sesion launch activity
-    public void startUser(View v){
-        Toast.makeText(this,"Start session",Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(this, UserActivity.class);
-        intent.putExtra("activity","trends");
-        startActivity(intent);
     }
 }

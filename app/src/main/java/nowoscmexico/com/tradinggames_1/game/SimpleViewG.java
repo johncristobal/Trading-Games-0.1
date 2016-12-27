@@ -1,6 +1,8 @@
 package nowoscmexico.com.tradinggames_1.game;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -112,14 +114,22 @@ public class SimpleViewG extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
-
     }
 
     //Contactaar dueño
     public void contacto(View v){
-        Intent intent = new Intent(this, UserActivity.class);
-        //intent.putExtra("nombre",result[pos]);
-        startActivity(intent);
 
+        SharedPreferences preferences = getSharedPreferences(getString(R.string.sharedName), Context.MODE_PRIVATE);
+        String sesion = preferences.getString("sesion","null");
+
+        if(sesion.equals("1")){
+            //launch activity to contaact dueno...???
+            //This is goint to be wahts or an internal chat???
+        }
+        else{
+            Intent intent = new Intent(this, UserActivity.class);
+            intent.putExtra("activity","contacto");
+            startActivity(intent);
+        }
     }
 }

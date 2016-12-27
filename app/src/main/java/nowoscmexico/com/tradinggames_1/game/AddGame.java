@@ -1,11 +1,5 @@
-/*
-* Activity to star session
-* */
-package nowoscmexico.com.tradinggames_1.user;
+package nowoscmexico.com.tradinggames_1.game;
 
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -18,17 +12,13 @@ import android.view.MenuItem;
 import android.view.View;
 
 import nowoscmexico.com.tradinggames_1.R;
-import nowoscmexico.com.tradinggames_1.TrendsGames;
-import nowoscmexico.com.tradinggames_1.game.MatchActivity;
 
-public class UserActivity extends AppCompatActivity {
-
-    public String lastActivity;
+public class AddGame extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user);
+        setContentView(R.layout.activity_add_game);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -43,26 +33,7 @@ public class UserActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-
-        Intent i = getIntent();
-        lastActivity = i.getStringExtra("activity");
     }
-
-    public void sesionOpened(View v){
-        //User registered--- launch new activity
-        Intent i = new Intent(this,RegisterUser.class);
-        startActivity(i);
-    }
-
-    /*@Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -91,27 +62,13 @@ public class UserActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void entrarSesion(View v){
-        //uSE Sharedpereferences to save user sesion
-        SharedPreferences sharedPreferences =getApplicationContext().getSharedPreferences(getString(R.string.sharedName), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("sesion","1");
-        editor.commit();
-
-        //When session opened, you have to show a differentes menu
-        if(lastActivity.equals("trends")){
-            //jUST SHOW TRENDS
-            Intent i = new Intent(this, TrendsGames.class);
-            startActivity(i);
-        }else if(lastActivity.equals("match")){
-            //TLaunch activty to save wish list
-            Intent i = new Intent(this, MatchActivity.class);
-            startActivity(i);
-        }else if(lastActivity.equals("contacto")){
-            //launch activity to contact dueno
-            Intent i = new Intent(this, TrendsGames.class);
-            startActivity(i);
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
         }
     }
 }
-

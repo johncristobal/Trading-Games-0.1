@@ -11,6 +11,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import nowoscmexico.com.tradinggames_1.game.MatchActivity;
 import nowoscmexico.com.tradinggames_1.game.SimpleViewG;
 import nowoscmexico.com.tradinggames_1.user.UserActivity;
 
@@ -21,13 +22,13 @@ public class CustomAdapterGrid extends BaseAdapter{
 
     public String [] result;
     public Context context;
-
+    public String sesion;
     private static LayoutInflater layi;
 
-    public CustomAdapterGrid(TrendsGames trend, String [] data){
+    public CustomAdapterGrid(TrendsGames trend, String [] data,String s){
         result = data;
         context = trend;
-
+        sesion = s;
         layi = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
@@ -103,15 +104,23 @@ public class CustomAdapterGrid extends BaseAdapter{
         holder.match.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(context,"Activity: "+result[pos],Toast.LENGTH_SHORT).show();
 
                 //When click in ,atch =>verify if sesion active
                 //IF sesion => save in matches
                 //else => start sesion
-                Intent intent = new Intent(context, UserActivity.class);
-                intent.putExtra("nombre",result[pos]);
-                intent.putExtra("activity","match");
-                context.startActivity(intent);
+                if(sesion.equals("1")){
+                    //Add and delete from the DB table match
+                    //if not in list
+                    Toast.makeText(context,"Juego agregado a lista de Match.\n"+result[pos],Toast.LENGTH_SHORT).show();
+                    //else
+                    //Toast.makeText(context,"Juego elimiando de lista de Match.\n"+result[pos],Toast.LENGTH_SHORT).show();
+
+                }else {
+                    Intent intent = new Intent(context, UserActivity.class);
+                    intent.putExtra("nombre",result[pos]);
+                    intent.putExtra("activity","match");
+                    context.startActivity(intent);
+                }
             }
         });
 
@@ -124,5 +133,4 @@ public class CustomAdapterGrid extends BaseAdapter{
         intent.putExtra("nombre",result[p]);
         context.startActivity(intent);
     }
-
 }

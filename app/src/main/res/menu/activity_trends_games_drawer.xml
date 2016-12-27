@@ -21,6 +21,11 @@
             android:id="@+id/mismatch"
             android:icon="@drawable/ic_travel"
             android:title="Mis match" />
+
+        <item
+            android:id="@+id/misgames"
+            android:icon="@drawable/ic_travel"
+            android:title="Mis Juegos" />
     </group>
 
 </menu>

@@ -1,8 +1,6 @@
-package nowoscmexico.com.tradinggames_1;
+package nowoscmexico.com.tradinggames_1.game;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -15,22 +13,25 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.GridView;
-import android.widget.Toast;
+import android.widget.ListView;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import nowoscmexico.com.tradinggames_1.R;
+import nowoscmexico.com.tradinggames_1.menuClass;
 import nowoscmexico.com.tradinggames_1.user.UserActivity;
 
-public class TrendsGames extends AppCompatActivity {
+public class MatchActivity extends AppCompatActivity {
 
-    //These elements will come from WS
-    public static String [] elements = {"uno","dos","tres","cuatro","cinco","seis","siete"};
-    public GridView grid;
     public NavigationView navigationView;
+
+    public ListView lista;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_trends_games);
+        setContentView(R.layout.activity_match);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -43,12 +44,17 @@ public class TrendsGames extends AppCompatActivity {
             }
         });
 
+        //get listitem
+        lista = (ListView)findViewById(R.id.listViewmatchs);
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
+        //NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        //navigationView.setNavigationItemSelectedListener(this);
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         //navigationView.setNavigationItemSelectedListener(menu.onNavigationItemSelected());
 
@@ -56,13 +62,18 @@ public class TrendsGames extends AppCompatActivity {
         menuClass menu = new menuClass(this,navigationView,drawer);
         menu.showMenu();
 
-        //Use sharedpreferences to save session
-        SharedPreferences sharedPreferences =getSharedPreferences(getString(R.string.sharedName), Context.MODE_PRIVATE);
-        String sesion = sharedPreferences.getString("sesion","null");
+        //Cargar de la base de datos mis match y lanzarlos al view
+        String [] data = {"game1","game2","game3"};
+        //DBaseMethods.ThreadDBRead read = new DBaseMethods.ThreadDBRead();
+        //ArrayList<Object> elements = read.execute(modelBase.FeedEntryPlatillo.TABLE_NAME).get();
+        ArrayList<Object> elements = new ArrayList<>();
+        elements.add("game1");
+        elements.add("game2");
+        elements.add("game3");
 
-        //Launch grid with elements of trends....
-        grid = (GridView)findViewById(R.id.gridView);
-        grid.setAdapter(new CustomAdapterGrid(this,elements,sesion));
+        MatchAdapter adapter = new MatchAdapter(this,elements);
+        lista.setAdapter(adapter);
+
     }
 
     @Override
@@ -78,7 +89,7 @@ public class TrendsGames extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.trends_games, menu);
+        getMenuInflater().inflate(R.menu.match, menu);
         return true;
     }
 
@@ -95,13 +106,5 @@ public class TrendsGames extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    //Inicar sesion launch activity
-    public void startUser(View v){
-        Toast.makeText(this,"Start session",Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(this, UserActivity.class);
-        intent.putExtra("activity","trends");
-        startActivity(intent);
     }
 }

@@ -26,10 +26,26 @@
         <activity
             android:name=".game.SimpleViewG"
             android:label="@string/title_activity_simple_view_g"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".user.UserActivity"
             android:label="@string/title_activity_user"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".game.MatchActivity"
+            android:label="@string/title_activity_match"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".game.GamesActivity"
+            android:label="@string/title_activity_games"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".game.AddGame"
+            android:label="@string/title_activity_add_game"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".user.RegisterUser"
+            android:label="@string/title_activity_register_user"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 

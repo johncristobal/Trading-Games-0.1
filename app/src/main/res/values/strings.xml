@@ -28,5 +28,12 @@
     <string name="title_activity_user">UserActivity</string>
 
     <string name="sharedName">nowoscmexico.com.tradinggames_1</string>
+    <string name="title_activity_match">MatchActivity</string>
+    <string name="title_activity_games">GamesActivity</string>
+    <string name="title_activity_add_game">AddGame</string>
+    <string name="title_activity_register_user">RegisterUser</string>
+
+    <string name="dbversion">28</string>
+    <string name="dbname">TrendinGames</string>
 
 </resources>

@@ -15,9 +15,42 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Iniciar sesiòn"
+        android:text="Crear cuenta"
         android:id="@+id/textView"
-        android:layout_centerVertical="true"
+        android:onClick="sesionOpened"
+        android:layout_below="@+id/button"
+        android:layout_alignEnd="@+id/button"
+        android:layout_marginTop="94dp" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textEmailAddress"
+        android:ems="10"
+        android:id="@+id/editText"
+        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:onClick="sesionOpened" />
+        android:layout_marginTop="91dp"
+        android:hint="Correo" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:ems="10"
+        android:id="@+id/editText2"
+        android:layout_below="@+id/editText"
+        android:layout_centerHorizontal="true"
+        android:hint="Contraseña"
+        android:layout_marginTop="15dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Entrar"
+        android:id="@+id/button"
+        android:layout_below="@+id/editText2"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp"
+        android:onClick="entrarSesion" />
 </RelativeLayout>
