@@ -35,5 +35,6 @@
 
     <string name="dbversion">28</string>
     <string name="dbname">TrendinGames</string>
+    <string name="title_activity_search">SearchActivity</string>
 
 </resources>

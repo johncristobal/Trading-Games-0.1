@@ -65,6 +65,9 @@ public class menuClass implements NavigationView.OnNavigationItemSelectedListene
             intent.putExtra("activity","trends");
             context.startActivity(intent);
         } else if (id == R.id.searchgame) {
+            Intent intent = new Intent(context, SearchActivity.class);
+            intent.putExtra("activity","trends");
+            context.startActivity(intent);
 
         } else if(id == R.id.startsesion) {
             Intent intent = new Intent(context, UserActivity.class);
