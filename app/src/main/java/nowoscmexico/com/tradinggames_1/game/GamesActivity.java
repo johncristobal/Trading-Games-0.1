@@ -1,5 +1,6 @@
 package nowoscmexico.com.tradinggames_1.game;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -22,6 +23,7 @@ import nowoscmexico.com.tradinggames_1.menuClass;
 public class GamesActivity extends AppCompatActivity {
 
     public ListView lista;
+    public static Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,12 +32,14 @@ public class GamesActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        context = this;
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                Intent intent = new Intent(getApplicationContext(), AddGame.class);
+                Intent intent = new Intent(context, AddGame.class);
                 intent.putExtra("activity","games");
                 startActivity(intent);
             }

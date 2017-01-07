@@ -1,11 +1,13 @@
 package nowoscmexico.com.tradinggames_1;
 
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.widget.SearchView;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -20,12 +22,14 @@ import android.widget.Toast;
 
 import nowoscmexico.com.tradinggames_1.user.UserActivity;
 
-public class TrendsGames extends AppCompatActivity {
+public class TrendsGames extends AppCompatActivity implements SearchView.OnQueryTextListener{
 
     //These elements will come from WS
     public static String [] elements = {"uno","dos","tres","cuatro","cinco","seis","siete"};
     public GridView grid;
     public NavigationView navigationView;
+
+    public SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,14 +38,14 @@ public class TrendsGames extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
-        });
+        });*/
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -57,8 +61,13 @@ public class TrendsGames extends AppCompatActivity {
         menu.showMenu();
 
         //Use sharedpreferences to save session
-        SharedPreferences sharedPreferences =getSharedPreferences(getString(R.string.sharedName), Context.MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(getString(R.string.sharedName), Context.MODE_PRIVATE);
         String sesion = sharedPreferences.getString("sesion","null");
+
+        //Ya vio el tutorial al principio, lo vera de nuevo solo si lo busca en el menu de ocpioens
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("tutohecho","1");
+        editor.commit();
 
         //Launch grid with elements of trends....
         grid = (GridView)findViewById(R.id.gridView);
@@ -79,6 +88,16 @@ public class TrendsGames extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.trends_games, menu);
+
+        //Search configuration
+        SearchManager searchManager = (SearchManager)getSystemService(Context.SEARCH_SERVICE);
+        MenuItem searchMenuItem = menu.findItem(R.id.searchopt);
+        SearchView searchView = (SearchView)searchMenuItem.getActionView();
+
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setSubmitButtonEnabled(true);
+        //searchView.setIconifiedByDefault(false);
+        searchView.setOnQueryTextListener(this);
         return true;
     }
 
@@ -103,5 +122,24 @@ public class TrendsGames extends AppCompatActivity {
         Intent intent = new Intent(this, UserActivity.class);
         intent.putExtra("activity","trends");
         startActivity(intent);
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String s) {
+
+        //La idea es hacer un viaje al WS retornando las coincidencias del String
+        //Mostrar los resultados en el view
+
+        String sesion = sharedPreferences.getString("sesion","null");
+        grid = (GridView)findViewById(R.id.gridView);
+        String [] elements2 = {"a","b","c","d"};
+        grid.setAdapter(new CustomAdapterGrid(this,elements2,sesion));
+
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String s) {
+        return false;
     }
 }

@@ -43,13 +43,16 @@ public class menuClass implements NavigationView.OnNavigationItemSelectedListene
 
     //menu with open sesion
     private void showSesionOpenedMenu() {
+        //hide / show menu items
         navigationView.getMenu().findItem(R.id.startsesion).setVisible(false);
+        navigationView.getMenu().findItem(R.id.searchgame).setVisible(false);
         navigationView.getMenu().findItem(R.id.mismatch).setVisible(true);
         navigationView.getMenu().findItem(R.id.misgames).setVisible(true);
     }
 
     //menu with close session
     private void closeMenu(){
+        navigationView.getMenu().findItem(R.id.searchgame).setVisible(false);
         navigationView.getMenu().findItem(R.id.mismatch).setVisible(false);
         navigationView.getMenu().findItem(R.id.misgames).setVisible(false);
     }
@@ -65,9 +68,9 @@ public class menuClass implements NavigationView.OnNavigationItemSelectedListene
             intent.putExtra("activity","trends");
             context.startActivity(intent);
         } else if (id == R.id.searchgame) {
-            Intent intent = new Intent(context, SearchActivity.class);
+            /*Intent intent = new Intent(context, SearchActivity.class);
             intent.putExtra("activity","trends");
-            context.startActivity(intent);
+            context.startActivity(intent);*/
 
         } else if(id == R.id.startsesion) {
             Intent intent = new Intent(context, UserActivity.class);

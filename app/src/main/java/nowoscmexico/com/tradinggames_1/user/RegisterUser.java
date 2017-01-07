@@ -112,7 +112,7 @@ public class RegisterUser extends AppCompatActivity {
         Intent i = new Intent(this,TrendsGames.class);
         startActivity(i);
 
-        //get infor from layout
+        //get info from layout and validate
         /*
         //Validate info and launch activity
         //Save it in WS :>
@@ -181,5 +181,4 @@ public class RegisterUser extends AppCompatActivity {
         //Send json to WS
         //WS get json and save data to DB server
     }
-
 }
