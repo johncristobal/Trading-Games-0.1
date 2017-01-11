@@ -13,5 +13,69 @@
     tools:showIn="@layout/activity_add_game">
 
 
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:ems="10"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/editTextnombre"
+        android:layout_alignParentEnd="true"
+        android:hint="Nombre del juego"
+        android:layout_marginTop="10dp" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textMultiLine"
+        android:ems="10"
+        android:layout_below="@+id/editTextnombre"
+        android:layout_alignParentStart="true"
+        android:id="@+id/editTextdescripcion"
+        android:layout_alignParentEnd="true"
+        android:hint="Descripción"
+        android:layout_marginTop="10dp" />
+
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/editTextdescripcion"
+        android:layout_alignParentStart="true"
+        android:id="@+id/spinnercategoria"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="10dp" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@mipmap/ic_launcher"
+        android:id="@+id/imageView"
+        android:layout_below="@+id/spinnercategoria"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:onClick="openGalley" />
+
+    <Button
+        android:text="Subir"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/button4"
+        android:onClick="addGame" />
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/imageView"
+        android:layout_marginTop="15dp"
+        android:layout_above="@+id/button4">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical" />
+    </HorizontalScrollView>
 
 </RelativeLayout>

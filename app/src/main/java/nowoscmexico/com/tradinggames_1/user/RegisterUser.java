@@ -61,7 +61,7 @@ public class RegisterUser extends AppCompatActivity {
 
         //Inicializas horariros
         horarios = (AppCompatSpinner)findViewById(R.id.viewSpinnerHorarios);
-        ArrayList<String> horas = new ArrayList<>();
+        /*ArrayList<String> horas = new ArrayList<>();
         horas.add("Hora de comida");
         horas.add("Antes de las 12 pm");
         horas.add("Entre 12 y 1 pm");
@@ -71,7 +71,7 @@ public class RegisterUser extends AppCompatActivity {
         horas.add("Después de las 4 pm");
 
         ArrayAdapter adapter = new ArrayAdapter(this,android.R.layout.simple_list_item_1,horas);
-        horarios.setAdapter(adapter);
+        horarios.setAdapter(adapter);*/
     }
 
     @Override

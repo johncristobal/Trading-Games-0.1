@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -30,6 +31,8 @@ public class TrendsGames extends AppCompatActivity implements SearchView.OnQuery
     public NavigationView navigationView;
 
     public SharedPreferences sharedPreferences;
+
+    public SearchView searchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,12 +95,13 @@ public class TrendsGames extends AppCompatActivity implements SearchView.OnQuery
         //Search configuration
         SearchManager searchManager = (SearchManager)getSystemService(Context.SEARCH_SERVICE);
         MenuItem searchMenuItem = menu.findItem(R.id.searchopt);
-        SearchView searchView = (SearchView)searchMenuItem.getActionView();
+        searchView = (SearchView)searchMenuItem.getActionView();
 
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setSubmitButtonEnabled(true);
         //searchView.setIconifiedByDefault(false);
         searchView.setOnQueryTextListener(this);
+
         return true;
     }
 
@@ -134,6 +138,8 @@ public class TrendsGames extends AppCompatActivity implements SearchView.OnQuery
         grid = (GridView)findViewById(R.id.gridView);
         String [] elements2 = {"a","b","c","d"};
         grid.setAdapter(new CustomAdapterGrid(this,elements2,sesion));
+
+        searchView.clearFocus();
 
         return false;
     }

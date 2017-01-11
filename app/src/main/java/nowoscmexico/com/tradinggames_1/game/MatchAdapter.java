@@ -70,13 +70,13 @@ public class MatchAdapter extends BaseAdapter {
             }
         });
 
-        ImageView update = (ImageView)vi.findViewById(R.id.imageViewEditData);
+        /*ImageView update = (ImageView)vi.findViewById(R.id.imageViewEditData);
         update.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Toast.makeText(context,"updating item: "+pos, Toast.LENGTH_LONG).show();
             }
-        });
+        });*/
 
         return vi;
     }

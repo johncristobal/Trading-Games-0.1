@@ -19,6 +19,21 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        /*try {
+            //Thread.sleep(3000);
+            SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.sharedName), Context.MODE_PRIVATE);
+            String sesion = sharedPreferences.getString("sesion","null");
+            //String tuto = sharedPreferences.getString("tutohecho","null");
+
+            if(sesion.equals("1")){
+                Intent i = new Intent(this, TrendsGames.class);
+                startActivity(i);
+            }else{
+                Intent i = new Intent(this, TutorialActivity.class);
+                startActivity(i);
+            }
+        }catch (Exception e){}*/
     }
 
     public void showTuto(View v){
