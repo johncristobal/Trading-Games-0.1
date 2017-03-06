@@ -1,5 +1,6 @@
 package nowoscmexico.com.tradinggames_1.user;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -11,15 +12,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.util.ArrayList;
 
+import nowoscmexico.com.tradinggames_1.GalleryActivity;
 import nowoscmexico.com.tradinggames_1.R;
-import nowoscmexico.com.tradinggames_1.TrendsGames;
+import nowoscmexico.com.tradinggames_1.game.MatchActivity;
 
 public class RegisterUser extends AppCompatActivity {
 
@@ -31,11 +30,14 @@ public class RegisterUser extends AppCompatActivity {
     public TextView chooseLocation;
     public AppCompatSpinner horarios;
 
+    public String lastActivity;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register_user);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("");
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -47,6 +49,9 @@ public class RegisterUser extends AppCompatActivity {
             }
         });
 
+        Intent i = getIntent();
+        lastActivity = i.getStringExtra("activity");
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
@@ -57,10 +62,10 @@ public class RegisterUser extends AppCompatActivity {
         confirma =(EditText)findViewById(R.id.editTextconfirma);
 
         //Textoview to show another antivities...
-        chooseLocation = (TextView)findViewById(R.id.textViewlocation);
+        //chooseLocation = (TextView)findViewById(R.id.textViewlocation);
 
         //Inicializas horariros
-        horarios = (AppCompatSpinner)findViewById(R.id.viewSpinnerHorarios);
+        //horarios = (AppCompatSpinner)findViewById(R.id.viewSpinnerHorarios);
         /*ArrayList<String> horas = new ArrayList<>();
         horas.add("Hora de comida");
         horas.add("Antes de las 12 pm");
@@ -109,8 +114,29 @@ public class RegisterUser extends AppCompatActivity {
     //validate uinfo and show map
     public void validateInfoandInit(View v){
 
-        Intent i = new Intent(this,TrendsGames.class);
-        startActivity(i);
+        //uSE Sharedpereferences to save user sesion
+        SharedPreferences sharedPreferences =getApplicationContext().getSharedPreferences(getString(R.string.sharedName), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("sesion","1");
+        editor.commit();
+
+        //When session opened, you have to show a differentes menu
+        if(lastActivity.equals("trends")){
+            //jUST SHOW TRENDS
+            Intent i = new Intent(this, GalleryActivity.class);
+            startActivity(i);
+        }else if(lastActivity.equals("match")){
+            //TLaunch activty to save wish list
+            Intent i = new Intent(this, MatchActivity.class);
+            startActivity(i);
+        }else if(lastActivity.equals("contacto")){
+            //launch activity to contact dueno
+            Intent i = new Intent(this, GalleryActivity.class);
+            startActivity(i);
+        }else{
+            Intent i = new Intent(this, GalleryActivity.class);
+            startActivity(i);
+        }
 
         //get info from layout and validate
         /*
@@ -172,7 +198,7 @@ public class RegisterUser extends AppCompatActivity {
                     //shared.edit().putString("idFonda",res).apply();
 
                     //Vmaos al menu godin y veamos fondas....woioooooo"
-                    Intent intent = new Intent(this,TrendsGames.class);
+                    Intent intent = new Intent(this,GalleryActivity.class);
                     startActivity(intent);
                 }
             }

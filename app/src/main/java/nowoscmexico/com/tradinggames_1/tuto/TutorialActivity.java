@@ -21,6 +21,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import nowoscmexico.com.tradinggames_1.GalleryActivity;
 import nowoscmexico.com.tradinggames_1.MainActivity;
 import nowoscmexico.com.tradinggames_1.R;
 import nowoscmexico.com.tradinggames_1.TrendsGames;
@@ -137,7 +138,7 @@ public class TutorialActivity extends AppCompatActivity {
     private void launchHomeScreen() {
         prefManager.setFirstTimeLaunch(false);
         //startActivity(new Intent(TutorialActivity.this, MainActivity.class));
-        startActivity(new Intent(TutorialActivity.this, TrendsGames.class));
+        startActivity(new Intent(TutorialActivity.this, GalleryActivity.class));
         overridePendingTransition(R.anim.slide_in_up,R.anim.slide_out_up);
         //finish();
     }

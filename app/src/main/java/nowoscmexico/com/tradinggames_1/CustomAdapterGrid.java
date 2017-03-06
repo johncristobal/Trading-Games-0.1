@@ -77,8 +77,8 @@ public class CustomAdapterGrid extends BaseAdapter{
         holder.game.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(context,"Activity: "+result[pos],Toast.LENGTH_SHORT).show();
-                launchSimpleView(pos);
+            Toast.makeText(context,"Activity: "+result[pos],Toast.LENGTH_SHORT).show();
+            launchSimpleView(pos);
             }
         });
 

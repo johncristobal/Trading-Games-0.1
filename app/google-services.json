@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "68497436265",
+    "firebase_url": "https://tradinggames-a6047.firebaseio.com",
+    "project_id": "tradinggames-a6047",
+    "storage_bucket": "tradinggames-a6047.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:68497436265:android:2136c426f3cd7b2e",
+        "android_client_info": {
+          "package_name": "nowoscmexico.com.tradinggames_1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "68497436265-o8f0sm3o2cmhhskqdg6c5m03s066mnp2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "nowoscmexico.com.tradinggames_1",
+            "certificate_hash": "fd56ca0d74c817103fbc6ed4f55dc5e375f8ca77"
+          }
+        },
+        {
+          "client_id": "68497436265-phllj6oovn1neckkv04ba1nga1vt4fdb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDGV8i7GbnR78W0MhWRzt38LTH4GTa3hFo"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "68497436265-phllj6oovn1neckkv04ba1nga1vt4fdb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

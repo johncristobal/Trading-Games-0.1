@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="nowoscmexico.com.tradinggames_1.user.RegisterUser">
+    tools:context="nowoscmexico.com.tradinggames_1.GalleryActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -15,30 +15,24 @@
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:background="@drawable/logoend"
-            app:popupTheme="@style/AppTheme.PopupOverlay"
-            android:layout_height="300dp"
-            app:titleMarginBottom="20dp"
-            android:gravity="bottom"
-            android:paddingBottom="30dp">
+            android:layout_height="?attr/actionBarSize"
+            android:background="@drawable/header"
+            app:popupTheme="@style/AppTheme.PopupOverlay" >
 
         <TextView
-            android:text="Registro"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/textView5"
-            android:layout_marginBottom="20dp"
-            android:gravity="center"
-            android:typeface="monospace"
-            android:textSize="20sp"
-            android:layout_marginRight="30dp" />
+            android:text="Bienvenido"
+            android:layout_gravity="center"
+            android:id="@+id/toolbar_title"
+            android:textAppearance="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large"
+            android:textSize="24sp"
+            android:typeface="monospace" />
 
         </android.support.v7.widget.Toolbar>
-
-
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_register_user" />
+    <include layout="@layout/content_gallery" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
@@ -46,6 +40,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@android:drawable/ic_dialog_email" />
+        app:srcCompat="@android:drawable/ic_dialog_email" />
 
 </android.support.design.widget.CoordinatorLayout>

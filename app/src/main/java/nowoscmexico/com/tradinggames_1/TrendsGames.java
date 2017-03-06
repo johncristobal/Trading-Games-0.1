@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.SearchView;
+import android.text.Layout;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -19,6 +20,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.GridView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import nowoscmexico.com.tradinggames_1.user.UserActivity;
@@ -122,6 +124,7 @@ public class TrendsGames extends AppCompatActivity implements SearchView.OnQuery
 
     //Inicar sesion launch activity
     public void startUser(View v){
+        //Validar si sesion iniciada...
         Toast.makeText(this,"Start session",Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(this, UserActivity.class);
         intent.putExtra("activity","trends");
@@ -133,6 +136,12 @@ public class TrendsGames extends AppCompatActivity implements SearchView.OnQuery
 
         //La idea es hacer un viaje al WS retornando las coincidencias del String
         //Mostrar los resultados en el view
+
+        /*
+        * Pero parece que quieren cambair el view...
+        * entonces esto cambiaria y el activity para la busqeuda serai este
+        * mIENTRAS que el otro del scroll left/right seria el bueno...
+        */
 
         String sesion = sharedPreferences.getString("sesion","null");
         grid = (GridView)findViewById(R.id.gridView);
