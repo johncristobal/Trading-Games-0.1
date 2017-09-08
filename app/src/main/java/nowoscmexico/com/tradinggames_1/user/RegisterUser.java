@@ -1,24 +1,37 @@
 package nowoscmexico.com.tradinggames_1.user;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
+import nowoscmexico.com.tradinggames_1.DataBase.DBaseMethods;
+import nowoscmexico.com.tradinggames_1.DataBase.modelBase;
 import nowoscmexico.com.tradinggames_1.GalleryActivity;
+import nowoscmexico.com.tradinggames_1.LogInActivity;
 import nowoscmexico.com.tradinggames_1.R;
-import nowoscmexico.com.tradinggames_1.game.MatchActivity;
 
 public class RegisterUser extends AppCompatActivity {
 
@@ -26,11 +39,16 @@ public class RegisterUser extends AppCompatActivity {
     public EditText correo;
     public EditText pass;
     public EditText confirma;
+    public EditText tlefono;
+    public CheckBox condiciones;
     public TextView pathAvatar;
     public TextView chooseLocation;
     public AppCompatSpinner horarios;
 
     public String lastActivity;
+
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,10 +75,25 @@ public class RegisterUser extends AppCompatActivity {
 
         //Vatiables
         nombre =(EditText)findViewById(R.id.editTextName);
-        correo =(EditText)findViewById(R.id.editTextcorreo);
+        correo =(EditText)findViewById(R.id.editTextcorreoo);
         pass =(EditText)findViewById(R.id.editTextpassword);
         confirma =(EditText)findViewById(R.id.editTextconfirma);
+        tlefono =(EditText)findViewById(R.id.editTextTelefono);
+        condiciones = (CheckBox)findViewById(R.id.checkBox);
 
+        Typeface custom_font = Typeface.createFromAsset(getAssets(), "fonts/HelveticaNeue Light.ttf");
+        nombre.setTypeface(custom_font);
+        correo.setTypeface(custom_font);
+        pass.setTypeface(custom_font);
+        confirma.setTypeface(custom_font);
+        tlefono.setTypeface(custom_font);
+        condiciones.setTypeface(custom_font);
+
+        Button b1 = (Button)findViewById(R.id.button2);
+        b1.setTypeface(custom_font);
+
+        TextView leer = (TextView)findViewById(R.id.textView7);
+        leer.setTypeface(custom_font);
         //Textoview to show another antivities...
         //chooseLocation = (TextView)findViewById(R.id.textViewlocation);
 
@@ -77,6 +110,32 @@ public class RegisterUser extends AppCompatActivity {
 
         ArrayAdapter adapter = new ArrayAdapter(this,android.R.layout.simple_list_item_1,horas);
         horarios.setAdapter(adapter);*/
+
+        mAuth = FirebaseAuth.getInstance();
+
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    // User is signed in
+                    Log.d("In", "onAuthStateChanged:signed_in:" + user.getUid());
+                    //guardo id en sharedpreferences
+                    SharedPreferences shared = getSharedPreferences(getString(R.string.sharedName),MODE_PRIVATE);
+                    shared.edit().putString("idusuario",user.getUid()).apply();
+                    shared.edit().putString("sesion","1").apply();
+
+                    //gellaeryactivity para ver juegos
+                    Intent intent = new Intent(RegisterUser.this,LogInActivity.class);
+                    startActivity(intent);
+
+                } else {
+                    // User is signed out
+                    Log.d("Out", "onAuthStateChanged:signed_out");
+                    //Toast.makeText(RegisterUser.this,"Error al guardar información. \n Intente más tarde.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        };
     }
 
     @Override
@@ -114,97 +173,96 @@ public class RegisterUser extends AppCompatActivity {
     //validate uinfo and show map
     public void validateInfoandInit(View v){
 
-        //uSE Sharedpereferences to save user sesion
-        SharedPreferences sharedPreferences =getApplicationContext().getSharedPreferences(getString(R.string.sharedName), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("sesion","1");
-        editor.commit();
-
-        //When session opened, you have to show a differentes menu
-        if(lastActivity.equals("trends")){
-            //jUST SHOW TRENDS
-            Intent i = new Intent(this, GalleryActivity.class);
-            startActivity(i);
-        }else if(lastActivity.equals("match")){
-            //TLaunch activty to save wish list
-            Intent i = new Intent(this, MatchActivity.class);
-            startActivity(i);
-        }else if(lastActivity.equals("contacto")){
-            //launch activity to contact dueno
-            Intent i = new Intent(this, GalleryActivity.class);
-            startActivity(i);
-        }else{
-            Intent i = new Intent(this, GalleryActivity.class);
-            startActivity(i);
-        }
-
-        //get info from layout and validate
-        /*
         //Validate info and launch activity
         //Save it in WS :>
         String name = nombre.getText().toString();
         String mail = correo.getText().toString();
         String pass1 = pass.getText().toString();
         String pass2 = confirma.getText().toString();
+        String telefono = tlefono.getText().toString();
 
+        //get data from celular to send
         String modelo = "modelo";
-        String ubicacion = "0,0";
-        String hora = "horario";
+        //location...ammmm...not at this time
+        //String ubicacion = "0,0";
+        //get phone number....
 
         if(pass1.equals("")){
-
-        }
-
-        if(!pass1.equals(pass2)){
+            pass.setFocusable(true);
             Toast.makeText(this,"Coloque una constraseña.",Toast.LENGTH_LONG).show();
             return;
         }
 
+        if(!pass1.equals(pass2)){
+            pass.setFocusable(true);
+            Toast.makeText(this,"Las contraseñas no coinciden. Favor de verificar.",Toast.LENGTH_LONG).show();
+            return;
+        }
+
         if(name.equals("")){
-            Toast.makeText(this,"Coloque nombre del Godin",Toast.LENGTH_LONG).show();
+            nombre.setFocusable(true);
+            Toast.makeText(this,"Coloque su nombre o algún alias",Toast.LENGTH_LONG).show();
             return;
         }
 
         if(mail.equals("")){
             correo.setFocusable(true);
-            Toast.makeText(this,"Coloque correo",Toast.LENGTH_LONG).show();
+            Toast.makeText(this,"Coloque un correo",Toast.LENGTH_LONG).show();
             return;
         }
-        if(hora.equals("Hora de comida")){
-            Toast.makeText(this,"Seleccione un horario de comida",Toast.LENGTH_LONG).show();
+
+        if(!condiciones.isChecked()){
+            Toast.makeText(this,"Acepta los términos y condiciones",Toast.LENGTH_LONG).show();
             return;
         }
 
         //openDB to save Data
         try{
-            //DBaseMethods.ThreadDBInsert insert = new DBaseMethods.ThreadDBInsert();
-            //String res = insert.execute(modelBase.FeedEntryGodin.TABLE_NAME, name, mail,ubicacion, hora, pass1,path).get();
-            String res = "1";
+            DBaseMethods.ThreadDBInsert insert = new DBaseMethods.ThreadDBInsert();
+            String res = insert.execute(modelBase.FeedEntryUsuario.TABLE_NAME, name, mail, telefono, pass1).get();
+            //String res = "1";
             if(res.equals("-1")){
-                Toast.makeText(this,"Error al guardar informaciòn. \n Intente màs tarde.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this,"Error al guardar información. \n Intente más tarde.", Toast.LENGTH_SHORT).show();
             }else{
                 //Si se guardo localmente,,,,intentammos guardar WS
                 //Create task to send Data to DB --- WS
-                //AsyncTaskWS task = new AsyncTaskWS();
-                //String ws = task.execute(modelBase.FeedEntryGodin.TABLE_NAME, name, mail,ubicacion, hora, pass1,path,modelo).get();
-                //Validar si ws ejecutado correctamente...
-                String ws = "1";
-                if(ws.equals("error")){
-                    Toast.makeText(this,"Error al guardar informaciòn. \n Intente màs tarde.", Toast.LENGTH_SHORT).show();
-                }else{
-                    //Guardo id de Fonda en un shared preferenes par aposterior uso
-                    //Aqui no es taaaan nvecesario ya que solo serà un unico godin registraod
-                    //SharedPreferences shared = getSharedPreferences("FKFonda",MODE_PRIVATE);
-                    //shared.edit().putString("idFonda",res).apply();
+                //WSTask task = new WSTask();
+                //String ws = task.execute(modelBase.FeedEntryUsuario.TABLE_NAME, name, mail, pass1,"1").get();
 
-                    //Vmaos al menu godin y veamos fondas....woioooooo"
-                    Intent intent = new Intent(this,GalleryActivity.class);
-                    startActivity(intent);
-                }
+                //Create user
+                mAuth.createUserWithEmailAndPassword(mail, pass1)
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            Log.d("Completo", "createUserWithEmail:onComplete:" + task.isSuccessful());
+
+                            // If sign in fails, display a message to the user. If sign in succeeds
+                            // the auth state listener will be notified and logic to handle the
+                            // signed in user can be handled in the listener.
+                            if (!task.isSuccessful()) {
+                                Toast.makeText(RegisterUser.this, "Error al iniciar sesión",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
             }
-        }catch(Exception e){}*/
+        }catch(Exception e){}
         //Create JSon with Data
         //Send json to WS
         //WS get json and save data to DB server
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(mAuthListener);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mAuthListener != null) {
+            mAuth.removeAuthStateListener(mAuthListener);
+        }
     }
 }

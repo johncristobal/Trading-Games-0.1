@@ -219,5 +219,4 @@ public class TutorialActivity extends AppCompatActivity {
             container.removeView(view);
         }
     }
-
 }

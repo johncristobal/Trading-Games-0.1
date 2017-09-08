@@ -24,7 +24,7 @@ public class modelBase extends SQLiteOpenHelper {
         public static final String COLUMN_NAME = "nombre";
         public static final String COLUMN_CORREO = "correo";
         public static final String COLUMN_TEL = "telefono";
-        public static final String COLUMN_UBI = "ubicacion";
+        //public static final String COLUMN_UBI = "ubicacion";
         public static final String COLUMN_PASS = "password";
         public static final String COLUMN_ACTIVO = "activo";
     }
@@ -37,12 +37,14 @@ public class modelBase extends SQLiteOpenHelper {
         public static final String COLUMN_CATE = "categoria";
         public static final String COLUMN_FOTO = "rutaFoto";
         public static final String COLUMN_TIME = "tiempopublicacion";
+        //public static final String COLUMN_TOKEN_FB = "token";
         public static final String COLUMN_FKUser = "idUsuario";
     }
 
     public static class FeedEntryMatch implements BaseColumns {
         public static final String TABLE_NAME = "match";
         public static final String COLUMN_USER = "id_usuario";
+        public static final String COLUMN_USER_PROPER = "id_usuario_proper";
         public static final String COLUMN_ARTICLE = "_id_article";
     }
 
@@ -54,7 +56,7 @@ public class modelBase extends SQLiteOpenHelper {
                     FeedEntryUsuario._ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
                     FeedEntryUsuario.COLUMN_NAME + TEXT_TYPE + "," +
                     FeedEntryUsuario.COLUMN_CORREO + TEXT_TYPE + "," +
-                    FeedEntryUsuario.COLUMN_UBI + TEXT_TYPE + "," +
+                    //FeedEntryUsuario.COLUMN_UBI + TEXT_TYPE + "," +
                     FeedEntryUsuario.COLUMN_PASS + TEXT_TYPE + "," +
                     FeedEntryUsuario.COLUMN_TEL + TEXT_TYPE + "," +
                     FeedEntryUsuario.COLUMN_ACTIVO + INT_TYPE + " )";
@@ -73,6 +75,7 @@ public class modelBase extends SQLiteOpenHelper {
             "CREATE TABLE " + FeedEntryMatch.TABLE_NAME + " (" +
                     FeedEntryMatch._ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
                     FeedEntryMatch.COLUMN_USER + INT_TYPE + "," +
+                    FeedEntryMatch.COLUMN_USER_PROPER + INT_TYPE + "," +
                     FeedEntryMatch.COLUMN_ARTICLE + INT_TYPE +")";
 
     private static final String SQL_DELETE_ENTRIESUsuario =

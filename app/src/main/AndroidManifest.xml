@@ -3,6 +3,9 @@
     package="nowoscmexico.com.tradinggames_1">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -34,7 +37,7 @@
 
         <meta-data
             android:name="android.app.searchable"
-            android:resource="@xml/searchable"></meta-data>
+            android:resource="@xml/searchable" />
 
         <activity
             android:name=".game.SimpleViewG"
@@ -70,14 +73,13 @@
 
             <meta-data
                 android:name="android.app.searchable"
-                android:resource="@xml/searchable"></meta-data>
+                android:resource="@xml/searchable" />
         </activity>
         <activity
             android:name=".GalleryActivity"
             android:label="@string/title_activity_gallery"
-            android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity android:name=".LogInActivity"></activity>
     </application>
 
 </manifest>

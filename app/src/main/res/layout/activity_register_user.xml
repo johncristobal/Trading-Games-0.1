@@ -15,23 +15,23 @@
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
+            android:layout_height="220dp"
             android:background="@drawable/logoend"
-            app:popupTheme="@style/AppTheme.PopupOverlay"
-            android:layout_height="300dp"
-            app:titleMarginBottom="20dp"
             android:gravity="bottom"
-            android:paddingBottom="30dp">
+            android:paddingBottom="30dp"
+            app:popupTheme="@style/AppTheme.PopupOverlay"
+            app:titleMarginBottom="20dp">
 
-        <TextView
-            android:text="Registro"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/textView5"
-            android:layout_marginBottom="20dp"
-            android:gravity="center"
-            android:typeface="monospace"
-            android:textSize="20sp"
-            android:layout_marginRight="30dp" />
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:layout_marginRight="30dp"
+                android:gravity="center"
+                android:text="Registro"
+                android:textSize="20sp"
+                android:typeface="monospace" />
 
         </android.support.v7.widget.Toolbar>
 

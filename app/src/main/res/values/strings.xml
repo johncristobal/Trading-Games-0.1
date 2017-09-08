@@ -33,9 +33,14 @@
     <string name="title_activity_add_game">AddGame</string>
     <string name="title_activity_register_user">RegisterUser</string>
 
-    <string name="dbversion">28</string>
+    <string name="dbversion">30</string>
     <string name="dbname">TrendinGames</string>
     <string name="title_activity_search">SearchActivity</string>
     <string name="title_activity_gallery">GalleryActivity</string>
+
+    <string name="tomafoto">Tomar foto</string>
+    <string name="galeria">Elegir de la galeria</string>
+
+    <string name="bucket">gs://tradinggames-a6047.appspot.com/</string>
 
 </resources>

@@ -1,13 +1,23 @@
 package nowoscmexico.com.tradinggames_1;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -28,8 +38,54 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Exclude;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
+import org.joda.time.Days;
+import org.joda.time.LocalDate;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+
+import nowoscmexico.com.tradinggames_1.DataBase.ArticuloDao;
+import nowoscmexico.com.tradinggames_1.DataBase.HilosWS;
+import nowoscmexico.com.tradinggames_1.DataBase.WSTask;
+import nowoscmexico.com.tradinggames_1.DataBase.modelBase;
+import nowoscmexico.com.tradinggames_1.game.AddGame;
+import nowoscmexico.com.tradinggames_1.game.GamesActivity;
 import nowoscmexico.com.tradinggames_1.game.SimpleViewG;
 import nowoscmexico.com.tradinggames_1.user.UserActivity;
+
+import static android.R.attr.bitmap;
 
 public class GalleryActivity extends AppCompatActivity {
 
@@ -37,23 +93,37 @@ public class GalleryActivity extends AppCompatActivity {
     //unicamente listas de datos...nada en tablas...diccionarios...
     // Ok => listas de objetos DAO
 
-    Integer[] imageIDs = {
+    /*Integer[] imageIDs = {
             R.drawable.fifa,
             R.drawable.mario,
             R.drawable.papermario,
             R.drawable.starfox,
             R.drawable.tloz
-    };
+    };*/
+
+    //arraylist with data of games from firebase....
+    public static ArrayList<ArticuloDao> juegosws;
 
     Context context;
     private ImageView imgSelected,imgmatch;
     private TextView videojuego;
+    private Gallery gallery;
     public NavigationView navigationView;
 
     private String gameSelected;
     private String sesion;
     private SharedPreferences sharedPreferences;
     private boolean flag=false;
+
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
+
+    public int numArticulos;
+    public int contadorArticulos;
+
+    public ArrayList<ImageView> imagenes;
+
+    public int flagcorrido;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +135,15 @@ public class GalleryActivity extends AppCompatActivity {
 
         context = this;
 
+        imagenes = new ArrayList<>();
+
+        flagcorrido = 0;
+        //FirebaseStorage storage = FirebaseStorage.getInstance();
+        //StorageReference storageRef = storage.getReferenceFromUrl(getString(R.string.bucket));
+
+        //FirebaseStorage storage = FirebaseStorage.getInstance();
+        //StorageReference storageRef = storage.getReferenceFromUrl("gs://tradinggames-a6047.appspot.com/");
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,6 +152,11 @@ public class GalleryActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+        /*LocalDate date1 = new LocalDate(2015, 04, 29);
+        LocalDate date2 = new LocalDate(2017, 04, 30);
+        int days = Days.daysBetween(date1, date2).getDays();
+        Toast.makeText(this,days+"",Toast.LENGTH_LONG).show();*/
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -92,33 +176,208 @@ public class GalleryActivity extends AppCompatActivity {
         sesion = sharedPreferences.getString("sesion","null");
 
         videojuego = (TextView)findViewById(R.id.textViewGameView);
-        //imgmatch = (ImageView) findViewById(R.id.imageViewmatch);
-
         // Note that Gallery view is deprecated in Android 4.1---
-        Gallery gallery = (Gallery) findViewById(R.id.gallery1);
-        imgSelected = (ImageView) findViewById(R.id.imageViewgall);
-        gallery.setAdapter(new ImageAdapter(this,imageIDs));
-        gallery.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View v, int position,long id)
-            {
-                Toast.makeText(getBaseContext(),"pic" + (position + 1) + " selected",
-                        Toast.LENGTH_SHORT).show();
+        gallery = (Gallery) findViewById(R.id.gallery1);
 
-                imgSelected.setImageResource(imageIDs[position]);
-                videojuego.setText(imageIDs[position]);
+        /*
+        * Probar glide sin hilos ni nada....puramente...
+        * */
 
-                gameSelected = imageIDs[position]+"";
+        /**************************
+         * Go for the games WS
+         */
+
+        try {
+            /*String namefo = "juegos/miituo.png";
+            Log.w("Name", namefo);
+            storageRef.child(namefo);
+
+            final File localFile = File.createTempFile("images", "jpg");
+
+            storageRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                    // Local temp file has been created
+                    String da = localFile.getAbsolutePath();
+                    Log.w("Jajaja",da);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Handle anyors err
+                    Log.w("Error","Waiting for an answer "+exception.toString());
+                }
+            });*/
+
+            imgSelected = (ImageView) findViewById(R.id.imageViewgall);
+
+            //new Thread(new Runnable() {
+                  //@Override
+                  //public void run() {
+
+                      /*storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener() {
+                          @Override
+                          public void onSuccess(Object o) {
+
+                              String cad = o.toString();
+                              Log.w("oBJE",cad);
+                              try {
+                                  URL url = new URL(cad);
+                                  Bitmap image = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+                                  //comment.setIamgentemp(image);
+                                  //mImageView.setImageBitmap(bitmap);
+                                  //lista.add(comment);
+                                  String cads = image.toString();
+
+                              } catch(Exception e) {
+                                  //System.out.println(e.toString());
+                                  e.printStackTrace();
+                              }
+                          }
+                      }).addOnFailureListener(new OnFailureListener() {
+                          @Override
+                          public void onFailure(@NonNull Exception exception) {
+                              // Handle any errors
+                              Log.w("Error",exception.toString());
+                          }
+                      });*/
+                  //}
+            //}).start();
+
+            //loadImagen();
+
+            saygoodbye();
+
+
+            /*mAuth.signInAnonymously()
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            String TAG = "Temp";
+                            Log.d(TAG, "signInAnonymously:onComplete:" + task.isSuccessful());
+
+
+                            // If sign in fails, display a message to the user. If sign in succeeds
+                            // the auth state listener will be notified and logic to handle the
+                            // signed in user can be handled in the listener.
+                            if (!task.isSuccessful()) {
+                                Log.w(TAG, "signInAnonymously", task.getException());
+                                Toast.makeText(GalleryActivity.this, "Authentication failed.",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+
+                            // ...
+                        }
+                    });*/
+
+
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private void loadImagen() {
+
+        try {
+            StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://tradinggames-a6047.appspot.com/juegos/miituo.png");
+            //StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://tradinggames-a6047.appspot.com/").child(folderuser+"/"+name);
+
+            // Load the image using Glide
+            imgSelected = (ImageView) findViewById(R.id.imageViewgall);
+            imgSelected.setDrawingCacheEnabled(true);
+            imgSelected.buildDrawingCache(true);
+            //final ImageView imageView = new ImageView(GalleryActivity.this);
+
+            Glide.with(GalleryActivity.this)
+                    //.using(new FirebaseImageLoader())
+                    .load("https://firebasestorage.googleapis.com/v0/b/tradinggames-a6047.appspot.com/o/s2YFT93wtFTXE75rjRkSvvdO6Y62%2Fs2YFT93wtFTXE75rjRkSvvdO6Y62_mario%20kart%2064_2.png?alt=media&token=ecb7fc6e-c4eb-4570-8a7b-560070656698")
+                    //.asBitmap()
+                    .into(imgSelected);
+
+            Bitmap image = imgSelected.getDrawingCache();
+
+            int a = 0;
+            a++;
+                /*imageView.setDrawingCacheEnabled(true);
+                imageView.buildDrawingCache(true);
+                Bitmap bitmapts = imageView.getDrawingCache();
+                File file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser+"/"+name);
+                File dir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser);
+                if(!dir.exists())
+                    dir.mkdirs();
+                try
+                {
+                    //file.createNewFile();
+                    FileOutputStream ostream = new FileOutputStream(file);
+                    bitmapts.compress(Bitmap.CompressFormat.JPEG, 100, ostream);
+                    ostream.close();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }*/
+
+            /*String savedImagePath = null;
+
+            //String imageFileName = "JPEG_" + "FILE_NAME" + ".jpg";
+            File storageDir  = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+"s2YFT93wtFTXE75rjRkSvvdO6Y62");
+
+            //File storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)+ "/YOUR_FOLDER_NAME");
+            boolean success = true;
+            if (!storageDir.exists()) {
+                success = storageDir.mkdirs();
             }
-        });
+            if (success) {
+                File imageFile = new File(storageDir, "s2YFT93wtFTXE75rjRkSvvdO6Y62_mario kart 64_1.png");
+                savedImagePath = imageFile.getAbsolutePath();
+                try {
+                    OutputStream fOut = new FileOutputStream(imageFile);
+                    image.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
+                    fOut.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-        videojuego.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(context, SimpleViewG.class);
-                intent.putExtra("nombre","Juego activo from DAO");
-                context.startActivity(intent);
-            }
-        });
+                // Add the image to the system gallery
+                //galleryAddPic(savedImagePath);
+                //Toast.makeText(mContext, "IMAGE SAVED"), Toast.LENGTH_LONG).show();
+            }*/
+
+            //saveImage(imgSelected,folderuser,name);
+                                                /*.into(new SimpleTarget<GlideDrawable>(){
+                                                    @Override
+                                                    public void onResourceReady(GlideDrawable glideDrawable, GlideAnimation<? super GlideDrawable> glideAnimation) {
+                                                        imageView.setImageDrawable(glideDrawable);
+                                                        imageView.setDrawingCacheEnabled(true);
+                                                        //saveImage();
+                                                        saveImage(imageView,folderuser,name);
+                                                    }});*/
+
+                                        /*imageView.setDrawingCacheEnabled(true);
+                                        imageView.buildDrawingCache(true);
+                                        Bitmap bitmapts = imageView.getDrawingCache();
+                                        File file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser+"/"+name);
+                                        File dir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser);
+                                        if(!dir.exists())
+                                            dir.mkdirs();
+                                        try
+                                        {
+                                            //file.createNewFile();
+                                            FileOutputStream ostream = new FileOutputStream(file);
+                                            bitmapts.compress(Bitmap.CompressFormat.JPEG, 100, ostream);
+                                            ostream.close();
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            e.printStackTrace();
+                                        }*/
+            //imagenes.add(imageView);
+
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
 
     }
 
@@ -163,13 +422,17 @@ public class GalleryActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
+/*
+*   Clase imagAdapter para cargar imagenes en gallery
+* */
     public class ImageAdapter extends BaseAdapter {
         private Context context;
         private int itemBackground;
         private Activity activity;
-        private Integer[] imageIDsbase;
+        private ArrayList<ArticuloDao> imageIDsbase;
 
-        public ImageAdapter(Activity activity,Integer [] img)
+        public ImageAdapter(Activity activity,ArrayList<ArticuloDao> img)
         {
             this.activity = activity;
             imageIDsbase = img;
@@ -179,10 +442,11 @@ public class GalleryActivity extends AppCompatActivity {
             itemBackground = a.getResourceId(R.styleable.MyGallery_android_galleryItemBackground, 0);
             a.recycle();
         }
+
         // returns the number of images
         @Override
         public int getCount() {
-            return imageIDsbase.length;
+            return imageIDsbase.size();
         }
         // returns the ID of an item
         @Override
@@ -200,6 +464,7 @@ public class GalleryActivity extends AppCompatActivity {
             public ImageView imgViewFlag;
             public ImageView imgViewStar;
         }
+
         // returns an ImageView view
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
@@ -222,11 +487,30 @@ public class GalleryActivity extends AppCompatActivity {
             else
             {
                 view = (ViewHolder) convertView.getTag();
+                //return convertView;
             }
 
-            view.imgViewFlag.setImageResource(imageIDsbase[position]);
+            //Coloca foto que obtengo de la lista de objeotsç
+            //-----------------------------Checar aqui orque ya no es image resource....es bitmap directamente--------------
+            //view.imgViewFlag.setImageResource(Integer.parseInt(imageIDsbase.get(position).getFoto()));
+
+            /*view.imgViewFlag.setImageBitmap(imageIDsbase.get(position).getIamgentemp());
             RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(450, 250);
-            view.imgViewFlag.setLayoutParams(layoutParams);
+            view.imgViewFlag.setLayoutParams(layoutParams);*/
+
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = 5;
+
+            final String folderuser = imageIDsbase.get(position).getIdusuario();
+            String[] fotos = imageIDsbase.get(position).getFoto().split(",");
+            //Evitr craah en caso que no traiga fotos
+            if (fotos.length > 1) {
+                //Aqui solo recuperamos una foto para mostrar en mainview
+                //for (int i = 0; i < 1; i++) {
+                final String name = fotos[0];
+                Bitmap bmp = BitmapFactory.decodeFile(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser+"/"+name,options);
+                view.imgViewFlag.setImageBitmap(bmp);
+            }
 
             if(sesion.equals("1")){
                 view.imgViewStar.setVisibility(View.VISIBLE);
@@ -243,7 +527,7 @@ public class GalleryActivity extends AppCompatActivity {
                         if(!flag){
                             flag=true;
                             view.imgViewStar.setImageResource(android.R.drawable.btn_star_big_on);
-                            Toast.makeText(activity,"Juego agregado a lista de Match.\n"+imageIDsbase[intt],Toast.LENGTH_SHORT).show();
+                            Toast.makeText(activity,"Juego agregado a lista de Match.\n"+imageIDsbase.get(intt).getFoto(),Toast.LENGTH_SHORT).show();
                         }else{
                             flag=false;
                             view.imgViewStar.setImageResource(android.R.drawable.btn_star);
@@ -251,7 +535,6 @@ public class GalleryActivity extends AppCompatActivity {
                         }
                         //else
                         //Toast.makeText(context,"Juego elimiando de lista de Match.\n"+result[pos],Toast.LENGTH_SHORT).show();
-
                     }else {
                         Intent intent = new Intent(context, UserActivity.class);
                         //intent.putExtra("nombre",gameSelected);
@@ -269,5 +552,473 @@ public class GalleryActivity extends AppCompatActivity {
             imageView.setBackgroundResource(itemBackground);
             return imageView;*/
         }
+    }
+
+    public void saygoodbye(){
+        AsyncTask<Void, Void, Void> sendthelast = new AsyncTask<Void, Void, Void>() {
+            ProgressDialog progress = new ProgressDialog(GalleryActivity.this);
+            String ErrorCode = "";
+            ArrayList<ArticuloDao> lista = new ArrayList<>();
+
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            DatabaseReference myRef = database.getReference();
+
+            @Override
+            protected void onPreExecute() {
+                progress.setTitle("Actualizando");
+                progress.setMessage("Recuperando información...");
+                progress.setIndeterminate(true);
+                progress.setCancelable(false);
+                progress.show();
+            }
+
+            @Override
+            protected void onCancelled() {
+                progress.dismiss();
+                Toast msg = Toast.makeText(getApplicationContext(), ErrorCode, Toast.LENGTH_LONG);
+                msg.show();
+
+                super.onCancelled();
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                //before launch alert, we have to send the confirmReport
+                try {
+                    //call ws to get games...the last games inserted into firebase...?
+                    //meanwhile...
+                    /*ArticuloDao dao1 = new ArticuloDao();
+                    dao1.setPathfoto(""+ R.drawable.fifa);
+                    //dao1.setIamgentemp(BitmapFactory.decodeResource(R.drawable.fifa,0));
+                    dao1.setTitulo("fifa");
+                    lista.add(dao1);
+
+                    ArticuloDao dao2 = new ArticuloDao();
+                    dao2.setPathfoto(""+ R.drawable.mario);
+                    dao2.setTitulo("mario");
+                    lista.add(dao2);
+
+                    ArticuloDao dao3 = new ArticuloDao();
+                    dao3.setPathfoto(""+ R.drawable.papermario);
+                    dao3.setTitulo("papermario");
+                    lista.add(dao3);
+
+
+                    ArticuloDao dao5 = new ArticuloDao();
+                    dao5.setPathfoto(""+ R.drawable.tloz);
+                    dao5.setTitulo("tloz");
+                    lista.add(dao5);*/
+
+                    myRef.child("articulo").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            int size = (int) dataSnapshot.getChildrenCount();
+                            Log.e("Number", "contador:" + size);
+                            numArticulos = size;
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                            Log.d("mensaje","error al cargar datos");
+                        }
+                    });
+
+                    Query recentPostsQuery = myRef.child("articulo").limitToFirst(100);
+
+                    recentPostsQuery.addChildEventListener(new ChildEventListener() {
+                        public static final String TAG = "CHILD";
+
+                        @Override
+                        public void onChildAdded(DataSnapshot dataSnapshot, String s){
+
+                            try {
+                                Log.d(TAG, "onChildAdded:" + dataSnapshot.getChildrenCount());
+                                final ArticuloDao comment = dataSnapshot.getValue(ArticuloDao.class);
+
+                                final String folderuser = comment.getIdusuario();
+                                String[] fotos = comment.getFoto().split(",");
+                                //Evitr craah en caso que no traiga fotos
+                                if (fotos.length > 1) {
+                                    //Aqui solo recuperamos una foto para mostrar en mainview
+                                    //for (int i = 0; i < 1; i++) {
+                                    final String name = fotos[0];
+
+                                    //COn el nombre de la imgaen...recuoero imagen de storage firebase
+                                    try {
+                                        //StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://tradinggames-a6047.appspot.com/").child("s2YFT93wtFTXE75rjRkSvvdO6Y62/s2YFT93wtFTXE75rjRkSvvdO6Y62_mario kart 64_1.png");
+                                        StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://tradinggames-a6047.appspot.com/").child(folderuser+"/"+name);
+
+                                        // Load the image using Glide ---------------- NO
+                                        /*imgSelected = (ImageView) findViewById(R.id.imageViewgall);
+                                        imgSelected.setDrawingCacheEnabled(true);
+                                        imgSelected.buildDrawingCache(true);
+                                        //final ImageView imageView = new ImageView(GalleryActivity.this);
+
+                                        Glide.with(GalleryActivity.this)
+                                                //.using(new FirebaseImageLoader())
+                                                .load(storageRef.getPath())
+                                                //.asBitmap()
+                                                .into(imgSelected);
+
+                                        saveImage(imgSelected,folderuser,name);*/
+
+                                        /*imageView.setDrawingCacheEnabled(true);
+                                        imageView.buildDrawingCache(true);
+                                        Bitmap bitmapts = imageView.getDrawingCache();
+                                        File file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser+"/"+name);
+                                        File dir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser);
+                                        if(!dir.exists())
+                                            dir.mkdirs();
+                                        try
+                                        {
+                                            //file.createNewFile();
+                                            FileOutputStream ostream = new FileOutputStream(file);
+                                            bitmapts.compress(Bitmap.CompressFormat.JPEG, 100, ostream);
+                                            ostream.close();
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            e.printStackTrace();
+                                        }*/
+                                        //imagenes.add(imageView);
+
+
+                                        try {
+                                            //Log.w("file", taskSnapshot.toString());
+                                            //Bitmap image = BitmapFactory.
+                                            //File imageFoto = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser+"/"+name);
+                                            //File image = FileProvider.getUriForFile(this,this.getApplicationContext().getPackageName() + ".provider",new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+username+"_"+polizaFolio+".png")); //new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+username+"_"+polizaFolio+".png");
+                                            /*FileOutputStream out = null;
+                                            try {
+                                                out = new FileOutputStream(localFile.getAbsolutePath());
+                                                image.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
+                                                // PNG is a lossless format, the compression factor (100) is ignored
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
+                                            } finally {
+                                                try {
+                                                    if (out != null) {
+                                                        out.close();
+                                                    }
+                                                } catch (IOException e) {
+                                                    e.printStackTrace();
+                                                }
+                                            }*/
+
+                                            //Bitmap thumbnail = Bitmap.createScaledBitmap(image, image.getWidth()/15, image.getHeight()/15, false);
+                                            //comment.setFoto(localFile.getAbsolutePath());
+
+                                            lista.add(comment);
+
+                                            //imgSelected.setImageBitmap(image);
+                                            //video
+
+                                        }
+                                        catch (Exception e){
+                                            e.printStackTrace();
+                                        }
+
+                                        final File storageDir  = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser);
+
+                                        //File storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)+ "/YOUR_FOLDER_NAME");
+                                        boolean success = true;
+                                        if (!storageDir.exists()) {
+                                            success = storageDir.mkdirs();
+                                        }
+                                        if (success) {
+                                            final File imageFile = new File(storageDir, name);
+                                            /*File imageFile = new File(storageDir, imageFileName);
+                                            savedImagePath = imageFile.getAbsolutePath();
+                                            try {
+                                                OutputStream fOut = new FileOutputStream(imageFile);
+                                                image.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
+                                                fOut.close();
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
+                                            }*/
+
+                                            storageRef.getFile(imageFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                                                @Override
+                                                public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                                                    //Local temp file has been created
+                                                    contadorArticulos++;
+
+                                                    try {
+                                                        /*Log.w("file", taskSnapshot.toString());
+                                                        Bitmap image = BitmapFactory.decodeFile(imageFile.getAbsolutePath());
+                                                        //File imageFoto = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser+"/"+name);
+                                                        //File image = FileProvider.getUriForFile(this,this.getApplicationContext().getPackageName() + ".provider",new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+username+"_"+polizaFolio+".png")); //new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+username+"_"+polizaFolio+".png");
+                                                        FileOutputStream out = null;
+                                                        try {
+                                                            out = new FileOutputStream(imageFile.getAbsolutePath());
+                                                            image.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
+                                                            // PNG is a lossless format, the compression factor (100) is ignored
+
+                                                        } catch (Exception e) {
+                                                            e.printStackTrace();
+                                                        } finally {
+                                                            try {
+                                                                if (out != null) {
+                                                                    out.close();
+                                                                }
+                                                            } catch (IOException e) {
+                                                                e.printStackTrace();
+                                                            }
+                                                        }*/
+
+                                                        //Bitmap thumbnail = Bitmap.createScaledBitmap(image, image.getWidth()/15, image.getHeight()/15, false);
+                                                        //comment.setFoto(localFile.getAbsolutePath());
+
+                                                        //lista.add(comment);
+                                                        //contadorArticulos++;
+
+                                                        //imgSelected.setImageBitmap(image);
+                                                        //video
+
+                                                    if(contadorArticulos == numArticulos) {
+                                                        gallery = (Gallery) findViewById(R.id.gallery1);
+                                                        gallery.setAdapter(new ImageAdapter(GalleryActivity.this, lista));
+                                                        gallery.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                                            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+                                                                Toast.makeText(getBaseContext(), "pic" + (position + 1) + " selected",
+                                                                        Toast.LENGTH_SHORT).show();
+
+                                                                BitmapFactory.Options options = new BitmapFactory.Options();
+                                                                options.inSampleSize = 5;
+
+                                                                Bitmap bmp = BitmapFactory.decodeFile(lista.get(position).getFoto(), options);
+                                                                imgSelected.setImageBitmap(bmp);
+                                                                //imgSelected.setImageResource(Integer.parseInt(juegosws.get(position).getPathfoto()));
+                                                                videojuego.setText(lista.get(position).getTitulo());
+
+                                                                gameSelected = lista.get(position).getFoto() + "";
+                                                            }
+                                                        });
+
+                                                        //open view with description of game
+                                                        videojuego.setOnClickListener(new View.OnClickListener() {
+                                                            @Override
+                                                            public void onClick(View view) {
+                                                                Intent intent = new Intent(context, SimpleViewG.class);
+                                                                intent.putExtra("nombre", "Juego activo from DAO");
+                                                                context.startActivity(intent);
+                                                            }
+                                                        });
+                                                        progress.dismiss();
+                                                    }
+                                                    }
+                                                    catch (Exception e){
+                                                        e.printStackTrace();
+                                                    }
+                                                }
+                                            }).addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception exception) {
+                                                    // Handle any errors
+                                                    Log.w("file", exception.toString());
+                                                }
+                                            });
+
+                                        }
+
+                                        //final File localFile = File.createTempFile("images", "jpg");
+
+                                    }
+                                    catch(Exception e){
+                                        e.printStackTrace();
+                                    }
+                                    //}
+                                }
+
+                                //juegosws = lista;
+                            }catch(Exception e){
+                                e.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void onChildChanged(DataSnapshot dataSnapshot, String s) {}
+
+                        @Override
+                        public void onChildRemoved(DataSnapshot dataSnapshot) {}
+
+                        @Override
+                        public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {}
+                    });
+
+                    //juegosws = lista;
+                    }
+                catch(Exception e){
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+
+                /*if (res.equals("false") || res.equals("true")) {
+
+                    new android.app.AlertDialog.Builder(LastOdometerActivity.this)
+                            .setTitle("Odómetro Reportado")
+                            .setMessage("El odómetro fue reportado con exito")
+                            .setIcon(R.drawable.miituo)
+                            .setCancelable(false)
+                            .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    //progresslast.dismiss();
+                                    //finalizamos....
+                                    //IinfoClient.getInfoClientObject().getPolicies().setReportState(13);
+
+                                    Intent i = new Intent(LastOdometerActivity.this, SyncActivity.class);
+                                    startActivity(i);
+                                }
+                            })
+                            .show();
+                }else{
+                    new android.app.AlertDialog.Builder(LastOdometerActivity.this)
+                            .setTitle("Odómetro no reportado")
+                            .setMessage("Problema al reportar odómetro, intente más tarde.")
+                            .setIcon(R.drawable.miituo)
+                            .setCancelable(false)
+                            .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    //progresslast.dismiss();
+                                    Intent i = new Intent(LastOdometerActivity.this, SyncActivity.class);
+                                    startActivity(i);
+                                }
+                            })
+                            .show();
+                }*/
+
+                /*if(!ws.equals("0") || !ws.equals("")){
+                    new android.app.AlertDialog.Builder(AddGame.this)
+                            .setTitle("Nivel completo!")
+                            .setMessage("Tu juego está en línea ahora.")
+                            .setCancelable(false)
+                            .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    //progresslast.dismiss();
+                                    //finalizamos....
+                                    //IinfoClient.getInfoClientObject().getPolicies().setReportState(13);
+
+                                    Intent i = new Intent(AddGame.this,GamesActivity.class);
+                                    startActivity(i);
+                                }
+                            })
+                            .show();
+
+                }else{
+                    new android.app.AlertDialog.Builder(AddGame.this)
+                            .setTitle("Game Over!")
+                            .setMessage("No pudimos completar la operación. Intenta más tarde.")
+                            .setCancelable(false)
+                            //.setIcon(R.drawable.)
+                            .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    //progresslast.dismiss();
+                                    //finalizamos....
+                                    //IinfoClient.getInfoClientObject().getPolicies().setReportState(13);
+
+                                    Intent i = new Intent(AddGame.this,GamesActivity.class);
+                                    startActivity(i);
+                                }
+                            })
+                            .show();
+                }*/
+
+                //imgmatch = (ImageView) findViewById(R.id.imageViewmatch);
+                //videojuego = (TextView)findViewById(R.id.textViewGameView);
+                // Note that Gallery view is deprecated in Android 4.1---
+                //Gallery gallery = (Gallery) findViewById(R.id.gallery1);
+
+                //imgSelected = (ImageView) findViewById(R.id.imageViewgall);
+                /*gallery.setAdapter(new ImageAdapter(GalleryActivity.this,juegosws));
+                gallery.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    public void onItemClick(AdapterView<?> parent, View v, int position,long id)
+                    {
+                        Toast.makeText(getBaseContext(),"pic" + (position + 1) + " selected",
+                                Toast.LENGTH_SHORT).show();
+
+                        imgSelected.setImageResource(Integer.parseInt(juegosws.get(position).getPathfoto()));
+                        videojuego.setText(juegosws.get(position).getTitulo());
+
+                        gameSelected = juegosws.get(position).getPathfoto()+"";
+                    }
+                });
+
+                //open view with description of game
+                videojuego.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(context, SimpleViewG.class);
+                        intent.putExtra("nombre","Juego activo from DAO");
+                        context.startActivity(intent);
+                    }
+                });*/
+                //video
+                //progress.dismiss();
+            }
+
+            private String saveImage(ImageView imagev,String folderuser,String imageFileName) {
+
+                Bitmap image = imagev.getDrawingCache();
+                /*imageView.setDrawingCacheEnabled(true);
+                imageView.buildDrawingCache(true);
+                Bitmap bitmapts = imageView.getDrawingCache();
+                File file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser+"/"+name);
+                File dir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser);
+                if(!dir.exists())
+                    dir.mkdirs();
+                try
+                {
+                    //file.createNewFile();
+                    FileOutputStream ostream = new FileOutputStream(file);
+                    bitmapts.compress(Bitmap.CompressFormat.JPEG, 100, ostream);
+                    ostream.close();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }*/
+
+                String savedImagePath = null;
+
+                //String imageFileName = "JPEG_" + "FILE_NAME" + ".jpg";
+                File storageDir  = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser);
+
+                //File storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)+ "/YOUR_FOLDER_NAME");
+                boolean success = true;
+                if (!storageDir.exists()) {
+                    success = storageDir.mkdirs();
+                }
+                if (success) {
+                    File imageFile = new File(storageDir, imageFileName);
+                    savedImagePath = imageFile.getAbsolutePath();
+                    try {
+                        OutputStream fOut = new FileOutputStream(imageFile);
+                        image.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
+                        fOut.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    // Add the image to the system gallery
+                    //galleryAddPic(savedImagePath);
+                    //Toast.makeText(mContext, "IMAGE SAVED"), Toast.LENGTH_LONG).show();
+                }
+                return savedImagePath;
+            }
+        };
+
+        sendthelast.execute();
     }
 }

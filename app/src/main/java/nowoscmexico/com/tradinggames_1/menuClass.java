@@ -71,7 +71,6 @@ public class menuClass implements NavigationView.OnNavigationItemSelectedListene
             Intent intent = new Intent(context, TrendsGames.class);
             intent.putExtra("activity","trends");
             context.startActivity(intent);
-
         } else if(id == R.id.startsesion) {
             Intent intent = new Intent(context, UserActivity.class);
             intent.putExtra("activity","trends");

@@ -13,44 +13,116 @@
     tools:showIn="@layout/activity_user">
 
     <TextView
+        android:id="@+id/textViewTitulo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Crear cuenta"
-        android:id="@+id/textView"
-        android:onClick="sesionOpened"
-        android:layout_below="@+id/button"
-        android:layout_alignEnd="@+id/button"
-        android:layout_marginTop="94dp" />
-
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:inputType="textEmailAddress"
-        android:ems="10"
-        android:id="@+id/editText"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="91dp"
-        android:hint="Correo" />
+        android:layout_marginTop="50dp"
+        android:text="Inicia sesión"
+        android:textColor="@android:color/white"
+        android:textSize="24sp" />
 
     <EditText
+        android:id="@+id/editTextcorreoo"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:inputType="textPassword"
+        android:layout_height="40dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/textViewTitulo"
+        android:layout_marginTop="60dp"
+        android:background="#f7ad7d"
         android:ems="10"
-        android:id="@+id/editText2"
-        android:layout_below="@+id/editText"
-        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:hint="Correo"
+        android:inputType="textEmailAddress" />
+
+    <EditText
+        android:id="@+id/editTextpass"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/editTextcorreoo"
+        android:layout_marginTop="15dp"
+        android:background="#f7ad7d"
+        android:gravity="center"
+        android:ems="10"
         android:hint="Contraseña"
-        android:layout_marginTop="15dp" />
+        android:inputType="textPassword" />
 
     <Button
+        android:id="@+id/buttonIn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Entrar"
-        android:id="@+id/button"
-        android:layout_below="@+id/editText2"
-        android:layout_centerHorizontal="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/editTextpass"
         android:layout_marginTop="15dp"
-        android:onClick="entrarSesion" />
+        android:background="#fff"
+        android:onClick="entrarSesion"
+        android:text="Entrar a mi cuenta" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textViewContrasena"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"
+        android:onClick="sesionOpened"
+        android:text="Crea una cuenta"
+        android:textColor="@android:color/white"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/textViewContrasena"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/buttonIn"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="24dp"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
+        android:text="¿Olvidaste tu contraseña?" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/textView"
+        android:gravity="center"
+        android:layout_marginTop="10dp">
+
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_marginTop="20dp"
+            android:columnCount="2"
+            android:rowCount="1"
+            android:foregroundGravity="center"
+            android:layout_centerHorizontal="true"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/button7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="0"
+                android:layout_row="0"
+                android:textColor="#fff"
+                android:background="@android:color/transparent"
+                android:text="f" />
+
+            <Button
+                android:id="@+id/button6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="1"
+                android:layout_row="0"
+                android:textColor="#fff"
+                android:background="@android:color/transparent"
+                android:text="G+" />
+        </GridLayout>
+    </RelativeLayout>
+
 </RelativeLayout>

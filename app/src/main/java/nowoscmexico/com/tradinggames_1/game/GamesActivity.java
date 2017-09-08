@@ -2,6 +2,7 @@ package nowoscmexico.com.tradinggames_1.game;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.view.View;
@@ -15,9 +16,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import nowoscmexico.com.tradinggames_1.DataBase.DBaseMethods;
+import nowoscmexico.com.tradinggames_1.DataBase.modelBase;
 import nowoscmexico.com.tradinggames_1.R;
 import nowoscmexico.com.tradinggames_1.menuClass;
 
@@ -31,6 +36,7 @@ public class GamesActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_games);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("");
         setSupportActionBar(toolbar);
 
         context = this;
@@ -61,16 +67,32 @@ public class GamesActivity extends AppCompatActivity {
 
         lista = (ListView)findViewById(R.id.listViewgames);
 
-        //Cargar de la base de datos mis games y lanzarlos al view
-        //DBaseMethods.ThreadDBRead read = new DBaseMethods.ThreadDBRead();
-        //ArrayList<Object> elements = read.execute(modelBase.FeedEntryPlatillo.TABLE_NAME).get();
-        ArrayList<Object> elements = new ArrayList<>();
-        elements.add("game1");
-        elements.add("game2");
-        elements.add("game3");
+        /*
+            Now let's read from te database
+         */
 
-        GamesAdapter adapter = new GamesAdapter(this,elements);
-        lista.setAdapter(adapter);
+        try {
+            Typeface typeface = Typeface.createFromAsset(getAssets(), "fonts/HelveticaNeue Light.ttf");
+
+            DBaseMethods.ThreadDBRead read = new DBaseMethods.ThreadDBRead();
+            ArrayList<Object> elements = new ArrayList<>();
+            elements = read.execute(modelBase.FeedEntryArticle.TABLE_NAME).get();
+            if(elements.size() == 0){
+                Toast.makeText(this,"Agrega tu primer juego.",Toast.LENGTH_LONG).show();
+                //Intent intent = new Intent(context, AddGame.class);
+                //intent.putExtra("activity","games");
+                //startActivity(intent);
+            }else{
+                GamesAdapter adapter = new GamesAdapter(this, elements,typeface);
+                lista.setAdapter(adapter);
+            }
+
+            TextView titulo = (TextView)findViewById(R.id.textViewTitle);
+            titulo.setTypeface(typeface);
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override
