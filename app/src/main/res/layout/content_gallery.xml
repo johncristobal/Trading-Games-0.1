@@ -6,45 +6,72 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="nowoscmexico.com.tradinggames_1.GalleryActivity"
+    tools:context="nowoscmexico.com.tradinggames.GalleryActivity"
     tools:showIn="@layout/app_bar_gallery">
 
     <ImageView
         android:id="@+id/imageViewgall"
-        android:layout_height="250dp"
         android:layout_width="match_parent"
-        android:scaleType="center"
+        android:layout_height="300dp"
+        android:layout_gravity="center_horizontal"
         android:layout_weight="1"
-        android:layout_gravity="center_horizontal">
-    </ImageView>
+        android:background="@drawable/backorange"
+        android:scaleType="fitCenter"></ImageView>
 
 
     <Gallery
         android:id="@+id/gallery1"
-        android:layout_marginTop="10dp"
         android:layout_width="fill_parent"
-        android:layout_height="100dp"
+        android:layout_height="130dp"
         android:layout_below="@+id/imageViewgall"
-        android:spacing="1dp"/>
+        android:layout_marginTop="10dp"
+        android:fastScrollEnabled="true"
+        android:scrollingCache="false"
+        android:spacing="1dp" />
 
     <RelativeLayout
         android:id="@+id/relativegame"
         android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_above="@+id/gallery1"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:alpha="0.8"
         android:background="#000000"
-        android:gravity="center_vertical"
-        android:layout_height="50dp"
-        android:layout_alignParentStart="true"
-        android:layout_above="@+id/gallery1">
+        android:gravity="center_vertical">
 
         <TextView
-            android:textColor="@android:color/white"
+            android:id="@+id/textViewGameView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/textViewGameView"
             android:layout_centerVertical="true"
-            android:layout_alignParentStart="true"
+            android:paddingLeft="15dp"
+            android:paddingStart="15dp"
+            android:textColor="@android:color/white"
             android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/textView6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_toLeftOf="@+id/imageView7"
+            android:layout_toStartOf="@+id/imageView7"
+            android:text="Ver detalles..."
+            android:textColor="?attr/colorPrimary" />
+
+        <ImageView
+            android:id="@+id/imageView7"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:src="@android:drawable/ic_dialog_info" />
     </RelativeLayout>
 
     <!--ImageView

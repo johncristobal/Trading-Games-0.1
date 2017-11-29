@@ -2,31 +2,76 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/app_bar_simple_view_g"
-    tools:context="nowoscmexico.com.tradinggames_1.game.SimpleViewG">
+    tools:context="nowoscmexico.com.tradinggames.game.SimpleViewG">
 
-    <ImageView
+    <!--ImageView
+        android:id="@+id/imageView2"
         android:layout_width="match_parent"
         android:layout_height="250dp"
-        android:id="@+id/imageView2"
-        android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
-        android:src="@drawable/ic_movie" />
+        android:layout_alignParentTop="true"
+        android:src="@drawable/ic_movie"
+        android:layout_alignParentLeft="true" /-->
+    <com.daimajia.slider.library.SliderLayout
+        android:id="@+id/slider"
+        android:layout_width="match_parent"
+        custom:pager_animation="Accordion"
+        custom:auto_cycle="true"
+        custom:indicator_visibility="visible"
+        custom:pager_animation_span="1100"
+        android:layout_height="200dp"/>
 
-    <TextView
+    <com.daimajia.slider.library.Indicators.PagerIndicator
+        android:id="@+id/custom_indicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Categoria"
+        android:gravity="center"
+        custom:selected_color="#0095BF"
+        custom:unselected_color="#55333333"
+        custom:selected_drawable="@drawable/camicon"
+        custom:shape="oval"
+        custom:selected_padding_left="5dp"
+        custom:selected_padding_right="5dp"
+        custom:unselected_padding_left="5dp"
+        custom:unselected_padding_right="5dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        custom:selected_width="6dp"
+        custom:selected_height="6dp"
+        custom:unselected_width="6dp"
+        custom:unselected_height="6dp"
+        android:layout_marginBottom="20dp"
+        />
+    <com.daimajia.slider.library.Indicators.PagerIndicator
+        android:id="@+id/custom_indicator2"
+        style="@style/AndroidImageSlider_Corner_Oval_Orange"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="20dp"
+        />
+    <ListView
+        android:layout_below="@+id/slider"
+        android:id="@+id/transformers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"></ListView>
+
+    <!--TextView
         android:id="@+id/textView2"
-        android:layout_below="@+id/imageView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
+        android:layout_below="@+id/slider"
         android:layout_marginLeft="15dp"
+        android:layout_marginTop="15dp"
+        android:text="Categoria"
         android:textSize="20dp"
-        android:layout_marginTop="15dp" />
+        android:layout_alignParentLeft="true" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -37,14 +82,16 @@
         android:layout_below="@+id/textView2"
         android:layout_alignParentStart="true"
         android:layout_marginLeft="15dp"
-        android:layout_marginTop="20dp" />
+        android:layout_marginTop="20dp"
+        android:layout_alignParentLeft="true" /-->
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
-        android:background="#dddddd">
+        android:background="#dddddd"
+        android:layout_alignParentLeft="true">
 
         <LinearLayout
             android:orientation="horizontal"

@@ -1,41 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/bg_screen1">
+    android:layout_height="match_parent">
 
-    <ImageView
+    <RelativeLayout
+        android:id="@+id/imagenRel"
+        android:layout_width="match_parent"
+        android:layout_height="310dp"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/backorange2"></RelativeLayout>
+
+    <!--ImageView
         android:id="@+id/imageView7"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="300dp"
+        android:layout_centerHorizontal="true"
         android:onClick="acertado"
-        android:src="@drawable/ic_food"
-        android:layout_centerHorizontal="true" />
-
-    <TextView
-        android:id="@+id/textView6"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingLeft="@dimen/desc_padding"
-        android:paddingRight="@dimen/desc_padding"
-        android:text="@string/slide_1_desc"
-        android:textAlignment="center"
-        android:textColor="@android:color/white"
-        android:textSize="@dimen/slide_desc"
-        android:layout_below="@+id/textView8"
-        android:layout_centerHorizontal="true" />
+        android:src="@drawable/ic_food" /-->
 
     <TextView
         android:id="@+id/textView8"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/slide_1_title"
-        android:textColor="@android:color/white"
-        android:textSize="@dimen/slide_title"
-        android:textStyle="bold"
-        android:layout_below="@+id/imageView7"
+        android:layout_below="@+id/imagenRel"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="94dp" />
+        android:layout_marginTop="30dp"
+        android:padding="5dp"
+        android:text="@string/slide_1_title"
+        android:textAlignment="center"
+        android:textColor="@android:color/black"
+        android:textSize="22sp" />
 
 
 </RelativeLayout>

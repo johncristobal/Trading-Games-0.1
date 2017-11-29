@@ -7,7 +7,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="nowoscmexico.com.tradinggames_1.MainActivity"
+    tools:context="nowoscmexico.com.tradinggames_1.nowoscmexico.com.tradinggames.MainActivity"
     android:background="@drawable/inicio">
 
 </RelativeLayout>

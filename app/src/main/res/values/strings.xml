@@ -1,19 +1,19 @@
 <resources>
-    <string name="app_name">TradingGames_1</string>
+    <string name="app_name">TradingGames</string>
     <string name="title_activity_tutorial">TutorialActivity</string>
 
     <string name="title_activity_welcome">Home Screen</string>
-    <string name="next">NEXT</string>
-    <string name="skip">SKIP</string>
-    <string name="start">GOT IT</string>
+    <string name="next">Siguiente</string>
+    <string name="skip">Anterior</string>
+    <string name="start">Empecemos!</string>
 
-    <string name="slide_1_title">Checa...</string>
+    <string name="slide_1_title">Checa los últimos juegos en línea</string>
     <string name="slide_1_desc">los ultimos juegos en lìnea!</string>
 
-    <string name="slide_2_title">Busca...</string>
+    <string name="slide_2_title">Busca nuevos juegos para pasar el rato</string>
     <string name="slide_2_desc">juegos para divertirte un rato!</string>
 
-    <string name="slide_3_title">Sube...</string>
+    <string name="slide_3_title">Sube tus propios juegos para compartir e intercambiar</string>
     <string name="slide_3_desc">tus propios juegos para compartir e intercambiar!</string>
     <string name="title_activity_trending">trending</string>
     <string name="title_activity_simple_game">SimpleGame</string>
