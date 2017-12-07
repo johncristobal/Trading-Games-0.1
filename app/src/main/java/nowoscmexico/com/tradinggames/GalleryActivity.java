@@ -221,92 +221,8 @@ public class GalleryActivity extends AppCompatActivity {
             //loadImagen();
             saygoodbye();
 
-            try {
-                                                        /*Log.w("file", taskSnapshot.toString());
-                                                        Bitmap image = BitmapFactory.decodeFile(imageFile.getAbsolutePath());
-                                                        //File imageFoto = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser+"/"+name);
-                                                        //File image = FileProvider.getUriForFile(this,this.getApplicationContext().getPackageName() + ".provider",new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+username+"_"+polizaFolio+".png")); //new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+username+"_"+polizaFolio+".png");
-                                                        FileOutputStream out = null;
-                                                        try {
-                                                            out = new FileOutputStream(imageFile.getAbsolutePath());
-                                                            image.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
-                                                            // PNG is a lossless format, the compression factor (100) is ignored
-
-                                                        } catch (Exception e) {
-                                                            e.printStackTrace();
-                                                        } finally {
-                                                            try {
-                                                                if (out != null) {
-                                                                    out.close();
-                                                                }
-                                                            } catch (IOException e) {
-                                                                e.printStackTrace();
-                                                            }
-                                                        }*/
-
-                //Bitmap thumbnail = Bitmap.createScaledBitmap(image, image.getWidth()/15, image.getHeight()/15, false);
-                //comment.setFoto(localFile.getAbsolutePath());
-
-                //lista.add(comment);
-                //contadorArticulos++;
-
-                //imgSelected.setImageBitmap(image);
-                //video
-
-                //if(contadorArticulos == numArticulos) {
-                gallery = (Gallery) findViewById(R.id.gallery1);
-
-                adapter = new ImageAdapter(GalleryActivity.this, lista);
-                //adapter.notifyDataSetChanged();
-                gallery.setAdapter(adapter);
-                gallery.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-                        //Toast.makeText(getBaseContext(), "pic" + (position + 1) + " selected",Toast.LENGTH_SHORT).show();
-
-                        //load imagen to show bigger
-                        /*BitmapFactory.Options options = new BitmapFactory.Options();
-                        options.inSampleSize = 5;
-
-                        Bitmap bmp = BitmapFactory.decodeFile(lista.get(position).getFoto(), options);
-                        imgSelected.setImageBitmap(bmp);*/
-
-                        final String folderuser = lista.get(position).getIdusuario();
-                        String[] fotos = lista.get(position).getFoto().split(",");
-                        //Evitr craah en caso que no traiga fotos
-                        if (fotos.length >= 1) {
-                            //Aqui solo recuperamos una foto para mostrar en mainview
-                            //for (int i = 0; i < 1; i++) {
-                            final String name = fotos[0];
-                            //Bitmap bmp = BitmapFactory.decodeFile(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser+"/"+name,options);
-                            //view.imgViewFlag.setImageBitmap(bmp);
-                            Glide.with(GalleryActivity.this)
-                                    .load(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser+"/"+name)
-                                    .into(imgSelected);
-                        }
-
-                        //set texto into background
-                        videojuego.setText(lista.get(position).getTitulo());
-                        gameSelected = lista.get(position).getFoto() + "";
-
-                        daito = lista.get(position);
-                    }
-                });
-
-                //open view with description of game
-                contenedor.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent intent = new Intent(context, SimpleViewG.class);
-                        intent.putExtra("nombre", daito.getTitulo());
-                        context.startActivity(intent);
-                    }
-                });
-                //progress.dismiss();
-                //}
-            }
-            catch (Exception e){
-                e.printStackTrace();
-            }
+            //GALLERY ADAPTER CODE DELETE
+            //...
 
             //show first element from list
             final String folderuser = lista.get(0).getIdusuario();
@@ -623,6 +539,23 @@ public class GalleryActivity extends AppCompatActivity {
 
             @Override
             protected void onPreExecute() {
+
+                //get num elements into articulo
+                myRef.child("articulo").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        int size = (int) dataSnapshot.getChildrenCount();
+                        Log.e("Number", "contador:" + size);
+                        numArticulos = size;
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                        Log.d("mensaje","error al cargar datos");
+                    }
+                });
+
                 progress.setTitle("Actualizando");
                 progress.setMessage("Recuperando información...");
                 progress.setIndeterminate(true);
@@ -643,24 +576,6 @@ public class GalleryActivity extends AppCompatActivity {
             protected Void doInBackground(Void... params) {
                 //before launch alert, we have to send the confirmReport
                 try {
-                    //call ws to get games...the last games inserted into firebase...?
-
-                    //get num elements into articulo
-                    myRef.child("articulo").addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            int size = (int) dataSnapshot.getChildrenCount();
-                            Log.e("Number", "contador:" + size);
-                            numArticulos = size;
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                            Log.d("mensaje","error al cargar datos");
-                        }
-                    });
-
                     //get articulos from firebase
                     Query recentPostsQuery = myRef.child("articulo").limitToFirst(100);
 
@@ -748,7 +663,7 @@ public class GalleryActivity extends AppCompatActivity {
                                                         //Local temp file has been created
                                                         contadorArticulos++;
 
-                                                        if (contadorArticulos >= 10)
+                                                        if (contadorArticulos >= 7)
                                                             progress.dismiss();
 
                                                         adapter.notifyDataSetChanged();
@@ -768,7 +683,6 @@ public class GalleryActivity extends AppCompatActivity {
                                     }
                                     //}
                                 }
-
                             }catch(Exception e){
                                 e.printStackTrace();
                             }
@@ -798,111 +712,92 @@ public class GalleryActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(Void aVoid) {
 
-                /*if (res.equals("false") || res.equals("true")) {
+                try {
+                /*Log.w("file", taskSnapshot.toString());
+                Bitmap image = BitmapFactory.decodeFile(imageFile.getAbsolutePath());
+                //File imageFoto = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser+"/"+name);
+                //File image = FileProvider.getUriForFile(this,this.getApplicationContext().getPackageName() + ".provider",new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+username+"_"+polizaFolio+".png")); //new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+username+"_"+polizaFolio+".png");
+                FileOutputStream out = null;
+                try {
+                    out = new FileOutputStream(imageFile.getAbsolutePath());
+                    image.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
+                    // PNG is a lossless format, the compression factor (100) is ignored
 
-                    new android.app.AlertDialog.Builder(LastOdometerActivity.this)
-                            .setTitle("Odómetro Reportado")
-                            .setMessage("El odómetro fue reportado con exito")
-                            .setIcon(R.drawable.miituo)
-                            .setCancelable(false)
-                            .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    //progresslast.dismiss();
-                                    //finalizamos....
-                                    //IinfoClient.getInfoClientObject().getPolicies().setReportState(13);
-
-                                    Intent i = new Intent(LastOdometerActivity.this, SyncActivity.class);
-                                    startActivity(i);
-                                }
-                            })
-                            .show();
-                }else{
-                    new android.app.AlertDialog.Builder(LastOdometerActivity.this)
-                            .setTitle("Odómetro no reportado")
-                            .setMessage("Problema al reportar odómetro, intente más tarde.")
-                            .setIcon(R.drawable.miituo)
-                            .setCancelable(false)
-                            .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    //progresslast.dismiss();
-                                    Intent i = new Intent(LastOdometerActivity.this, SyncActivity.class);
-                                    startActivity(i);
-                                }
-                            })
-                            .show();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (out != null) {
+                            out.close();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }*/
 
-                /*if(!ws.equals("0") || !ws.equals("")){
-                    new android.app.AlertDialog.Builder(AddGame.this)
-                            .setTitle("Nivel completo!")
-                            .setMessage("Tu juego está en línea ahora.")
-                            .setCancelable(false)
-                            .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    //progresslast.dismiss();
-                                    //finalizamos....
-                                    //IinfoClient.getInfoClientObject().getPolicies().setReportState(13);
+                    //Bitmap thumbnail = Bitmap.createScaledBitmap(image, image.getWidth()/15, image.getHeight()/15, false);
+                    //comment.setFoto(localFile.getAbsolutePath());
 
-                                    Intent i = new Intent(AddGame.this,GamesActivity.class);
-                                    startActivity(i);
-                                }
-                            })
-                            .show();
+                    //lista.add(comment);
+                    //contadorArticulos++;
 
-                }else{
-                    new android.app.AlertDialog.Builder(AddGame.this)
-                            .setTitle("Game Over!")
-                            .setMessage("No pudimos completar la operación. Intenta más tarde.")
-                            .setCancelable(false)
-                            //.setIcon(R.drawable.)
-                            .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    //progresslast.dismiss();
-                                    //finalizamos....
-                                    //IinfoClient.getInfoClientObject().getPolicies().setReportState(13);
+                    //imgSelected.setImageBitmap(image);
+                    //video
 
-                                    Intent i = new Intent(AddGame.this,GamesActivity.class);
-                                    startActivity(i);
-                                }
-                            })
-                            .show();
-                }*/
+                    //if(contadorArticulos == numArticulos) {
+                    gallery = (Gallery) findViewById(R.id.gallery1);
 
-                //imgmatch = (ImageView) findViewById(R.id.imageViewmatch);
-                //videojuego = (TextView)findViewById(R.id.textViewGameView);
-                // Note that Gallery view is deprecated in Android 4.1---
-                //Gallery gallery = (Gallery) findViewById(R.id.gallery1);
+                    adapter = new ImageAdapter(GalleryActivity.this, lista);
+                    //adapter.notifyDataSetChanged();
+                    gallery.setAdapter(adapter);
+                    gallery.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+                            //Toast.makeText(getBaseContext(), "pic" + (position + 1) + " selected",Toast.LENGTH_SHORT).show();
 
-                //imgSelected = (ImageView) findViewById(R.id.imageViewgall);
-                /*gallery.setAdapter(new ImageAdapter(GalleryActivity.this,juegosws));
-                gallery.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    public void onItemClick(AdapterView<?> parent, View v, int position,long id)
-                    {
-                        Toast.makeText(getBaseContext(),"pic" + (position + 1) + " selected",
-                                Toast.LENGTH_SHORT).show();
+                            //load imagen to show bigger
+                        /*BitmapFactory.Options options = new BitmapFactory.Options();
+                        options.inSampleSize = 5;
 
-                        imgSelected.setImageResource(Integer.parseInt(juegosws.get(position).getPathfoto()));
-                        videojuego.setText(juegosws.get(position).getTitulo());
+                        Bitmap bmp = BitmapFactory.decodeFile(lista.get(position).getFoto(), options);
+                        imgSelected.setImageBitmap(bmp);*/
 
-                        gameSelected = juegosws.get(position).getPathfoto()+"";
-                    }
-                });
+                            final String folderuser = lista.get(position).getIdusuario();
+                            String[] fotos = lista.get(position).getFoto().split(",");
+                            //Evitr craah en caso que no traiga fotos
+                            if (fotos.length >= 1) {
+                                //Aqui solo recuperamos una foto para mostrar en mainview
+                                //for (int i = 0; i < 1; i++) {
+                                final String name = fotos[0];
+                                //Bitmap bmp = BitmapFactory.decodeFile(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser+"/"+name,options);
+                                //view.imgViewFlag.setImageBitmap(bmp);
+                                Glide.with(GalleryActivity.this)
+                                        .load(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser+"/"+name)
+                                        .into(imgSelected);
+                            }
 
-                //open view with description of game
-                videojuego.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent intent = new Intent(context, SimpleViewG.class);
-                        intent.putExtra("nombre","Juego activo from DAO");
-                        context.startActivity(intent);
-                    }
-                });*/
-                //video
-                //progress.dismiss();
+                            //set texto into background
+                            videojuego.setText(lista.get(position).getTitulo());
+                            gameSelected = lista.get(position).getFoto() + "";
+
+                            daito = lista.get(position);
+                        }
+                    });
+
+                    //open view with description of game
+                    contenedor.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Intent intent = new Intent(context, SimpleViewG.class);
+                            intent.putExtra("nombre", daito.getTitulo());
+                            context.startActivity(intent);
+                        }
+                    });
+                    //progress.dismiss();
+                    //}
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                }
             }
 
             private String saveImage(ImageView imagev,String folderuser,String imageFileName) {

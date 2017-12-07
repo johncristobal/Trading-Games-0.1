@@ -262,7 +262,7 @@ public class AddGame extends AppCompatActivity {
         /*
         * Subir foto a firebase...recuperar path de donde se guardo para enviarla aqui como parametro
         * */
-        String foto = "pathfoto";
+        //String foto = "pathfoto";
 
         if(name.equals("")){
             nombre.setFocusable(true);
