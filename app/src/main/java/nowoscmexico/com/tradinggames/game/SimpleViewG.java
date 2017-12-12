@@ -38,7 +38,7 @@ public class SimpleViewG extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,BaseSliderView.OnSliderClickListener, ViewPagerEx.OnPageChangeListener {
 
     public LinearLayout contactar;
-    public TextView categoria,descripcion;
+    public TextView categoriaTV,descripcionTV;
 
     private SliderLayout mDemoSlider;
 
@@ -83,10 +83,12 @@ public class SimpleViewG extends AppCompatActivity
 
         contactar = (LinearLayout)findViewById(R.id.contactarDueno);
 
-        /*
-        categoria = (TextView)findViewById(R.id.textView2);
-        descripcion = (TextView)findViewById(R.id.textView3);
-        */
+        categoriaTV = (TextView)findViewById(R.id.textViewcategoria);
+        descripcionTV = (TextView)findViewById(R.id.textViewdescripcion);
+
+        categoriaTV.setText(categoria);
+        descripcionTV.setText(descripcion);
+
         final String folderuser = usuario;
         String[] fotos = foto.split(",");
         HashMap<String,String> url_maps = new HashMap<String, String>();
@@ -118,9 +120,11 @@ public class SimpleViewG extends AppCompatActivity
         for(String name : url_maps.keySet()){
             TextSliderView textSliderView = new TextSliderView(this);
             // initialize a SliderLayout
+            final File storageDir = new File(url_maps.get(name));
+
             textSliderView
                     //.description(name)
-                    .image(url_maps.get(name))
+                    .image(storageDir)
                     .setScaleType(BaseSliderView.ScaleType.Fit)
                     .setOnSliderClickListener(this);
 
@@ -139,7 +143,9 @@ public class SimpleViewG extends AppCompatActivity
         mDemoSlider.stopAutoCycle();
 
         //when clic on list, change type transformer
-        ListView l = (ListView)findViewById(R.id.transformers);
+
+        mDemoSlider.setPresetTransformer("RotateUp");
+        /*ListView l = (ListView)findViewById(R.id.transformers);
         l.setAdapter(new TransformerAdapter(this));
         l.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -147,7 +153,7 @@ public class SimpleViewG extends AppCompatActivity
                 mDemoSlider.setPresetTransformer(((TextView) view).getText().toString());
                 Toast.makeText(SimpleViewG.this, ((TextView) view).getText().toString(), Toast.LENGTH_SHORT).show();
             }
-        });
+        });*/
     }
 
     @Override
