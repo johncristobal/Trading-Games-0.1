@@ -135,7 +135,18 @@ public class GamesAdapter extends BaseAdapter {
         update.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(context,"updating game: "+pos, Toast.LENGTH_LONG).show();
+
+                Intent i = new Intent(context,UpdateGame.class);
+                i.putExtra("nombre",dao.getTitulo());
+                i.putExtra("descripcion",dao.getDescripcion());
+                i.putExtra("categoria",dao.getCategoria());
+                i.putExtra("foto",dao.getFoto());
+                i.putExtra("id",dao.getId());
+
+                context.startActivity(i);
+
+                //abrir vista (single view to edit)
+                //Toast.makeText(context,"updating game: "+pos, Toast.LENGTH_LONG).show();
             }
         });
 

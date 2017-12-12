@@ -116,7 +116,6 @@ public class AddGame extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         Typeface typeface = Typeface.createFromAsset(getAssets(), "fonts/HelveticaNeue Light.ttf");
-
         //get variables
         nombre = (EditText)findViewById(R.id.editTextnombre);
         descripcion = (EditText)findViewById(R.id.editTextdescripcion);

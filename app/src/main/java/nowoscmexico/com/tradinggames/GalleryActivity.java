@@ -537,6 +537,15 @@ public class GalleryActivity extends AppCompatActivity {
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             DatabaseReference myRef = database.getReference();
 
+            public void borrarDB(){
+
+            }
+
+            //cargar articulo a la base ddatos
+            public void cargararticulo(ArticuloDao dao){
+
+            }
+
             @Override
             protected void onPreExecute() {
 
@@ -551,7 +560,6 @@ public class GalleryActivity extends AppCompatActivity {
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-
                         Log.d("mensaje","error al cargar datos");
                     }
                 });
@@ -591,6 +599,12 @@ public class GalleryActivity extends AppCompatActivity {
                                 final ArticuloDao comment = dataSnapshot.getValue(ArticuloDao.class);
                                 lista.add(comment);
 
+                                /*
+                                //Aqui me falta borrar base de datos local y cargar nueva informacion...
+                                borrarDB();
+                                cargararticulo(comment);
+                                */
+
                                 final String folderuser = comment.getIdusuario();
                                 String[] fotos = comment.getFoto().split(",");
                                 //Evitr craah en caso que no traiga fotos
@@ -605,38 +619,6 @@ public class GalleryActivity extends AppCompatActivity {
                                             //StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://tradinggames-a6047.appspot.com/").child("s2YFT93wtFTXE75rjRkSvvdO6Y62/s2YFT93wtFTXE75rjRkSvvdO6Y62_mario kart 64_1.png");
                                             StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://tradinggames-a6047.appspot.com/").child(folderuser + "/" + name);
 
-                                            // Load the image using Glide ---------------- NO
-                                            /*imgSelected = (ImageView) findViewById(R.id.imageViewgall);
-                                            imgSelected.setDrawingCacheEnabled(true);
-                                            imgSelected.buildDrawingCache(true);
-                                            //final ImageView imageView = new ImageView(GalleryActivity.this);
-
-                                            Glide.with(GalleryActivity.this)
-                                                    //.using(new FirebaseImageLoader())
-                                                    .load(storageRef.getPath())
-                                                    //.asBitmap()
-                                                    .into(imgSelected);
-
-                                            saveImage(imgSelected,folderuser,name);*/
-
-                                            /*imageView.setDrawingCacheEnabled(true);
-                                            imageView.buildDrawingCache(true);
-                                            Bitmap bitmapts = imageView.getDrawingCache();
-                                            File file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser+"/"+name);
-                                            File dir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser);
-                                            if(!dir.exists())
-                                                dir.mkdirs();
-                                            try
-                                            {
-                                                //file.createNewFile();
-                                                FileOutputStream ostream = new FileOutputStream(file);
-                                                bitmapts.compress(Bitmap.CompressFormat.JPEG, 100, ostream);
-                                                ostream.close();
-                                            }
-                                            catch (Exception e)
-                                            {
-                                                e.printStackTrace();
-                                            }*/
                                             //imagenes.add(imageView);
                                             final File storageDir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + File.separator + folderuser);
 
@@ -713,37 +695,6 @@ public class GalleryActivity extends AppCompatActivity {
             protected void onPostExecute(Void aVoid) {
 
                 try {
-                /*Log.w("file", taskSnapshot.toString());
-                Bitmap image = BitmapFactory.decodeFile(imageFile.getAbsolutePath());
-                //File imageFoto = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser+"/"+name);
-                //File image = FileProvider.getUriForFile(this,this.getApplicationContext().getPackageName() + ".provider",new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+username+"_"+polizaFolio+".png")); //new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+username+"_"+polizaFolio+".png");
-                FileOutputStream out = null;
-                try {
-                    out = new FileOutputStream(imageFile.getAbsolutePath());
-                    image.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
-                    // PNG is a lossless format, the compression factor (100) is ignored
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    try {
-                        if (out != null) {
-                            out.close();
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }*/
-
-                    //Bitmap thumbnail = Bitmap.createScaledBitmap(image, image.getWidth()/15, image.getHeight()/15, false);
-                    //comment.setFoto(localFile.getAbsolutePath());
-
-                    //lista.add(comment);
-                    //contadorArticulos++;
-
-                    //imgSelected.setImageBitmap(image);
-                    //video
-
                     //if(contadorArticulos == numArticulos) {
                     gallery = (Gallery) findViewById(R.id.gallery1);
 
@@ -761,25 +712,25 @@ public class GalleryActivity extends AppCompatActivity {
                         Bitmap bmp = BitmapFactory.decodeFile(lista.get(position).getFoto(), options);
                         imgSelected.setImageBitmap(bmp);*/
 
-                            final String folderuser = lista.get(position).getIdusuario();
-                            String[] fotos = lista.get(position).getFoto().split(",");
-                            //Evitr craah en caso que no traiga fotos
-                            if (fotos.length >= 1) {
-                                //Aqui solo recuperamos una foto para mostrar en mainview
-                                //for (int i = 0; i < 1; i++) {
-                                final String name = fotos[0];
-                                //Bitmap bmp = BitmapFactory.decodeFile(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser+"/"+name,options);
-                                //view.imgViewFlag.setImageBitmap(bmp);
-                                Glide.with(GalleryActivity.this)
-                                        .load(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser+"/"+name)
-                                        .into(imgSelected);
-                            }
+                        final String folderuser = lista.get(position).getIdusuario();
+                        String[] fotos = lista.get(position).getFoto().split(",");
+                        //Evitr craah en caso que no traiga fotos
+                        if (fotos.length >= 1) {
+                            //Aqui solo recuperamos una foto para mostrar en mainview
+                            //for (int i = 0; i < 1; i++) {
+                            final String name = fotos[0];
+                            //Bitmap bmp = BitmapFactory.decodeFile(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser+"/"+name,options);
+                            //view.imgViewFlag.setImageBitmap(bmp);
+                            Glide.with(GalleryActivity.this)
+                                    .load(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser+"/"+name)
+                                    .into(imgSelected);
+                        }
 
-                            //set texto into background
-                            videojuego.setText(lista.get(position).getTitulo());
-                            gameSelected = lista.get(position).getFoto() + "";
+                        //set texto into background
+                        videojuego.setText(lista.get(position).getTitulo());
+                        gameSelected = lista.get(position).getFoto() + "";
 
-                            daito = lista.get(position);
+                        daito = lista.get(position);
                         }
                     });
 
@@ -789,6 +740,10 @@ public class GalleryActivity extends AppCompatActivity {
                         public void onClick(View view) {
                             Intent intent = new Intent(context, SimpleViewG.class);
                             intent.putExtra("nombre", daito.getTitulo());
+                            intent.putExtra("foto", daito.getFoto());
+                            intent.putExtra("descripcion", daito.getDescripcion());
+                            intent.putExtra("categoria", daito.getCategoria());
+                            intent.putExtra("usuario", daito.getIdusuario());
                             context.startActivity(intent);
                         }
                     });

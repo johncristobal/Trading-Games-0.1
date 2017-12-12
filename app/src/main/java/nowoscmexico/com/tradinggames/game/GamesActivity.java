@@ -73,6 +73,7 @@ public class GamesActivity extends AppCompatActivity {
         try {
             Typeface typeface = Typeface.createFromAsset(getAssets(), "fonts/HelveticaNeue Light.ttf");
 
+            //leo articulos de la base de datos y los muestro aqui...
             DBaseMethods.ThreadDBRead read = new DBaseMethods.ThreadDBRead();
             ArrayList<Object> elements = new ArrayList<>();
             elements = read.execute(modelBase.FeedEntryArticle.TABLE_NAME).get();

@@ -42,5 +42,6 @@
     <string name="galeria">Elegir de la galeria</string>
 
     <string name="bucket">gs://tradinggames-a6047.appspot.com/</string>
+    <string name="title_activity_update_game">UpdateGame</string>
 
 </resources>

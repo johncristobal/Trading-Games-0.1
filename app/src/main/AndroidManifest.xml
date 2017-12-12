@@ -14,19 +14,20 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="nowoscmexico.com.tradinggames.MainActivity"
+            android:name=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name="nowoscmexico.com.tradinggames.tuto.TutorialActivity"
+            android:name=".tuto.TutorialActivity"
             android:label="@string/title_activity_tutorial"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="nowoscmexico.com.tradinggames.TrendsGames"
+            android:name=".TrendsGames"
             android:label="@string/title_activity_trends_games"
             android:theme="@style/AppTheme.NoActionBar" />
 
@@ -35,31 +36,31 @@
             android:resource="@xml/searchable" />
 
         <activity
-            android:name="nowoscmexico.com.tradinggames.game.SimpleViewG"
+            android:name=".game.SimpleViewG"
             android:label="@string/title_activity_simple_view_g"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="nowoscmexico.com.tradinggames.user.UserActivity"
+            android:name=".user.UserActivity"
             android:label="@string/title_activity_user"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="nowoscmexico.com.tradinggames.game.MatchActivity"
+            android:name=".game.MatchActivity"
             android:label="@string/title_activity_match"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="nowoscmexico.com.tradinggames.game.GamesActivity"
+            android:name=".game.GamesActivity"
             android:label="@string/title_activity_games"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="nowoscmexico.com.tradinggames.game.AddGame"
+            android:name=".game.AddGame"
             android:label="@string/title_activity_add_game"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="nowoscmexico.com.tradinggames.user.RegisterUser"
+            android:name=".user.RegisterUser"
             android:label="@string/title_activity_register_user"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="nowoscmexico.com.tradinggames.SearchActivity"
+            android:name=".SearchActivity"
             android:label="@string/title_activity_search"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -71,10 +72,14 @@
                 android:resource="@xml/searchable" />
         </activity>
         <activity
-            android:name="nowoscmexico.com.tradinggames.GalleryActivity"
+            android:name=".GalleryActivity"
             android:label="@string/title_activity_gallery"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".LogInActivity" />
+        <activity
+            android:name=".game.UpdateGame"
+            android:label="@string/title_activity_update_game"
             android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity android:name="nowoscmexico.com.tradinggames.LogInActivity"></activity>
     </application>
 
 </manifest>

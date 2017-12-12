@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -19,14 +20,17 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.daimajia.slider.library.Animations.DescriptionAnimation;
 import com.daimajia.slider.library.SliderLayout;
 import com.daimajia.slider.library.SliderTypes.BaseSliderView;
 import com.daimajia.slider.library.SliderTypes.TextSliderView;
 import com.daimajia.slider.library.Tricks.ViewPagerEx;
 
+import java.io.File;
 import java.util.HashMap;
 
+import nowoscmexico.com.tradinggames.GalleryActivity;
 import nowoscmexico.com.tradinggames.user.UserActivity;
 import nowoscmexico.com.tradinggames.R;
 
@@ -47,6 +51,10 @@ public class SimpleViewG extends AppCompatActivity
 
         Intent intent = getIntent();
         String tit = intent.getStringExtra("nombre");
+        String foto = intent.getStringExtra("foto");
+        String descripcion = intent.getStringExtra("descripcion");
+        String categoria = intent.getStringExtra("categoria");
+        String usuario = intent.getStringExtra("usuario");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(tit);
@@ -74,14 +82,32 @@ public class SimpleViewG extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);*/
 
         contactar = (LinearLayout)findViewById(R.id.contactarDueno);
-        //categoria = (TextView)findViewById(R.id.textView2);
-        //descripcion = (TextView)findViewById(R.id.textView3);
 
+        /*
+        categoria = (TextView)findViewById(R.id.textView2);
+        descripcion = (TextView)findViewById(R.id.textView3);
+        */
+        final String folderuser = usuario;
+        String[] fotos = foto.split(",");
+        HashMap<String,String> url_maps = new HashMap<String, String>();
+
+        //Evitr craah en caso que no traiga fotos
+        if (fotos.length >= 1) {
+            //Aqui solo recuperamos una foto para mostrar en mainview
+            for (int i = 0; i < fotos.length; i++) {
+                final String name = fotos[i];
+
+                url_maps.put("tit"+i, getExternalFilesDir(Environment.DIRECTORY_PICTURES)+ File.separator+folderuser+"/"+name);
+            }
+        }
+
+        /*
         HashMap<String,Integer> url_maps = new HashMap<String, Integer>();
         url_maps.put("Hannibal", R.drawable.papermario);
         url_maps.put("Big Bang Theory", R.drawable.tloz);
         url_maps.put("House of Cards", R.drawable.mario);
         url_maps.put("Game of Thrones", R.drawable.starfox);
+        */
 
         /*HashMap<String,Integer> file_maps = new HashMap<String, Integer>();
         file_maps.put("Hannibal",R.drawable.hannibal);
