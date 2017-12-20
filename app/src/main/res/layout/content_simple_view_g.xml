@@ -128,9 +128,9 @@
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/textViewcategoria"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/slider"
         android:text="Categoría:"
         android:textStyle="bold" />
 
@@ -139,9 +139,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/slider"
+        android:layout_marginLeft="5dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="10dp"
         android:layout_toEndOf="@+id/textView2"
         android:layout_toRightOf="@+id/textView2"
-        android:text="TextView" />
+        android:text="TextView"
+        android:textSize="20sp" />
 
     <TextView
         android:id="@+id/textView10"
@@ -150,7 +154,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/textView2"
-        android:layout_marginTop="14dp"
+        android:layout_marginTop="16dp"
         android:text="Descripción:"
         android:textStyle="bold" />
 
@@ -158,9 +162,12 @@
         android:id="@+id/textViewdescripcion"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/textView10"
+        android:layout_alignBottom="@+id/textView10"
+        android:layout_marginLeft="5dp"
+        android:layout_marginStart="5dp"
         android:layout_toEndOf="@+id/textView10"
         android:layout_toRightOf="@+id/textView10"
-        android:text="TextView" />
+        android:text="TextView"
+        android:textSize="20sp" />
 
 </RelativeLayout>

@@ -84,9 +84,12 @@ public class AddGame extends AppCompatActivity {
     public File photoFile = null;
     public String mCurrentPhotoPath;
     public ArrayList<ImageView> imagenesReales;
+    public boolean[] imagenes = {false,false,false,false};
+
     private int FRONT_VEHICLE = 1;
 
     ProgressDialog progress;
+    private Bitmap bmp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -273,7 +276,7 @@ public class AddGame extends AppCompatActivity {
             return;
         }
         if(sinimagenes()){
-            Toast.makeText(this,"Suba al menos una imagen",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,"Sube al menos una imagen",Toast.LENGTH_SHORT).show();
             return;
         }
         try{
@@ -430,99 +433,95 @@ public class AddGame extends AppCompatActivity {
                             .show();
                 }
             }
-        };
 
-        sendthelast.execute();
-    }
+            private String insertarFB(String tableName, String name, String desc, String catego, String fotofull, String datestring, String iduse) {
 
-    private String insertarFB(String tableName, String name, String desc, String catego, String fotofull, String datestring, String iduse) {
+                try {
+                    String table = tableName;
+                    Log.w("Here",table);
 
-        try {
-            String table = tableName;
-            Log.w("Here",table);
+                    FirebaseDatabase database = FirebaseDatabase.getInstance();
+                    DatabaseReference myRef = database.getReference();
 
-            FirebaseDatabase database = FirebaseDatabase.getInstance();
-            DatabaseReference myRef = database.getReference();
+                    //Thread.sleep(3000);
 
-            //Thread.sleep(3000);
-
-            switch (table){
+                    switch (table){
                 /*Agrega articulo a DB*/
-                case modelBase.FeedEntryArticle.TABLE_NAME:
+                        case modelBase.FeedEntryArticle.TABLE_NAME:
 
-                    //String keyArticle = myRef.child("articulo").push().getKey();
-                    //Log.w("key",keyArticle);
-                    String keyArticle = myRef.child("articulo").push().getKey();
-                    ArticuloDao article = new ArticuloDao(keyArticle,name,desc,catego,fotofull,datestring,iduse);
-                    Map<String, Object> postValuesArticle = article.toMap();
-                    myRef.child("articulo").child(keyArticle).updateChildren(postValuesArticle);
+                            //String keyArticle = myRef.child("articulo").push().getKey();
+                            //Log.w("key",keyArticle);
+                            String keyArticle = myRef.child("articulo").push().getKey();
+                            ArticuloDao article = new ArticuloDao(keyArticle,name,keyArticle,desc,catego,fotofull,datestring,iduse);
+                            Map<String, Object> postValuesArticle = article.toMap();
+                            myRef.child("articulo").child(keyArticle).updateChildren(postValuesArticle);
 
-                    //now...lets try upload an image to firebase...
-                    // Create a storage reference from our app
-                    //use the keyarticle to set the reference with the article....create the bucket
+                            //now...lets try upload an image to firebase...
+                            // Create a storage reference from our app
+                            //use the keyarticle to set the reference with the article....create the bucket
 
-                    String fotos = fotofull;
-                    String iduser = iduse;
+                            String fotos = fotofull;
+                            String iduser = iduse;
 
-                    FirebaseStorage storage = FirebaseStorage.getInstance();
-                    StorageReference storageRef = storage.getReferenceFromUrl("gs://tradinggames-a6047.appspot.com/");
+                            FirebaseStorage storage = FirebaseStorage.getInstance();
+                            StorageReference storageRef = storage.getReferenceFromUrl("gs://tradinggames-a6047.appspot.com/");
 
-                    String [] todasfotos = fotos.split(",");
-                    for(int i=0; i<todasfotos.length;i++){
-                        //here a have the filename from the pictures....
-                        //gt each image from stotraga
-                        File image = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+todasfotos[i]);
-                        Uri uri = Uri.fromFile(image);
+                            String [] todasfotos = fotos.split(",");
+                            for(int i=0; i<todasfotos.length;i++){
+                                //here a have the filename from the pictures....
+                                //gt each image from stotraga
+                                File image = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+todasfotos[i]);
+                                Uri uri = Uri.fromFile(image);
 
-                        // Create file metadata including the content type
-                        StorageMetadata metadata = new StorageMetadata.Builder()
-                                .setContentType("image/png")
-                                .build();
+                                // Create file metadata including the content type
+                                StorageMetadata metadata = new StorageMetadata.Builder()
+                                        .setContentType("image/png")
+                                        .build();
 
-                        StorageReference riversRef = storageRef.child(iduser+"/"+image.getName());
-                        //UploadTask uploadTask = riversRef.putBytes(image,metadata);
-                        UploadTask uploadTask = riversRef.putFile(uri,metadata);
+                                StorageReference riversRef = storageRef.child(iduser+"/"+image.getName());
+                                //UploadTask uploadTask = riversRef.putBytes(image,metadata);
+                                UploadTask uploadTask = riversRef.putFile(uri,metadata);
 
-                        // Register observers to listen for when the download is done or if it fails
-                        uploadTask.addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception exception) {
-                                Log.e("Error","Algo fallo");
-                                exception.printStackTrace();
-                                // Handle unsuccessful uploads
+                                // Register observers to listen for when the download is done or if it fails
+                                uploadTask.addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception exception) {
+                                        Log.e("Error","Algo fallo");
+                                        exception.printStackTrace();
+                                        // Handle unsuccessful uploads
+                                    }
+                                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                    @Override
+                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                        // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+                                        //Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                                        Uri downloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
+                                    }
+                                });
                             }
-                        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                            @Override
-                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
-                                //Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                                Uri downloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
-                            }
-                        });
-                    }
 
 
-                    // Create a reference to "mountains.jpg"
-                    //StorageReference mountainsRef = storageRef.child("mountains.jpg");
+                            // Create a reference to "mountains.jpg"
+                            //StorageReference mountainsRef = storageRef.child("mountains.jpg");
 
-                    //Uri uri = Uri.parse("android.resource://nowoscmexico.com.tradinggames_1/drawable/fifa.jpg");
+                            //Uri uri = Uri.parse("android.resource://nowoscmexico.com.tradinggames_1/drawable/fifa.jpg");
                     /*String filename = "yy2.png";
                     String path = Environment.getExternalStorageDirectory()+"/Pictures/" + filename;
                     File f = new File(path);  //
                     Uri uri = Uri.fromFile(f);
                     */
-                    // Create a reference to 'images/mountains.jpg'
-                    //StorageReference mountainImagesRef = storageRef.child("images/mountains.jpg").putFile(,metadata);
+                            // Create a reference to 'images/mountains.jpg'
+                            //StorageReference mountainImagesRef = storageRef.child("images/mountains.jpg").putFile(,metadata);
 
-                    //UploadTask uploadTask = mountainsRef.putBytes(data);
+                            //UploadTask uploadTask = mountainsRef.putBytes(data);
 
-                    return keyArticle;
-            }
+                            return keyArticle;
+                    }
 
-            //myRef.child("usuarios").child("2").setValue(user);
+                    //myRef.child("usuarios").child("2").setValue(user);
 
-            //String key = myRef.child("usuarios").push().getKey();
-            //UsuarioDao user2 = new UsuarioDao("2","nombre","telefono","correo","pass","0");
+                    //String key = myRef.child("usuarios").push().getKey();
+                    //UsuarioDao user2 = new UsuarioDao("2","nombre","telefono","correo","pass","0");
 
             /*ArticuloDao dao = new ArticuloDao("1","titulo","descripcion","cate","path","tiempo","11");
             myRef.child("articulo").child("1").setValue(dao);
@@ -545,7 +544,7 @@ public class AddGame extends AppCompatActivity {
                 }
             });*/
 
-            // Read from the database
+                    // Read from the database
             /*myRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
@@ -567,90 +566,67 @@ public class AddGame extends AppCompatActivity {
                 }
             });*/
 
-            //return "1";
-        }catch(Exception e){
-            e.printStackTrace();
-            return "0";
-        }
-
-        return "1";
-    }
-
-    private String insertarLocal(String tableName, String name, String desc, String catego, String fotofull, String datestring, String iduser) {
-        String val = tableName;
-        Log.w("Here",val);
-
-        switch (val){
-
-            case modelBase.FeedEntryArticle.TABLE_NAME:
-                // Gets the data repository in write mode
-                SQLiteDatabase db = DBaseMethods.base.getWritableDatabase();
-
-                // Create a new map of values, where column names are the keys
-                ContentValues values = new ContentValues();
-                //values.put(modelBase.FeedEntryArticle.COLUMN_ID, strings[6]);
-                values.put(modelBase.FeedEntryArticle.COLUMN_TITULO, name);
-                values.put(modelBase.FeedEntryArticle.COLUMN_DESCRIPCION, desc);
-                values.put(modelBase.FeedEntryArticle.COLUMN_CATE, catego);
-                values.put(modelBase.FeedEntryArticle.COLUMN_FOTO, fotofull);
-                values.put(modelBase.FeedEntryArticle.COLUMN_TIME, datestring);
-                values.put(modelBase.FeedEntryArticle.COLUMN_FKUser, iduser);
-
-                // Insert the new row, returning the primary key value of the new row
-                //Just change name table and the values....
-                long newRowId = db.insert(val, null, values);
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
+                    //return "1";
+                }catch(Exception e){
                     e.printStackTrace();
+                    return "0";
                 }
 
-                return "" + newRowId;
+                return "1";
+            }
+            @NonNull
+            private String insertarLocal(String tableName, String name, String desc, String catego, String fotofull, String datestring, String iduser) {
+                String val = tableName;
+                Log.w("Here",val);
 
-            default:
-                break;
-        }
+                switch (val){
 
-        return "";
+                    case modelBase.FeedEntryArticle.TABLE_NAME:
+                        // Gets the data repository in write mode
+                        SQLiteDatabase db = DBaseMethods.base.getWritableDatabase();
+
+                        // Create a new map of values, where column names are the keys
+                        ContentValues values = new ContentValues();
+                        //values.put(modelBase.FeedEntryArticle.COLUMN_ID, strings[6]);
+                        values.put(modelBase.FeedEntryArticle.COLUMN_TITULO, name);
+                        values.put(modelBase.FeedEntryArticle.COLUMN_DESCRIPCION, desc);
+                        values.put(modelBase.FeedEntryArticle.COLUMN_CATE, catego);
+                        values.put(modelBase.FeedEntryArticle.COLUMN_FOTO, fotofull);
+                        values.put(modelBase.FeedEntryArticle.COLUMN_TIME, datestring);
+                        values.put(modelBase.FeedEntryArticle.COLUMN_FKUser, iduser);
+
+                        // Insert the new row, returning the primary key value of the new row
+                        //Just change name table and the values....
+                        long newRowId = db.insert(val, null, values);
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
+                        return "" + newRowId;
+
+                    default:
+                        break;
+                }
+
+                return "";
+            }
+
+        };
+
+        sendthelast.execute();
     }
 
+//--------------recupera nombre de fotos con ','----------------------------------------------------
     private String saveImages(String iduser) {
 
         String todaslasfotos = "";
 
-        for(int i=1;i<=imagenesReales.size();i++){
+        for(int i=1;i<=imagenes.length;i++){
             //get the image -- save as iduser+i.png into App folder
-            todaslasfotos += iduser+"_"+name+"_"+i+".png,";
-
-            /*ImageView imageview = imagenesReales.get(i);
-            imageview.buildDrawingCache();
-            Bitmap bm=imageview.getDrawingCache();
-
-            OutputStream fOut = null;
-            Uri outputFileUri;
-            try {
-                File root = new File(Environment.getExternalStorageDirectory()
-                        + File.separator + "pictures" + File.separator);
-
-                if(!root.exists())
-                    root.mkdirs();
-
-                File sdImageMainDirectory = new File(root, iduser+i+".png");
-
-                todaslasfotos += iduser+i+".png,";
-
-                outputFileUri = Uri.fromFile(sdImageMainDirectory);
-                fOut = new FileOutputStream(sdImageMainDirectory);
-            } catch (Exception e) {
-                Toast.makeText(this, "Error occured. Please try again later.",
-                        Toast.LENGTH_SHORT).show();
-            }
-            try {
-                bm.compress(Bitmap.CompressFormat.PNG, 100, fOut);
-                fOut.flush();
-                fOut.close();
-            } catch (Exception e) {
-            }*/
+            if(imagenes[i])
+                todaslasfotos += iduser+"_"+name+"_"+i+".png,";
         }
 
         return todaslasfotos;
@@ -661,7 +637,7 @@ public class AddGame extends AppCompatActivity {
 
         //Log.w("imagesola",temp.toString());
         //Log.w("imageya",imagenup1.getDrawable().toString());
-        imagenesReales = new ArrayList<>();
+        /*imagenesReales = new ArrayList<>();
 
         if((imagenup1.getDrawable() != temp)){
             imagenesReales.add(imagenup1);
@@ -677,10 +653,16 @@ public class AddGame extends AppCompatActivity {
             imagenesReales.add(imagenup6);
         }*/
 
-        if((imagenup1.getDrawable() == temp) && (imagenup2.getDrawable() == temp2) && (imagenup3.getDrawable() == temp3) && (imagenup4.getDrawable() == temp4)){// && (imagenup5.getDrawable() == temp5) && (imagenup6.getDrawable() == temp6)){
+        /*if((imagenup1.getDrawable() == temp) && (imagenup2.getDrawable() == temp2) && (imagenup3.getDrawable() == temp3) && (imagenup4.getDrawable() == temp4)){// && (imagenup5.getDrawable() == temp5) && (imagenup6.getDrawable() == temp6)){
             return true;
         }
-        return false;
+        return false;*/
+
+        if(!imagenes[0] && !imagenes[1] && !imagenes[2] && !imagenes[3])
+            return false;
+        else
+            return true;
+
     }
 
     public void sendpicture(View c){
@@ -922,18 +904,29 @@ public class AddGame extends AppCompatActivity {
         mCurrentPhotoPath = preferences.getString("nombrefoto", "null");
 
         String filePath = mCurrentPhotoPath;//photoFile.getPath();
-        Bitmap bmp = BitmapFactory.decodeFile(filePath);
+        //Bitmap bmp = BitmapFactory.decodeFile(filePath);
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 5;
+        bmp = BitmapFactory.decodeFile(filePath,options);
 
-        Bitmap thumbnail = Bitmap.createScaledBitmap(bmp, bmp.getWidth()/2, bmp.getHeight()/2, false);
+        //Bitmap thumbnail = Bitmap.createScaledBitmap(bmp, bmp.getWidth()/2, bmp.getHeight()/2, false);
 
-        if(tag.equals("1"))
-            imagenup1.setImageBitmap(thumbnail);
-        else if(tag.equals("2"))
-            imagenup2.setImageBitmap(thumbnail);
-        else if(tag.equals("3"))
-            imagenup3.setImageBitmap(thumbnail);
-        else if(tag.equals("4"))
-            imagenup4.setImageBitmap(thumbnail);
+        if(tag.equals("1")) {
+            imagenup1.setImageBitmap(bmp);
+            imagenes[Integer.parseInt(tag)] = true;
+        }
+        else if(tag.equals("2")) {
+            imagenup2.setImageBitmap(bmp);
+            imagenes[Integer.parseInt(tag)] = true;
+        }
+        else if(tag.equals("3")) {
+            imagenup3.setImageBitmap(bmp);
+            imagenes[Integer.parseInt(tag)] = true;
+        }
+        else if(tag.equals("4")) {
+            imagenup4.setImageBitmap(bmp);
+            imagenes[Integer.parseInt(tag)] = true;
+        }
         /*(else if(tag.equals("5"))
             imagenup5.setImageBitmap(thumbnail);
         else if(tag.equals("6"))

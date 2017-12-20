@@ -13,6 +13,7 @@ public class ArticuloDao {
 
     String id;
     String titulo;
+    String idfirebase;
     String descripcion;
     String categoria;
     String foto;
@@ -21,9 +22,10 @@ public class ArticuloDao {
 
     Bitmap iamgentemp;
 
-    public ArticuloDao(String id, String titulo, String descripcion, String categoria, String pathfoto, String timeup, String idusuario) {
+    public ArticuloDao(String id, String titulo,String idfirebase, String descripcion, String categoria, String pathfoto, String timeup, String idusuario) {
         this.id = id;
         this.titulo = titulo;
+        this.idfirebase = idfirebase;
         this.descripcion = descripcion;
         this.categoria = categoria;
         this.foto = pathfoto;
@@ -57,6 +59,14 @@ public class ArticuloDao {
 
     public void setTitulo(String titulo) {
         this.titulo = titulo;
+    }
+
+    public String getIdfirebase() {
+        return idfirebase;
+    }
+
+    public void setIdfirebase(String titulo) {
+        this.idfirebase = titulo;
     }
 
     public String getDescripcion() {
@@ -103,6 +113,7 @@ public class ArticuloDao {
         HashMap<String, Object> result = new HashMap<>();
         result.put("id", id);
         result.put("titulo", titulo);
+        result.put("idfirebase", idfirebase);
         result.put("descripcion", descripcion);
         result.put("categoria", categoria);
         result.put("foto", foto);

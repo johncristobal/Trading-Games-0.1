@@ -142,6 +142,8 @@ public class GamesAdapter extends BaseAdapter {
                 i.putExtra("categoria",dao.getCategoria());
                 i.putExtra("foto",dao.getFoto());
                 i.putExtra("id",dao.getId());
+                i.putExtra("idfirebase",dao.getIdfirebase());
+                i.putExtra("idusuario",dao.getIdusuario());
 
                 context.startActivity(i);
 

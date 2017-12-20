@@ -33,6 +33,7 @@ public class modelBase extends SQLiteOpenHelper {
     public static class FeedEntryArticle implements BaseColumns {
         public static final String TABLE_NAME = "article";
         public static final String COLUMN_TITULO = "titulo";
+        public static final String COLUMN_IDFIREBASE = "idfirebase";
         public static final String COLUMN_DESCRIPCION = "descripcion";
         public static final String COLUMN_CATE = "categoria";
         public static final String COLUMN_FOTO = "rutaFoto";
@@ -65,6 +66,7 @@ public class modelBase extends SQLiteOpenHelper {
             "CREATE TABLE " + FeedEntryArticle.TABLE_NAME + " (" +
                     FeedEntryArticle._ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
                     FeedEntryArticle.COLUMN_TITULO + TEXT_TYPE + "," +
+                    FeedEntryArticle.COLUMN_IDFIREBASE + TEXT_TYPE + "," +
                     FeedEntryArticle.COLUMN_DESCRIPCION + TEXT_TYPE + "," +
                     FeedEntryArticle.COLUMN_CATE + TEXT_TYPE + "," +
                     FeedEntryArticle.COLUMN_FOTO + TEXT_TYPE + "," +

@@ -68,11 +68,11 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/gridLayout2"
                 android:layout_centerHorizontal="true"
-                android:background="@drawable/corner"
-                android:textColor="#fff"
                 android:layout_marginTop="15dp"
-                android:onClick="addGame"
-                android:text="Subir" />
+                android:background="@drawable/corner"
+                android:onClick="updateGame"
+                android:text="Actualizar"
+                android:textColor="#fff" />
 
             <GridLayout
                 android:id="@+id/gridLayout2"
@@ -91,8 +91,7 @@
                     android:layout_column="0"
                     android:layout_marginTop="3dp"
                     android:layout_row="0"
-                    android:onClick="pictureSelect"
-                    android:tag="1"
+                    android:onClick="pictureUpdate"
                     app:srcCompat="@drawable/camicon" />
 
                 <ImageView
@@ -100,39 +99,36 @@
                     android:layout_width="90dp"
                     android:layout_height="90dp"
                     android:layout_column="1"
-                    android:layout_marginTop="20dp"
+                    android:layout_marginLeft="20dp"
                     android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
                     android:layout_row="0"
-                    android:onClick="pictureSelect"
-                    android:tag="2"
-                    app:srcCompat="@drawable/camicon"
-                    android:layout_marginLeft="20dp" />
+                    android:onClick="pictureUpdate"
+                    app:srcCompat="@drawable/camicon" />
 
                 <ImageView
                     android:id="@+id/imageViewfoto3"
                     android:layout_width="90dp"
                     android:layout_height="90dp"
                     android:layout_column="0"
+                    android:layout_marginLeft="20dp"
                     android:layout_marginStart="20dp"
                     android:layout_marginTop="10dp"
                     android:layout_row="1"
-                    android:onClick="pictureSelect"
-                    android:tag="3"
-                    app:srcCompat="@drawable/camicon"
-                    android:layout_marginLeft="20dp" />
+                    android:onClick="pictureUpdate"
+                    app:srcCompat="@drawable/camicon" />
 
                 <ImageView
                     android:id="@+id/imageViewfoto4"
                     android:layout_width="90dp"
                     android:layout_height="90dp"
                     android:layout_column="1"
+                    android:layout_marginLeft="20dp"
                     android:layout_marginStart="20dp"
                     android:layout_marginTop="10dp"
                     android:layout_row="1"
-                    android:onClick="pictureSelect"
-                    android:tag="4"
-                    app:srcCompat="@drawable/camicon"
-                    android:layout_marginLeft="20dp" />
+                    android:onClick="pictureUpdate"
+                    app:srcCompat="@drawable/camicon" />
 
             </GridLayout>
 

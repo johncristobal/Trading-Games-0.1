@@ -70,7 +70,7 @@ public class WSTask extends AsyncTask<String,Void,String>{
                     //String keyArticle = myRef.child("articulo").push().getKey();
                     //Log.w("key",keyArticle);
                     String keyArticle = myRef.child("articulo").push().getKey();
-                    ArticuloDao article = new ArticuloDao(keyArticle,params[1],params[2],params[3],params[4],params[5],params[6]);
+                    ArticuloDao article = new ArticuloDao(keyArticle,"",params[1],params[2],params[3],params[4],params[5],params[6]);
                     Map<String, Object> postValuesArticle = article.toMap();
                     myRef.child("articulo").child(keyArticle).updateChildren(postValuesArticle);
 

@@ -3,6 +3,7 @@ package nowoscmexico.com.tradinggames.game;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -81,13 +82,24 @@ public class SimpleViewG extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);*/
 
+        Typeface typeface = Typeface.createFromAsset(getAssets(), "fonts/HelveticaNeue Light.ttf");
+        Typeface typefacebold = Typeface.createFromAsset(getAssets(), "fonts/Helvetica Neu Bold.ttf");
+
         contactar = (LinearLayout)findViewById(R.id.contactarDueno);
 
         categoriaTV = (TextView)findViewById(R.id.textViewcategoria);
         descripcionTV = (TextView)findViewById(R.id.textViewdescripcion);
 
+        categoriaTV.setTypeface(typeface);
+        descripcionTV.setTypeface(typeface);
+
         categoriaTV.setText(categoria);
         descripcionTV.setText(descripcion);
+
+        TextView cate1 = (TextView)findViewById(R.id.textView2);
+        TextView desc1 = (TextView)findViewById(R.id.textView10);
+        cate1.setTypeface(typefacebold);
+        desc1.setTypeface(typefacebold);
 
         final String folderuser = usuario;
         String[] fotos = foto.split(",");

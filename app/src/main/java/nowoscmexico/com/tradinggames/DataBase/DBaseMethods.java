@@ -148,6 +148,7 @@ public class DBaseMethods {
                             fond.setCategoria(cursor.getString(3));
                             fond.setFoto(cursor.getString(4));
                             fond.setTimeup(cursor.getString(5));
+                            fond.setIdusuario(cursor.getString(6));
 
                             proyectos.add(fond);
                         }while(cursor.moveToNext());

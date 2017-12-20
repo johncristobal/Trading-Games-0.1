@@ -40,6 +40,8 @@
 
     <string name="tomafoto">Tomar foto</string>
     <string name="galeria">Elegir de la galeria</string>
+    <string name="eliminarfoto">Eliminar foto</string>
+    <string name="nuevafoto">Tomar nueva foto</string>
 
     <string name="bucket">gs://tradinggames-a6047.appspot.com/</string>
     <string name="title_activity_update_game">UpdateGame</string>

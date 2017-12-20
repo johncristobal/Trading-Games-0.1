@@ -2,10 +2,12 @@ package nowoscmexico.com.tradinggames;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -53,6 +55,8 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 
+import nowoscmexico.com.tradinggames.DataBase.DBaseMethods;
+import nowoscmexico.com.tradinggames.DataBase.modelBase;
 import nowoscmexico.com.tradinggames.user.UserActivity;
 import nowoscmexico.com.tradinggames.DataBase.ArticuloDao;
 import nowoscmexico.com.tradinggames.R;
@@ -539,15 +543,45 @@ public class GalleryActivity extends AppCompatActivity {
 
             public void borrarDB(){
 
+                SQLiteDatabase db = DBaseMethods.base.getWritableDatabase();
+
+                db.execSQL("DELETE FROM " + modelBase.FeedEntryUsuario.TABLE_NAME);
+                db.execSQL("DELETE FROM " + modelBase.FeedEntryArticle.TABLE_NAME);
+                db.execSQL("DELETE FROM " + modelBase.FeedEntryMatch.TABLE_NAME);
+                db.close();
             }
-
             //cargar articulo a la base ddatos
-            public void cargararticulo(ArticuloDao dao){
+            public long cargararticulo(ArticuloDao dao){
 
+                try {
+                    SQLiteDatabase db = DBaseMethods.base.getWritableDatabase();
+
+                    // Create a new map of values, where column names are the keys
+                    ContentValues values = new ContentValues();
+                    //values.put(modelBase.FeedEntryArticle.COLUMN_ID, strings[6]);
+                    values.put(modelBase.FeedEntryArticle.COLUMN_TITULO, dao.getTitulo());
+                    values.put(modelBase.FeedEntryArticle.COLUMN_IDFIREBASE, dao.getIdfirebase());
+                    values.put(modelBase.FeedEntryArticle.COLUMN_DESCRIPCION, dao.getDescripcion());
+                    values.put(modelBase.FeedEntryArticle.COLUMN_CATE, dao.getCategoria());
+                    values.put(modelBase.FeedEntryArticle.COLUMN_FOTO, dao.getFoto());
+                    values.put(modelBase.FeedEntryArticle.COLUMN_TIME, dao.getTimeup());
+                    values.put(modelBase.FeedEntryArticle.COLUMN_FKUser, dao.getIdusuario());
+
+                    // Insert the new row, returning the primary key value of the new row
+                    //Just change name table and the values....
+                    long newRowId = db.insert(modelBase.FeedEntryArticle.TABLE_NAME, null, values);
+                    return newRowId;
+                }
+                catch(Exception e){
+                    return -1;
+                }
             }
 
             @Override
             protected void onPreExecute() {
+
+                //borro local database
+                borrarDB();
 
                 //get num elements into articulo
                 myRef.child("articulo").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -599,11 +633,8 @@ public class GalleryActivity extends AppCompatActivity {
                                 final ArticuloDao comment = dataSnapshot.getValue(ArticuloDao.class);
                                 lista.add(comment);
 
-                                /*
                                 //Aqui me falta borrar base de datos local y cargar nueva informacion...
-                                borrarDB();
                                 cargararticulo(comment);
-                                */
 
                                 final String folderuser = comment.getIdusuario();
                                 String[] fotos = comment.getFoto().split(",");
