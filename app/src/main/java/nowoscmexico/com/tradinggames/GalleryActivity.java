@@ -59,7 +59,6 @@ import nowoscmexico.com.tradinggames.DataBase.DBaseMethods;
 import nowoscmexico.com.tradinggames.DataBase.modelBase;
 import nowoscmexico.com.tradinggames.user.UserActivity;
 import nowoscmexico.com.tradinggames.DataBase.ArticuloDao;
-import nowoscmexico.com.tradinggames.R;
 import nowoscmexico.com.tradinggames.game.SimpleViewG;
 
 public class GalleryActivity extends AppCompatActivity {
@@ -87,7 +86,7 @@ public class GalleryActivity extends AppCompatActivity {
     public NavigationView navigationView;
 
     private String gameSelected;
-    private String sesion;
+    private String sesion,idusuario;
     private SharedPreferences sharedPreferences;
     private boolean flag=false;
 
@@ -152,6 +151,7 @@ public class GalleryActivity extends AppCompatActivity {
         //get if user logged
         sharedPreferences = getSharedPreferences(getString(R.string.sharedName), Context.MODE_PRIVATE);
         sesion = sharedPreferences.getString("sesion","null");
+        idusuario = sharedPreferences.getString("idusuario","null");
 
         videojuego = (TextView)findViewById(R.id.textViewGameView);
         // Note that Gallery view is deprecated in Android 4.1---
@@ -223,8 +223,10 @@ public class GalleryActivity extends AppCompatActivity {
             //}).start();
 
             //loadImagen();
-            saygoodbye();
 
+
+            Sendthelast last = new Sendthelast();
+            last.execute();
             //GALLERY ADAPTER CODE DELETE
             //...
 
@@ -533,310 +535,317 @@ public class GalleryActivity extends AppCompatActivity {
         }
     }
 
-    public void saygoodbye(){
-        AsyncTask<Void, Void, Void> sendthelast = new AsyncTask<Void, Void, Void>() {
-            ProgressDialog progress = new ProgressDialog(GalleryActivity.this);
-            String ErrorCode = "";
+    //public void saygoodbye(){
+   public class Sendthelast extends AsyncTask<Void, Void, Void>{
+        ProgressDialog progress = new ProgressDialog(GalleryActivity.this);
+        String ErrorCode = "";
 
-            FirebaseDatabase database = FirebaseDatabase.getInstance();
-            DatabaseReference myRef = database.getReference();
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference();
 
-            public void borrarDB(){
+        public void borrarDB(){
 
+            SQLiteDatabase db = DBaseMethods.base.getWritableDatabase();
+
+            db.execSQL("DELETE FROM " + modelBase.FeedEntryUsuario.TABLE_NAME);
+            db.execSQL("DELETE FROM " + modelBase.FeedEntryArticle.TABLE_NAME);
+            db.execSQL("DELETE FROM " + modelBase.FeedEntryMatch.TABLE_NAME);
+            db.close();
+        }
+
+        //cargar articulo a la base ddatos
+        public long cargararticulo(ArticuloDao dao){
+
+            try {
                 SQLiteDatabase db = DBaseMethods.base.getWritableDatabase();
 
-                db.execSQL("DELETE FROM " + modelBase.FeedEntryUsuario.TABLE_NAME);
-                db.execSQL("DELETE FROM " + modelBase.FeedEntryArticle.TABLE_NAME);
-                db.execSQL("DELETE FROM " + modelBase.FeedEntryMatch.TABLE_NAME);
-                db.close();
+                // Create a new map of values, where column names are the keys
+                ContentValues values = new ContentValues();
+                //values.put(modelBase.FeedEntryArticle.COLUMN_ID, strings[6]);
+                values.put(modelBase.FeedEntryArticle.COLUMN_TITULO, dao.getTitulo());
+                values.put(modelBase.FeedEntryArticle.COLUMN_IDFIREBASE, dao.getIdfirebase());
+                values.put(modelBase.FeedEntryArticle.COLUMN_DESCRIPCION, dao.getDescripcion());
+                values.put(modelBase.FeedEntryArticle.COLUMN_CATE, dao.getCategoria());
+                values.put(modelBase.FeedEntryArticle.COLUMN_FOTO, dao.getFoto());
+                values.put(modelBase.FeedEntryArticle.COLUMN_TIME, dao.getTimeup());
+                values.put(modelBase.FeedEntryArticle.COLUMN_FKUser, dao.getIdusuario());
+
+                // Insert the new row, returning the primary key value of the new row
+                //Just change name table and the values....
+                long newRowId = db.insert(modelBase.FeedEntryArticle.TABLE_NAME, null, values);
+                return newRowId;
             }
-            //cargar articulo a la base ddatos
-            public long cargararticulo(ArticuloDao dao){
-
-                try {
-                    SQLiteDatabase db = DBaseMethods.base.getWritableDatabase();
-
-                    // Create a new map of values, where column names are the keys
-                    ContentValues values = new ContentValues();
-                    //values.put(modelBase.FeedEntryArticle.COLUMN_ID, strings[6]);
-                    values.put(modelBase.FeedEntryArticle.COLUMN_TITULO, dao.getTitulo());
-                    values.put(modelBase.FeedEntryArticle.COLUMN_IDFIREBASE, dao.getIdfirebase());
-                    values.put(modelBase.FeedEntryArticle.COLUMN_DESCRIPCION, dao.getDescripcion());
-                    values.put(modelBase.FeedEntryArticle.COLUMN_CATE, dao.getCategoria());
-                    values.put(modelBase.FeedEntryArticle.COLUMN_FOTO, dao.getFoto());
-                    values.put(modelBase.FeedEntryArticle.COLUMN_TIME, dao.getTimeup());
-                    values.put(modelBase.FeedEntryArticle.COLUMN_FKUser, dao.getIdusuario());
-
-                    // Insert the new row, returning the primary key value of the new row
-                    //Just change name table and the values....
-                    long newRowId = db.insert(modelBase.FeedEntryArticle.TABLE_NAME, null, values);
-                    return newRowId;
-                }
-                catch(Exception e){
-                    return -1;
-                }
+            catch(Exception e){
+                return -1;
             }
+        }
 
-            @Override
-            protected void onPreExecute() {
+        @Override
+        protected void onPreExecute() {
 
-                //borro local database
-                borrarDB();
+            //borro local database
+            borrarDB();
 
-                //get num elements into articulo
-                myRef.child("articulo").addListenerForSingleValueEvent(new ValueEventListener() {
+            //get num elements into articulo
+            myRef.child("articulo").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    int size = (int) dataSnapshot.getChildrenCount();
+                    Log.e("Number", "contador:" + size);
+                    numArticulos = size;
+
+                    if(numArticulos == 0){
+                        progress.dismiss();
+                        cancel(true);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.d("mensaje","error al cargar datos");
+                }
+            });
+
+            progress.setTitle("Actualizando");
+            progress.setMessage("Recuperando información...");
+            progress.setIndeterminate(true);
+            progress.setCancelable(false);
+            progress.show();
+        }
+
+        @Override
+        protected void onCancelled() {
+            progress.dismiss();
+            Toast msg = Toast.makeText(getApplicationContext(), ErrorCode, Toast.LENGTH_LONG);
+            msg.show();
+
+            super.onCancelled();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            //before launch alert, we have to send the confirmReport
+            try {
+                //get articulos from firebase
+                Query recentPostsQuery = myRef.child("articulo").limitToFirst(100);
+
+                recentPostsQuery.addChildEventListener(new ChildEventListener() {
+                    public static final String TAG = "CHILD";
+
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        int size = (int) dataSnapshot.getChildrenCount();
-                        Log.e("Number", "contador:" + size);
-                        numArticulos = size;
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s){
+
+                        try {
+                            Log.d(TAG, "onChildAdded:" + dataSnapshot.getChildrenCount());
+                            //Recupero objeto articulo de firebase y cast a ArticuloDao
+                            final ArticuloDao comment = dataSnapshot.getValue(ArticuloDao.class);
+                            lista.add(comment);
+
+                            //salvo en base local
+                            if(comment.getIdusuario().equals(idusuario))
+                                cargararticulo(comment);
+
+                            final String folderuser = comment.getIdusuario();
+                            String[] fotos = comment.getFoto().split(",");
+                            //Evitr craah en caso que no traiga fotos
+                            if (fotos.length >= 1) {
+                                //Aqui solo recuperamos una foto para mostrar en mainview
+                                try {
+                                    for (int i = 0; i < fotos.length; i++) {
+                                        final String name = fotos[i];
+
+                                        //COn el nombre de la imgaen...recuoero imagen de storage firebase
+
+                                        //StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://tradinggames-a6047.appspot.com/").child("s2YFT93wtFTXE75rjRkSvvdO6Y62/s2YFT93wtFTXE75rjRkSvvdO6Y62_mario kart 64_1.png");
+                                        StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://tradinggames-a6047.appspot.com/").child(folderuser + "/" + name);
+
+                                        //imagenes.add(imageView);
+                                        final File storageDir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + File.separator + folderuser);
+
+                                        //File storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)+ "/YOUR_FOLDER_NAME");
+                                        boolean success = true;
+                                        if (!storageDir.exists()) {
+                                            success = storageDir.mkdirs();
+                                        }
+                                        if (success) {
+                                            final File imageFile = new File(storageDir, name);
+                                            /*File imageFile = new File(storageDir, imageFileName);
+                                            savedImagePath = imageFile.getAbsolutePath();
+                                            try {
+                                                OutputStream fOut = new FileOutputStream(imageFile);
+                                                image.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
+                                                fOut.close();
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
+                                            }*/
+
+                                            storageRef.getFile(imageFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                                                @Override
+                                                public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                                                    //Local temp file has been created
+                                                    contadorArticulos++;
+
+                                                    if (contadorArticulos >= 1)
+                                                        progress.dismiss();
+
+                                                    adapter.notifyDataSetChanged();
+                                                }
+                                            }).addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception exception) {
+                                                    // Handle any errors
+                                                    Log.w("file", exception.toString());
+                                                }
+                                            });
+                                        }
+                                    }
+                                }
+                                catch(Exception e){
+                                    e.printStackTrace();
+                                }
+                                //}
+                            }
+                        }catch(Exception e){
+                            e.printStackTrace();
+                        }
                     }
 
                     @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        Log.d("mensaje","error al cargar datos");
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {}
+
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {}
+
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {}
+                });
+
+                //juegosws = lista;
+                }
+            catch(Exception e){
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+
+            try {
+                //if(contadorArticulos == numArticulos) {
+                gallery = (Gallery) findViewById(R.id.gallery1);
+
+                adapter = new ImageAdapter(GalleryActivity.this, lista);
+                //adapter.notifyDataSetChanged();
+                gallery.setAdapter(adapter);
+                gallery.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+                        //Toast.makeText(getBaseContext(), "pic" + (position + 1) + " selected",Toast.LENGTH_SHORT).show();
+
+                        //load imagen to show bigger
+                    /*BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inSampleSize = 5;
+
+                    Bitmap bmp = BitmapFactory.decodeFile(lista.get(position).getFoto(), options);
+                    imgSelected.setImageBitmap(bmp);*/
+
+                    final String folderuser = lista.get(position).getIdusuario();
+                    String[] fotos = lista.get(position).getFoto().split(",");
+                    //Evitr craah en caso que no traiga fotos
+                    if (fotos.length >= 1) {
+                        //Aqui solo recuperamos una foto para mostrar en mainview
+                        //for (int i = 0; i < 1; i++) {
+                        final String name = fotos[0];
+                        //Bitmap bmp = BitmapFactory.decodeFile(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser+"/"+name,options);
+                        //view.imgViewFlag.setImageBitmap(bmp);
+                        Glide.with(GalleryActivity.this)
+                                .load(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser+"/"+name)
+                                .into(imgSelected);
+                    }
+
+                    //set texto into background
+                    videojuego.setText(lista.get(position).getTitulo());
+                    gameSelected = lista.get(position).getFoto() + "";
+
+                    daito = lista.get(position);
                     }
                 });
 
-                progress.setTitle("Actualizando");
-                progress.setMessage("Recuperando información...");
-                progress.setIndeterminate(true);
-                progress.setCancelable(false);
-                progress.show();
-            }
-
-            @Override
-            protected void onCancelled() {
-                progress.dismiss();
-                Toast msg = Toast.makeText(getApplicationContext(), ErrorCode, Toast.LENGTH_LONG);
-                msg.show();
-
-                super.onCancelled();
-            }
-
-            @Override
-            protected Void doInBackground(Void... params) {
-                //before launch alert, we have to send the confirmReport
-                try {
-                    //get articulos from firebase
-                    Query recentPostsQuery = myRef.child("articulo").limitToFirst(100);
-
-                    recentPostsQuery.addChildEventListener(new ChildEventListener() {
-                        public static final String TAG = "CHILD";
-
-                        @Override
-                        public void onChildAdded(DataSnapshot dataSnapshot, String s){
-
-                            try {
-                                Log.d(TAG, "onChildAdded:" + dataSnapshot.getChildrenCount());
-                                //Recupero objeto articulo de firebase y cast a ArticuloDao
-                                final ArticuloDao comment = dataSnapshot.getValue(ArticuloDao.class);
-                                lista.add(comment);
-
-                                //Aqui me falta borrar base de datos local y cargar nueva informacion...
-                                cargararticulo(comment);
-
-                                final String folderuser = comment.getIdusuario();
-                                String[] fotos = comment.getFoto().split(",");
-                                //Evitr craah en caso que no traiga fotos
-                                if (fotos.length >= 1) {
-                                    //Aqui solo recuperamos una foto para mostrar en mainview
-                                    try {
-                                        for (int i = 0; i < fotos.length; i++) {
-                                            final String name = fotos[i];
-
-                                            //COn el nombre de la imgaen...recuoero imagen de storage firebase
-
-                                            //StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://tradinggames-a6047.appspot.com/").child("s2YFT93wtFTXE75rjRkSvvdO6Y62/s2YFT93wtFTXE75rjRkSvvdO6Y62_mario kart 64_1.png");
-                                            StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://tradinggames-a6047.appspot.com/").child(folderuser + "/" + name);
-
-                                            //imagenes.add(imageView);
-                                            final File storageDir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + File.separator + folderuser);
-
-                                            //File storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)+ "/YOUR_FOLDER_NAME");
-                                            boolean success = true;
-                                            if (!storageDir.exists()) {
-                                                success = storageDir.mkdirs();
-                                            }
-                                            if (success) {
-                                                final File imageFile = new File(storageDir, name);
-                                                /*File imageFile = new File(storageDir, imageFileName);
-                                                savedImagePath = imageFile.getAbsolutePath();
-                                                try {
-                                                    OutputStream fOut = new FileOutputStream(imageFile);
-                                                    image.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
-                                                    fOut.close();
-                                                } catch (Exception e) {
-                                                    e.printStackTrace();
-                                                }*/
-
-                                                storageRef.getFile(imageFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                                                    @Override
-                                                    public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                                                        //Local temp file has been created
-                                                        contadorArticulos++;
-
-                                                        if (contadorArticulos >= 7)
-                                                            progress.dismiss();
-
-                                                        adapter.notifyDataSetChanged();
-                                                    }
-                                                }).addOnFailureListener(new OnFailureListener() {
-                                                    @Override
-                                                    public void onFailure(@NonNull Exception exception) {
-                                                        // Handle any errors
-                                                        Log.w("file", exception.toString());
-                                                    }
-                                                });
-                                            }
-                                        }
-                                    }
-                                    catch(Exception e){
-                                        e.printStackTrace();
-                                    }
-                                    //}
-                                }
-                            }catch(Exception e){
-                                e.printStackTrace();
-                            }
-                        }
-
-                        @Override
-                        public void onChildChanged(DataSnapshot dataSnapshot, String s) {}
-
-                        @Override
-                        public void onChildRemoved(DataSnapshot dataSnapshot) {}
-
-                        @Override
-                        public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {}
-                    });
-
-                    //juegosws = lista;
+                //open view with description of game
+                contenedor.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(context, SimpleViewG.class);
+                        intent.putExtra("nombre", daito.getTitulo());
+                        intent.putExtra("foto", daito.getFoto());
+                        intent.putExtra("descripcion", daito.getDescripcion());
+                        intent.putExtra("categoria", daito.getCategoria());
+                        intent.putExtra("usuario", daito.getIdusuario());
+                        context.startActivity(intent);
                     }
-                catch(Exception e){
-                    e.printStackTrace();
-                }
-                return null;
+                });
+                //progress.dismiss();
+                //}
             }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+        }
 
-            @Override
-            protected void onPostExecute(Void aVoid) {
+        private String saveImage(ImageView imagev,String folderuser,String imageFileName) {
 
+            Bitmap image = imagev.getDrawingCache();
+            /*imageView.setDrawingCacheEnabled(true);
+            imageView.buildDrawingCache(true);
+            Bitmap bitmapts = imageView.getDrawingCache();
+            File file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser+"/"+name);
+            File dir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser);
+            if(!dir.exists())
+                dir.mkdirs();
+            try
+            {
+                //file.createNewFile();
+                FileOutputStream ostream = new FileOutputStream(file);
+                bitmapts.compress(Bitmap.CompressFormat.JPEG, 100, ostream);
+                ostream.close();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }*/
+
+            String savedImagePath = null;
+
+            //String imageFileName = "JPEG_" + "FILE_NAME" + ".jpg";
+            File storageDir  = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser);
+
+            //File storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)+ "/YOUR_FOLDER_NAME");
+            boolean success = true;
+            if (!storageDir.exists()) {
+                success = storageDir.mkdirs();
+            }
+            if (success) {
+                File imageFile = new File(storageDir, imageFileName);
+                savedImagePath = imageFile.getAbsolutePath();
                 try {
-                    //if(contadorArticulos == numArticulos) {
-                    gallery = (Gallery) findViewById(R.id.gallery1);
-
-                    adapter = new ImageAdapter(GalleryActivity.this, lista);
-                    //adapter.notifyDataSetChanged();
-                    gallery.setAdapter(adapter);
-                    gallery.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-                            //Toast.makeText(getBaseContext(), "pic" + (position + 1) + " selected",Toast.LENGTH_SHORT).show();
-
-                            //load imagen to show bigger
-                        /*BitmapFactory.Options options = new BitmapFactory.Options();
-                        options.inSampleSize = 5;
-
-                        Bitmap bmp = BitmapFactory.decodeFile(lista.get(position).getFoto(), options);
-                        imgSelected.setImageBitmap(bmp);*/
-
-                        final String folderuser = lista.get(position).getIdusuario();
-                        String[] fotos = lista.get(position).getFoto().split(",");
-                        //Evitr craah en caso que no traiga fotos
-                        if (fotos.length >= 1) {
-                            //Aqui solo recuperamos una foto para mostrar en mainview
-                            //for (int i = 0; i < 1; i++) {
-                            final String name = fotos[0];
-                            //Bitmap bmp = BitmapFactory.decodeFile(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser+"/"+name,options);
-                            //view.imgViewFlag.setImageBitmap(bmp);
-                            Glide.with(GalleryActivity.this)
-                                    .load(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser+"/"+name)
-                                    .into(imgSelected);
-                        }
-
-                        //set texto into background
-                        videojuego.setText(lista.get(position).getTitulo());
-                        gameSelected = lista.get(position).getFoto() + "";
-
-                        daito = lista.get(position);
-                        }
-                    });
-
-                    //open view with description of game
-                    contenedor.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            Intent intent = new Intent(context, SimpleViewG.class);
-                            intent.putExtra("nombre", daito.getTitulo());
-                            intent.putExtra("foto", daito.getFoto());
-                            intent.putExtra("descripcion", daito.getDescripcion());
-                            intent.putExtra("categoria", daito.getCategoria());
-                            intent.putExtra("usuario", daito.getIdusuario());
-                            context.startActivity(intent);
-                        }
-                    });
-                    //progress.dismiss();
-                    //}
-                }
-                catch (Exception e){
+                    OutputStream fOut = new FileOutputStream(imageFile);
+                    image.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
+                    fOut.close();
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
+
+                // Add the image to the system gallery
+                //galleryAddPic(savedImagePath);
+                //Toast.makeText(mContext, "IMAGE SAVED"), Toast.LENGTH_LONG).show();
             }
+            return savedImagePath;
+        }
+    };
 
-            private String saveImage(ImageView imagev,String folderuser,String imageFileName) {
-
-                Bitmap image = imagev.getDrawingCache();
-                /*imageView.setDrawingCacheEnabled(true);
-                imageView.buildDrawingCache(true);
-                Bitmap bitmapts = imageView.getDrawingCache();
-                File file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser+"/"+name);
-                File dir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser);
-                if(!dir.exists())
-                    dir.mkdirs();
-                try
-                {
-                    //file.createNewFile();
-                    FileOutputStream ostream = new FileOutputStream(file);
-                    bitmapts.compress(Bitmap.CompressFormat.JPEG, 100, ostream);
-                    ostream.close();
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }*/
-
-                String savedImagePath = null;
-
-                //String imageFileName = "JPEG_" + "FILE_NAME" + ".jpg";
-                File storageDir  = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser);
-
-                //File storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)+ "/YOUR_FOLDER_NAME");
-                boolean success = true;
-                if (!storageDir.exists()) {
-                    success = storageDir.mkdirs();
-                }
-                if (success) {
-                    File imageFile = new File(storageDir, imageFileName);
-                    savedImagePath = imageFile.getAbsolutePath();
-                    try {
-                        OutputStream fOut = new FileOutputStream(imageFile);
-                        image.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
-                        fOut.close();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                    // Add the image to the system gallery
-                    //galleryAddPic(savedImagePath);
-                    //Toast.makeText(mContext, "IMAGE SAVED"), Toast.LENGTH_LONG).show();
-                }
-                return savedImagePath;
-            }
-        };
-
-        sendthelast.execute();
-    }
+        //sendthelast.execute();
+    //}
 }

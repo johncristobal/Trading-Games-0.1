@@ -144,11 +144,12 @@ public class DBaseMethods {
                             //fond.setId(Integer.parseInt(cursor.getString(0)));
                             fond.setId(cursor.getString(0));
                             fond.setTitulo(cursor.getString(1));
-                            fond.setDescripcion(cursor.getString(2));
-                            fond.setCategoria(cursor.getString(3));
-                            fond.setFoto(cursor.getString(4));
-                            fond.setTimeup(cursor.getString(5));
-                            fond.setIdusuario(cursor.getString(6));
+                            fond.setDescripcion(cursor.getString(3));
+                            fond.setCategoria(cursor.getString(4));
+                            fond.setFoto(cursor.getString(5));
+                            fond.setTimeup(cursor.getString(6));
+                            fond.setIdusuario(cursor.getString(7));
+                            fond.setIdfirebase(cursor.getString(2));
 
                             proyectos.add(fond);
                         }while(cursor.moveToNext());
@@ -159,7 +160,6 @@ public class DBaseMethods {
                 default:
                     break;
             }
-
             return null;
         }
     }

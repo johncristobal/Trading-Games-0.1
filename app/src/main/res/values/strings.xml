@@ -33,7 +33,7 @@
     <string name="title_activity_add_game">AddGame</string>
     <string name="title_activity_register_user">RegisterUser</string>
 
-    <string name="dbversion">30</string>
+    <string name="dbversion">31</string>
     <string name="dbname">TrendinGames</string>
     <string name="title_activity_search">SearchActivity</string>
     <string name="title_activity_gallery">GalleryActivity</string>

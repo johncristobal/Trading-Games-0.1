@@ -5,6 +5,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.net.Uri;
+import android.os.Environment;
+import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +17,18 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import nowoscmexico.com.tradinggames.DataBase.ArticuloDao;
@@ -106,7 +121,37 @@ public class GamesAdapter extends BaseAdapter {
                             }else{
                                 Toast.makeText(context,"Eliminado...", Toast.LENGTH_LONG).show();
                                 //now delete the game form firebase...
-                                //....
+                                FirebaseDatabase database = FirebaseDatabase.getInstance();
+                                DatabaseReference myRef = database.getReference();
+                                //ArticuloDao article = new ArticuloDao(_id,name,idfirebase,desc,catego,fotofull,datestring,iduse);
+                                //Map<String, Object> postValuesArticle = article.toMap();
+                                myRef.child("articulo").child(dao.getIdfirebase()).removeValue();
+
+                                FirebaseStorage storage = FirebaseStorage.getInstance();
+                                StorageReference storageRef = storage.getReferenceFromUrl("gs://tradinggames-a6047.appspot.com/");
+
+                                String [] todasfotos = dao.getFoto().split(",");
+                                for(int j=0; j<todasfotos.length;j++){
+                                    //here a have the filename from the pictures....
+                                    //gt each image from stotraga
+                                    //File image = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+todasfotos[i]);
+                                    //Uri uri = Uri.fromFile(image);
+
+                                    StorageReference riversRef = storageRef.child(dao.getIdusuario()+"/"+todasfotos[j]);
+                                    //StorageReference riversRef = storageRef.child(dao.getIdusuario()+"/"+image.getName());
+                                    //UploadTask uploadTask = riversRef.putBytes(image,metadata);
+                                    riversRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+
+                                        }
+                                    });
+                                }
 
                                 Intent intent = new Intent(context, GamesActivity.class);
                                 intent.putExtra("activity","games");

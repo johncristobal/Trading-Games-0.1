@@ -284,346 +284,22 @@ public class AddGame extends AppCompatActivity {
             //progress.show();
 
             //Save the images names ftom the imageview to App folder
-            saygoodbye();
+            //saygoodbye();
+            sendthelast last = new sendthelast();
+            last.execute();
         }catch(Exception e){
             e.printStackTrace();
         }
     }
 
-
-    public void saygoodbye(){
-        AsyncTask<Void, Void, Void> sendthelast = new AsyncTask<Void, Void, Void>() {
-            ProgressDialog progress = new ProgressDialog(AddGame.this);
-            String ErrorCode = "";
-
-            @Override
-            protected void onPreExecute() {
-                progress.setTitle("Actualizando");
-                progress.setMessage("Subiendo información...");
-                progress.setIndeterminate(true);
-                progress.setCancelable(false);
-                progress.show();
-            }
-
-            @Override
-            protected void onCancelled() {
-                progress.dismiss();
-                Toast msg = Toast.makeText(getApplicationContext(), ErrorCode, Toast.LENGTH_LONG);
-                msg.show();
-
-                super.onCancelled();
-            }
-
-            @Override
-            protected Void doInBackground(Void... params) {
-                //before launch alert, we have to send the confirmReport
-                try {
-                    //res = api.ConfirmReportLast("ReportOdometer/Confirmreport");
-
-                    String fotofull = saveImages(iduser);
-
-                    //get date to save gmae
-                    DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-                    Date date = new Date();
-                    String datestring = (dateFormat.format(date)); //2016/11/16 12:08:43
-
-                    //Firstly save data into localabtabase
-                    //DBaseMethods.ThreadDBInsert insert = new DBaseMethods.ThreadDBInsert();
-                    //String res = insert.execute(modelBase.FeedEntryArticle.TABLE_NAME, name, desc,catego, fotofull, datestring,iduser).get();
-                    String res = insertarLocal(modelBase.FeedEntryArticle.TABLE_NAME, name, desc, catego, fotofull, datestring,iduser);
-                    //String res = "1";
-                    if(res.equals("-1")){
-                        Toast.makeText(AddGame.this,"Error al guardar información. \n Intente más tarde.", Toast.LENGTH_SHORT).show();
-                    }else{
-                        //Si se guardo localmente,,,,intentammos guardar WS
-                        //Create task to send Data to DB --- WS
-                        //WSTask task = new WSTask(AddGame.this);
-                        ws = insertarFB(modelBase.FeedEntryArticle.TABLE_NAME, name, desc, catego,fotofull,datestring,iduser);
-
-                        //Validar si ws ejecutado correctamente...
-                        //String ws = "1";
-                /*
-                QUE REGRESARA firebase en caso de error???
-                 */
-                    }
-
-                }catch(Exception e){
-                    e.printStackTrace();
-                }
-
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-
-                /*if (res.equals("false") || res.equals("true")) {
-
-                    new android.app.AlertDialog.Builder(LastOdometerActivity.this)
-                            .setTitle("Odómetro Reportado")
-                            .setMessage("El odómetro fue reportado con exito")
-                            .setIcon(R.drawable.miituo)
-                            .setCancelable(false)
-                            .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    //progresslast.dismiss();
-                                    //finalizamos....
-                                    //IinfoClient.getInfoClientObject().getPolicies().setReportState(13);
-
-                                    Intent i = new Intent(LastOdometerActivity.this, SyncActivity.class);
-                                    startActivity(i);
-                                }
-                            })
-                            .show();
-                }else{
-                    new android.app.AlertDialog.Builder(LastOdometerActivity.this)
-                            .setTitle("Odómetro no reportado")
-                            .setMessage("Problema al reportar odómetro, intente más tarde.")
-                            .setIcon(R.drawable.miituo)
-                            .setCancelable(false)
-                            .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    //progresslast.dismiss();
-                                    Intent i = new Intent(LastOdometerActivity.this, SyncActivity.class);
-                                    startActivity(i);
-                                }
-                            })
-                            .show();
-                }*/
-
-                progress.dismiss();
-
-                if(!ws.equals("0") || !ws.equals("")){
-                    new android.app.AlertDialog.Builder(AddGame.this)
-                            .setTitle("Nivel completo!")
-                            .setMessage("Tu juego está en línea ahora.")
-                            .setCancelable(false)
-                            .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    //progresslast.dismiss();
-                                    //finalizamos....
-                                    //IinfoClient.getInfoClientObject().getPolicies().setReportState(13);
-
-                                    Intent i = new Intent(AddGame.this,GamesActivity.class);
-                                    startActivity(i);
-                                }
-                            })
-                            .show();
-
-                }else{
-                    new android.app.AlertDialog.Builder(AddGame.this)
-                            .setTitle("Game Over!")
-                            .setMessage("No pudimos completar la operación. Intenta más tarde.")
-                            .setCancelable(false)
-                            //.setIcon(R.drawable.)
-                            .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    //progresslast.dismiss();
-                                    //finalizamos....
-                                    //IinfoClient.getInfoClientObject().getPolicies().setReportState(13);
-
-                                    Intent i = new Intent(AddGame.this,GamesActivity.class);
-                                    startActivity(i);
-                                }
-                            })
-                            .show();
-                }
-            }
-
-            private String insertarFB(String tableName, String name, String desc, String catego, String fotofull, String datestring, String iduse) {
-
-                try {
-                    String table = tableName;
-                    Log.w("Here",table);
-
-                    FirebaseDatabase database = FirebaseDatabase.getInstance();
-                    DatabaseReference myRef = database.getReference();
-
-                    //Thread.sleep(3000);
-
-                    switch (table){
-                /*Agrega articulo a DB*/
-                        case modelBase.FeedEntryArticle.TABLE_NAME:
-
-                            //String keyArticle = myRef.child("articulo").push().getKey();
-                            //Log.w("key",keyArticle);
-                            String keyArticle = myRef.child("articulo").push().getKey();
-                            ArticuloDao article = new ArticuloDao(keyArticle,name,keyArticle,desc,catego,fotofull,datestring,iduse);
-                            Map<String, Object> postValuesArticle = article.toMap();
-                            myRef.child("articulo").child(keyArticle).updateChildren(postValuesArticle);
-
-                            //now...lets try upload an image to firebase...
-                            // Create a storage reference from our app
-                            //use the keyarticle to set the reference with the article....create the bucket
-
-                            String fotos = fotofull;
-                            String iduser = iduse;
-
-                            FirebaseStorage storage = FirebaseStorage.getInstance();
-                            StorageReference storageRef = storage.getReferenceFromUrl("gs://tradinggames-a6047.appspot.com/");
-
-                            String [] todasfotos = fotos.split(",");
-                            for(int i=0; i<todasfotos.length;i++){
-                                //here a have the filename from the pictures....
-                                //gt each image from stotraga
-                                File image = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+todasfotos[i]);
-                                Uri uri = Uri.fromFile(image);
-
-                                // Create file metadata including the content type
-                                StorageMetadata metadata = new StorageMetadata.Builder()
-                                        .setContentType("image/png")
-                                        .build();
-
-                                StorageReference riversRef = storageRef.child(iduser+"/"+image.getName());
-                                //UploadTask uploadTask = riversRef.putBytes(image,metadata);
-                                UploadTask uploadTask = riversRef.putFile(uri,metadata);
-
-                                // Register observers to listen for when the download is done or if it fails
-                                uploadTask.addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception exception) {
-                                        Log.e("Error","Algo fallo");
-                                        exception.printStackTrace();
-                                        // Handle unsuccessful uploads
-                                    }
-                                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                    @Override
-                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                        // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
-                                        //Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                                        Uri downloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
-                                    }
-                                });
-                            }
-
-
-                            // Create a reference to "mountains.jpg"
-                            //StorageReference mountainsRef = storageRef.child("mountains.jpg");
-
-                            //Uri uri = Uri.parse("android.resource://nowoscmexico.com.tradinggames_1/drawable/fifa.jpg");
-                    /*String filename = "yy2.png";
-                    String path = Environment.getExternalStorageDirectory()+"/Pictures/" + filename;
-                    File f = new File(path);  //
-                    Uri uri = Uri.fromFile(f);
-                    */
-                            // Create a reference to 'images/mountains.jpg'
-                            //StorageReference mountainImagesRef = storageRef.child("images/mountains.jpg").putFile(,metadata);
-
-                            //UploadTask uploadTask = mountainsRef.putBytes(data);
-
-                            return keyArticle;
-                    }
-
-                    //myRef.child("usuarios").child("2").setValue(user);
-
-                    //String key = myRef.child("usuarios").push().getKey();
-                    //UsuarioDao user2 = new UsuarioDao("2","nombre","telefono","correo","pass","0");
-
-            /*ArticuloDao dao = new ArticuloDao("1","titulo","descripcion","cate","path","tiempo","11");
-            myRef.child("articulo").child("1").setValue(dao);
-            String keyart = myRef.child("articulo").push().getKey();
-
-            Log.w("key",key);
-            Log.w("keyart",keyart);*/
-
-
-            /*myRef.child("usuarios").child("1").addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    UsuarioDao value = dataSnapshot.getValue(UsuarioDao.class);
-                    Log.d("DB", "Value is: " + value.getId());
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });*/
-
-                    // Read from the database
-            /*myRef.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    // This method is called once with the initial value and again
-                    // whenever data at this location is updated.
-                    try {
-                        UsuarioDao value = dataSnapshot.getValue(UsuarioDao.class);
-                        Log.d("DB", "Value is: " + value.getId());
-                    }
-                    catch(Exception e){
-                        e.printStackTrace();
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError error) {
-                    // Failed to read value
-                    Log.w("DB", "Failed to read value.", error.toException());
-                }
-            });*/
-
-                    //return "1";
-                }catch(Exception e){
-                    e.printStackTrace();
-                    return "0";
-                }
-
-                return "1";
-            }
-            @NonNull
-            private String insertarLocal(String tableName, String name, String desc, String catego, String fotofull, String datestring, String iduser) {
-                String val = tableName;
-                Log.w("Here",val);
-
-                switch (val){
-
-                    case modelBase.FeedEntryArticle.TABLE_NAME:
-                        // Gets the data repository in write mode
-                        SQLiteDatabase db = DBaseMethods.base.getWritableDatabase();
-
-                        // Create a new map of values, where column names are the keys
-                        ContentValues values = new ContentValues();
-                        //values.put(modelBase.FeedEntryArticle.COLUMN_ID, strings[6]);
-                        values.put(modelBase.FeedEntryArticle.COLUMN_TITULO, name);
-                        values.put(modelBase.FeedEntryArticle.COLUMN_DESCRIPCION, desc);
-                        values.put(modelBase.FeedEntryArticle.COLUMN_CATE, catego);
-                        values.put(modelBase.FeedEntryArticle.COLUMN_FOTO, fotofull);
-                        values.put(modelBase.FeedEntryArticle.COLUMN_TIME, datestring);
-                        values.put(modelBase.FeedEntryArticle.COLUMN_FKUser, iduser);
-
-                        // Insert the new row, returning the primary key value of the new row
-                        //Just change name table and the values....
-                        long newRowId = db.insert(val, null, values);
-                        try {
-                            Thread.sleep(500);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-
-                        return "" + newRowId;
-
-                    default:
-                        break;
-                }
-
-                return "";
-            }
-
-        };
-
-        sendthelast.execute();
-    }
+    //}
 
 //--------------recupera nombre de fotos con ','----------------------------------------------------
     private String saveImages(String iduser) {
 
         String todaslasfotos = "";
 
-        for(int i=1;i<=imagenes.length;i++){
+        for(int i=0;i<imagenes.length;i++){
             //get the image -- save as iduser+i.png into App folder
             if(imagenes[i])
                 todaslasfotos += iduser+"_"+name+"_"+i+".png,";
@@ -659,9 +335,9 @@ public class AddGame extends AppCompatActivity {
         return false;*/
 
         if(!imagenes[0] && !imagenes[1] && !imagenes[2] && !imagenes[3])
-            return false;
-        else
             return true;
+        else
+            return false;
 
     }
 
@@ -733,7 +409,10 @@ public class AddGame extends AppCompatActivity {
         if(name.equals("")){
             Toast.makeText(this,"Ponle un nombre para poder guardar la foto",Toast.LENGTH_SHORT).show();
         }else {
-            final CharSequence[] items = {getString(R.string.tomafoto), getString(R.string.galeria),
+            //Directament abrimos camara
+            cameraIntent();
+
+            /*final CharSequence[] items = {getString(R.string.tomafoto), getString(R.string.galeria),
                     "Cancel"};
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Agregar imagen");
@@ -754,7 +433,7 @@ public class AddGame extends AppCompatActivity {
                     }
                 }
             });
-            builder.show();
+            builder.show();*/
         }
     }
 
@@ -832,14 +511,16 @@ public class AddGame extends AppCompatActivity {
         switch (requestCode) {
             case Utility.MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    if(userChoosenTask.equals(getString(R.string.tomafoto)))
+                    cameraIntent();
+
+                    /*if(userChoosenTask.equals(getString(R.string.tomafoto)))
                         cameraIntent();
                     else if(userChoosenTask.equals(getString(R.string.galeria)))
-                        galleryIntent();
+                        galleryIntent();*/
                 } else {
-                    //code for deny
+                    Toast.makeText(this,"Permiso denegado",Toast.LENGTH_LONG);
                 }
-                break;
+            break;
         }
     }
 
@@ -906,24 +587,24 @@ public class AddGame extends AppCompatActivity {
         String filePath = mCurrentPhotoPath;//photoFile.getPath();
         //Bitmap bmp = BitmapFactory.decodeFile(filePath);
         BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inSampleSize = 5;
+        options.inSampleSize = 8;
         bmp = BitmapFactory.decodeFile(filePath,options);
 
         //Bitmap thumbnail = Bitmap.createScaledBitmap(bmp, bmp.getWidth()/2, bmp.getHeight()/2, false);
 
-        if(tag.equals("1")) {
+        if(tag.equals("0")) {
             imagenup1.setImageBitmap(bmp);
             imagenes[Integer.parseInt(tag)] = true;
         }
-        else if(tag.equals("2")) {
+        else if(tag.equals("1")) {
             imagenup2.setImageBitmap(bmp);
             imagenes[Integer.parseInt(tag)] = true;
         }
-        else if(tag.equals("3")) {
+        else if(tag.equals("2")) {
             imagenup3.setImageBitmap(bmp);
             imagenes[Integer.parseInt(tag)] = true;
         }
-        else if(tag.equals("4")) {
+        else if(tag.equals("3")) {
             imagenup4.setImageBitmap(bmp);
             imagenes[Integer.parseInt(tag)] = true;
         }
@@ -956,4 +637,328 @@ public class AddGame extends AppCompatActivity {
         editor.commit();
         return image;
     }
+
+    //public void saygoodbye(){
+    public class sendthelast extends AsyncTask <Void, Void, Void> {
+        ProgressDialog progress = new ProgressDialog(AddGame.this);
+        String ErrorCode = "";
+
+        @Override
+        protected void onPreExecute() {
+            progress.setTitle("Actualizando");
+            progress.setMessage("Subiendo información...");
+            progress.setIndeterminate(true);
+            progress.setCancelable(false);
+            progress.show();
+        }
+
+        @Override
+        protected void onCancelled() {
+            progress.dismiss();
+            Toast msg = Toast.makeText(getApplicationContext(), ErrorCode, Toast.LENGTH_LONG);
+            msg.show();
+
+            super.onCancelled();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            //before launch alert, we have to send the confirmReport
+            try {
+                //res = api.ConfirmReportLast("ReportOdometer/Confirmreport");
+
+                String fotofull = saveImages(iduser);
+
+                //get date to save gmae
+                DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                Date date = new Date();
+                String datestring = (dateFormat.format(date)); //2016/11/16 12:08:43
+
+                //Firstly save data into localabtabase
+                //DBaseMethods.ThreadDBInsert insert = new DBaseMethods.ThreadDBInsert();
+                //String res = insert.execute(modelBase.FeedEntryArticle.TABLE_NAME, name, desc,catego, fotofull, datestring,iduser).get();
+                //String res = insertarLocal(modelBase.FeedEntryArticle.TABLE_NAME, name, desc, catego, fotofull, datestring,iduser);
+                String res = "1";
+                if(res.equals("-1")){
+                    Toast.makeText(AddGame.this,"Error al guardar información. \n Intente más tarde.", Toast.LENGTH_SHORT).show();
+                }else{
+                    //Si se guardo localmente,,,,intentammos guardar WS
+                    //Create task to send Data to DB --- WS
+                    //WSTask task = new WSTask(AddGame.this);
+                    ws = insertarFB(modelBase.FeedEntryArticle.TABLE_NAME, name, desc, catego,fotofull,datestring,iduser);
+
+                    //Validar si ws ejecutado correctamente...
+                    //String ws = "1";
+                    /*
+                    QUE REGRESARA firebase en caso de error???
+                     */
+                }
+
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+
+            /*if (res.equals("false") || res.equals("true")) {
+
+                new android.app.AlertDialog.Builder(LastOdometerActivity.this)
+                        .setTitle("Odómetro Reportado")
+                        .setMessage("El odómetro fue reportado con exito")
+                        .setIcon(R.drawable.miituo)
+                        .setCancelable(false)
+                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                //progresslast.dismiss();
+                                //finalizamos....
+                                //IinfoClient.getInfoClientObject().getPolicies().setReportState(13);
+
+                                Intent i = new Intent(LastOdometerActivity.this, SyncActivity.class);
+                                startActivity(i);
+                            }
+                        })
+                        .show();
+            }else{
+                new android.app.AlertDialog.Builder(LastOdometerActivity.this)
+                        .setTitle("Odómetro no reportado")
+                        .setMessage("Problema al reportar odómetro, intente más tarde.")
+                        .setIcon(R.drawable.miituo)
+                        .setCancelable(false)
+                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                //progresslast.dismiss();
+                                Intent i = new Intent(LastOdometerActivity.this, SyncActivity.class);
+                                startActivity(i);
+                            }
+                        })
+                        .show();
+            }*/
+
+            progress.dismiss();
+
+            if(!ws.equals("0") || !ws.equals("")){
+                new android.app.AlertDialog.Builder(AddGame.this)
+                        .setTitle("Nivel completo!")
+                        .setMessage("Tu juego está en línea ahora.")
+                        .setCancelable(false)
+                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                //progresslast.dismiss();
+                                //finalizamos....
+                                //IinfoClient.getInfoClientObject().getPolicies().setReportState(13);
+
+                                Intent i = new Intent(AddGame.this,GamesActivity.class);
+                                startActivity(i);
+                            }
+                        })
+                        .show();
+
+            }else{
+                new android.app.AlertDialog.Builder(AddGame.this)
+                        .setTitle("Game Over!")
+                        .setMessage("No pudimos completar la operación. Intenta más tarde.")
+                        .setCancelable(false)
+                        //.setIcon(R.drawable.)
+                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                //progresslast.dismiss();
+                                //finalizamos....
+                                //IinfoClient.getInfoClientObject().getPolicies().setReportState(13);
+
+                                Intent i = new Intent(AddGame.this,GamesActivity.class);
+                                startActivity(i);
+                            }
+                        })
+                        .show();
+            }
+        }
+
+    private String insertarFB(String tableName, String name, String desc, String catego, String fotofull, String datestring, String iduse) {
+
+        try {
+            String table = tableName;
+            Log.w("Here",table);
+
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            DatabaseReference myRef = database.getReference();
+
+            //Thread.sleep(3000);
+
+            switch (table){
+            /*Agrega articulo a DB*/
+                case modelBase.FeedEntryArticle.TABLE_NAME:
+
+                    //String keyArticle = myRef.child("articulo").push().getKey();
+                    //Log.w("key",keyArticle);
+                    String keyArticle = myRef.child("articulo").push().getKey();
+                    ArticuloDao article = new ArticuloDao(keyArticle,name,keyArticle,desc,catego,fotofull,datestring,iduse);
+                    Map<String, Object> postValuesArticle = article.toMap();
+                    myRef.child("articulo").child(keyArticle).updateChildren(postValuesArticle);
+
+                    //now...lets try upload an image to firebase...
+                    // Create a storage reference from our app
+                    //use the keyarticle to set the reference with the article....create the bucket
+
+                    String fotos = fotofull;
+                    String iduser = iduse;
+
+                    FirebaseStorage storage = FirebaseStorage.getInstance();
+                    StorageReference storageRef = storage.getReferenceFromUrl("gs://tradinggames-a6047.appspot.com/");
+
+                    String [] todasfotos = fotos.split(",");
+                    for(int i=0; i<todasfotos.length;i++){
+                        //here a have the filename from the pictures....
+                        //gt each image from stotraga
+                        File image = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+todasfotos[i]);
+                        Uri uri = Uri.fromFile(image);
+
+                        // Create file metadata including the content type
+                        StorageMetadata metadata = new StorageMetadata.Builder()
+                                .setContentType("image/png")
+                                .build();
+
+                        StorageReference riversRef = storageRef.child(iduser+"/"+image.getName());
+                        //UploadTask uploadTask = riversRef.putBytes(image,metadata);
+                        UploadTask uploadTask = riversRef.putFile(uri,metadata);
+
+                        // Register observers to listen for when the download is done or if it fails
+                        uploadTask.addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception exception) {
+                                Log.e("Error","Algo fallo");
+                                exception.printStackTrace();
+                                // Handle unsuccessful uploads
+                            }
+                        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+                                //Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                                Uri downloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
+                            }
+                        });
+                    }
+
+                    // Create a reference to "mountains.jpg"
+                    //StorageReference mountainsRef = storageRef.child("mountains.jpg");
+
+                    //Uri uri = Uri.parse("android.resource://nowoscmexico.com.tradinggames_1/drawable/fifa.jpg");
+                /*String filename = "yy2.png";
+                String path = Environment.getExternalStorageDirectory()+"/Pictures/" + filename;
+                File f = new File(path);  //
+                Uri uri = Uri.fromFile(f);
+                */
+                    // Create a reference to 'images/mountains.jpg'
+                    //StorageReference mountainImagesRef = storageRef.child("images/mountains.jpg").putFile(,metadata);
+
+                    //UploadTask uploadTask = mountainsRef.putBytes(data);
+
+                    return keyArticle;
+            }
+
+            //myRef.child("usuarios").child("2").setValue(user);
+
+            //String key = myRef.child("usuarios").push().getKey();
+            //UsuarioDao user2 = new UsuarioDao("2","nombre","telefono","correo","pass","0");
+
+        /*ArticuloDao dao = new ArticuloDao("1","titulo","descripcion","cate","path","tiempo","11");
+        myRef.child("articulo").child("1").setValue(dao);
+        String keyart = myRef.child("articulo").push().getKey();
+
+        Log.w("key",key);
+        Log.w("keyart",keyart);*/
+
+
+        /*myRef.child("usuarios").child("1").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                UsuarioDao value = dataSnapshot.getValue(UsuarioDao.class);
+                Log.d("DB", "Value is: " + value.getId());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });*/
+
+            // Read from the database
+        /*myRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+                try {
+                    UsuarioDao value = dataSnapshot.getValue(UsuarioDao.class);
+                    Log.d("DB", "Value is: " + value.getId());
+                }
+                catch(Exception e){
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                Log.w("DB", "Failed to read value.", error.toException());
+            }
+        });*/
+
+            //return "1";
+        }catch(Exception e){
+            e.printStackTrace();
+            return "0";
+        }
+
+        return "1";
+    }
+    @NonNull
+    private String insertarLocal(String tableName, String name, String desc, String catego, String fotofull, String datestring, String iduser) {
+        String val = tableName;
+        Log.w("Here",val);
+
+        switch (val){
+            case modelBase.FeedEntryArticle.TABLE_NAME:
+                // Gets the data repository in write mode
+                SQLiteDatabase db = DBaseMethods.base.getWritableDatabase();
+
+                // Create a new map of values, where column names are the keys
+                ContentValues values = new ContentValues();
+
+                values.put(modelBase.FeedEntryArticle.COLUMN_TITULO, name);
+                values.put(modelBase.FeedEntryArticle.COLUMN_DESCRIPCION, desc);
+                values.put(modelBase.FeedEntryArticle.COLUMN_CATE, catego);
+                values.put(modelBase.FeedEntryArticle.COLUMN_FOTO, fotofull);
+                values.put(modelBase.FeedEntryArticle.COLUMN_TIME, datestring);
+                values.put(modelBase.FeedEntryArticle.COLUMN_FKUser, iduser);
+                values.put(modelBase.FeedEntryArticle.COLUMN_IDFIREBASE, "");
+
+                // Insert the new row, returning the primary key value of the new row
+                //Just change name table and the values....
+                long newRowId = db.insert(val, null, values);
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                return "" + newRowId;
+
+            default:
+                break;
+        }
+
+        return "";
+    }
+
+    };
+
 }

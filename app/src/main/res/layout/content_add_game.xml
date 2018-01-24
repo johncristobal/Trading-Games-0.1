@@ -92,7 +92,7 @@
                     android:layout_marginTop="3dp"
                     android:layout_row="0"
                     android:onClick="pictureSelect"
-                    android:tag="1"
+                    android:tag="0"
                     app:srcCompat="@drawable/camicon" />
 
                 <ImageView
@@ -104,7 +104,7 @@
                     android:layout_marginStart="20dp"
                     android:layout_row="0"
                     android:onClick="pictureSelect"
-                    android:tag="2"
+                    android:tag="1"
                     app:srcCompat="@drawable/camicon"
                     android:layout_marginLeft="20dp" />
 
@@ -117,7 +117,7 @@
                     android:layout_marginTop="10dp"
                     android:layout_row="1"
                     android:onClick="pictureSelect"
-                    android:tag="3"
+                    android:tag="2"
                     app:srcCompat="@drawable/camicon"
                     android:layout_marginLeft="20dp" />
 
@@ -130,7 +130,7 @@
                     android:layout_marginTop="10dp"
                     android:layout_row="1"
                     android:onClick="pictureSelect"
-                    android:tag="4"
+                    android:tag="3"
                     app:srcCompat="@drawable/camicon"
                     android:layout_marginLeft="20dp" />
 
