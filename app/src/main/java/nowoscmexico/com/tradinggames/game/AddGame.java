@@ -587,7 +587,7 @@ public class AddGame extends AppCompatActivity {
         String filePath = mCurrentPhotoPath;//photoFile.getPath();
         //Bitmap bmp = BitmapFactory.decodeFile(filePath);
         BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inSampleSize = 8;
+        options.inSampleSize = 2;
         bmp = BitmapFactory.decodeFile(filePath,options);
 
         //Bitmap thumbnail = Bitmap.createScaledBitmap(bmp, bmp.getWidth()/2, bmp.getHeight()/2, false);
@@ -638,7 +638,6 @@ public class AddGame extends AppCompatActivity {
         return image;
     }
 
-    //public void saygoodbye(){
     public class sendthelast extends AsyncTask <Void, Void, Void> {
         ProgressDialog progress = new ProgressDialog(AddGame.this);
         String ErrorCode = "";

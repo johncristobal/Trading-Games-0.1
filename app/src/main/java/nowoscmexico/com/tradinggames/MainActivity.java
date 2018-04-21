@@ -133,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.sharedName), Context.MODE_PRIVATE);
         String sesion = sharedPreferences.getString("sesion","null");
         //String tuto = sharedPreferences.getString("tutohecho","null");
-
+        sharedPreferences.edit().putString("sesion","1").apply();
         if(sesion.equals("1")){
             Intent i = new Intent(this, TrendsGames.class);
             startActivity(i);
