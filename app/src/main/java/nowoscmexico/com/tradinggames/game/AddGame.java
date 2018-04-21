@@ -1,5 +1,9 @@
 package nowoscmexico.com.tradinggames.game;
 
+/*
+* Comentario de prueba...
+* */
+
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
