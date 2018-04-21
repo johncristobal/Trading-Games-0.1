@@ -2,6 +2,7 @@ package nowoscmexico.com.tradinggames.game;
 
 /*
 * Comentario de prueba...
+* Asegurado paquete...
 * */
 
 import android.Manifest;
