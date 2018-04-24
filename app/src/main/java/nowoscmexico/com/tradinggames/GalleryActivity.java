@@ -36,6 +36,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -231,7 +232,7 @@ public class GalleryActivity extends AppCompatActivity {
             //...
 
             //show first element from list
-            final String folderuser = lista.get(0).getIdusuario();
+            /*final String folderuser = lista.get(0).getIdusuario();
             String[] fotos = lista.get(0).getFoto().split(",");
             //Evitr craah en caso que no traiga fotos
             if (fotos.length >= 1) {
@@ -243,11 +244,11 @@ public class GalleryActivity extends AppCompatActivity {
                 Glide.with(GalleryActivity.this)
                         .load(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser+"/"+name)
                         .into(imgSelected);
-            }
+            }*/
 
             //set texto into background
-            videojuego.setText(lista.get(0).getTitulo());
-            gameSelected = lista.get(0).getFoto() + "";
+            //videojuego.setText(lista.get(0).getTitulo());
+            //gameSelected = lista.get(0).getFoto() + "";
 
         }catch(Exception e){
             e.printStackTrace();
@@ -490,6 +491,8 @@ public class GalleryActivity extends AppCompatActivity {
                 //view.imgViewFlag.setImageBitmap(bmp);
                 Glide.with(GalleryActivity.this)
                         .load(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser+"/"+name)
+                        .centerCrop()
+                        .override(150,250)
                         .into(view.imgViewFlag);
             }
 
@@ -657,18 +660,24 @@ public class GalleryActivity extends AppCompatActivity {
                                         //COn el nombre de la imgaen...recuoero imagen de storage firebase
 
                                         //StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://tradinggames-a6047.appspot.com/").child("s2YFT93wtFTXE75rjRkSvvdO6Y62/s2YFT93wtFTXE75rjRkSvvdO6Y62_mario kart 64_1.png");
-                                        StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://tradinggames-a6047.appspot.com/").child(folderuser + "/" + name);
-
+                                        final StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://tradinggames-a6047.appspot.com/").child(folderuser + "/" + name);
+                                        final long ONE_MEGABYTE = 1024*1024;
                                         //imagenes.add(imageView);
                                         final File storageDir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + File.separator + folderuser);
 
                                         //File storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)+ "/YOUR_FOLDER_NAME");
                                         boolean success = true;
-                                        if (!storageDir.exists()) {
-                                            success = storageDir.mkdirs();
-                                        }
+                                        //if (!storageDir.exists()) {
+                                        //    success = storageDir.mkdirs();
+                                        //}
                                         if (success) {
-                                            final File imageFile = new File(storageDir, name);
+                                            contadorArticulos++;
+
+                                            if (contadorArticulos >= 5)
+                                                progress.dismiss();
+
+                                            adapter.notifyDataSetChanged();
+
                                             /*File imageFile = new File(storageDir, imageFileName);
                                             savedImagePath = imageFile.getAbsolutePath();
                                             try {
@@ -679,13 +688,25 @@ public class GalleryActivity extends AppCompatActivity {
                                                 e.printStackTrace();
                                             }*/
 
-                                            storageRef.getFile(imageFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                                            /*
+                                            storageRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                                                @Override
+                                                public void onSuccess(byte[] bytes) {
+                                                    Glide.with(GalleryActivity.this).load(storageRef).diskCacheStrategy(DiskCacheStrategy.ALL).into(kuryerImg);
+                                                }
+                                            }).addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+
+                                                }
+                                            });*/
+                                            /*storageRef.getFile(imageFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
                                                 @Override
                                                 public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
                                                     //Local temp file has been created
                                                     contadorArticulos++;
 
-                                                    if (contadorArticulos >= 1)
+                                                    if (contadorArticulos >= 3)
                                                         progress.dismiss();
 
                                                     adapter.notifyDataSetChanged();
@@ -696,7 +717,7 @@ public class GalleryActivity extends AppCompatActivity {
                                                     // Handle any errors
                                                     Log.w("file", exception.toString());
                                                 }
-                                            });
+                                            });*/
                                         }
                                     }
                                 }
@@ -759,11 +780,25 @@ public class GalleryActivity extends AppCompatActivity {
                         //Aqui solo recuperamos una foto para mostrar en mainview
                         //for (int i = 0; i < 1; i++) {
                         final String name = fotos[0];
+
+                        final StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://tradinggames-a6047.appspot.com/").child(folderuser + "/" + name);
+                        final long ONE_MEGABYTE = 1024*1024;
+                        storageRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                            @Override
+                            public void onSuccess(byte[] bytes) {
+                                Glide.with(GalleryActivity.this).load(storageRef).diskCacheStrategy(DiskCacheStrategy.ALL).into(imgSelected);
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+
+                            }
+                        });
                         //Bitmap bmp = BitmapFactory.decodeFile(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser+"/"+name,options);
                         //view.imgViewFlag.setImageBitmap(bmp);
-                        Glide.with(GalleryActivity.this)
-                                .load(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser+"/"+name)
-                                .into(imgSelected);
+                        //Glide.with(GalleryActivity.this)
+                        //        .load(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser+"/"+name)
+                        //        .into(imgSelected);
                     }
 
                     //set texto into background
