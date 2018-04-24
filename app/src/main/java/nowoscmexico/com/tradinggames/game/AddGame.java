@@ -1,5 +1,10 @@
 package nowoscmexico.com.tradinggames.game;
 
+/*
+* Comentario de prueba...
+* Asegurado paquete...
+* */
+
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -31,6 +36,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -69,6 +75,7 @@ public class AddGame extends AppCompatActivity {
     public EditText nombre;
     public EditText descripcion;
     public Spinner categoria;
+    public String [] categorias= {"Terror", "Deportes", "Ciencia Ficcion", "Suspenso", "Aventura", "Musical"};
 
     public Drawable temp,temp2,temp3,temp4;//,temp5,temp6;
 
@@ -260,7 +267,26 @@ public class AddGame extends AppCompatActivity {
         /*
         * Validar categoria
         * */
-        catego = "categoria";
+        //Se llena el spinner con el array de categorias.
+        categoria.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, categorias));
+
+        //Se utiliza este metodo para elegir el elemento del spinner y despues asignarlo a categoria.
+        categoria.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                catego= (adapterView.getItemAtPosition(i)).toString();
+                //Se muestra el msj con el elemento que se seleccionó.
+                Toast.makeText(adapterView.getContext(), (String)adapterView.getItemAtPosition(i), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+
+
         /*
         * Subir foto a firebase...recuperar path de donde se guardo para enviarla aqui como parametro
         * */
@@ -587,7 +613,7 @@ public class AddGame extends AppCompatActivity {
         String filePath = mCurrentPhotoPath;//photoFile.getPath();
         //Bitmap bmp = BitmapFactory.decodeFile(filePath);
         BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inSampleSize = 8;
+        options.inSampleSize = 2;
         bmp = BitmapFactory.decodeFile(filePath,options);
 
         //Bitmap thumbnail = Bitmap.createScaledBitmap(bmp, bmp.getWidth()/2, bmp.getHeight()/2, false);
@@ -638,7 +664,6 @@ public class AddGame extends AppCompatActivity {
         return image;
     }
 
-    //public void saygoodbye(){
     public class sendthelast extends AsyncTask <Void, Void, Void> {
         ProgressDialog progress = new ProgressDialog(AddGame.this);
         String ErrorCode = "";
@@ -920,6 +945,7 @@ public class AddGame extends AppCompatActivity {
 
         return "1";
     }
+
     @NonNull
     private String insertarLocal(String tableName, String name, String desc, String catego, String fotofull, String datestring, String iduser) {
         String val = tableName;
@@ -944,6 +970,7 @@ public class AddGame extends AppCompatActivity {
                 // Insert the new row, returning the primary key value of the new row
                 //Just change name table and the values....
                 long newRowId = db.insert(val, null, values);
+
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
