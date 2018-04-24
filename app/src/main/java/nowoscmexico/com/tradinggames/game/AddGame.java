@@ -3,6 +3,7 @@ package nowoscmexico.com.tradinggames.game;
 /*
 * Comentario de prueba...
 * Asegurado paquete...
+* Un comentario mas para probar github desde lap home
 * */
 
 import android.Manifest;
