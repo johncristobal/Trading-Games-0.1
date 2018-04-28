@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
                 if (user != null) {
                     // User is signed in
                     if (user.getUid().equals("WII3oNBHEgcLJNcrB7GBy2GhmNF3")){
-                        Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+                        Log.d(TAG, "onAuthStateChanged:signed_out:" + user.getUid());
                         //Intent i = new Intent(getApplicationContext(), TutorialActivity.class);
                         //startActivity(i);
                     }

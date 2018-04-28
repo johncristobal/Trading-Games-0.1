@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -36,7 +37,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.Registry;
+import com.bumptech.glide.annotation.GlideModule;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.module.AppGlideModule;
+import com.bumptech.glide.request.RequestOptions;
+import com.firebase.client.utilities.Base64;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -55,6 +61,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.io.InputStream;
 
 import nowoscmexico.com.tradinggames.DataBase.DBaseMethods;
 import nowoscmexico.com.tradinggames.DataBase.modelBase;
@@ -401,6 +408,16 @@ public class GalleryActivity extends AppCompatActivity {
     }
 
 
+    @GlideModule
+    public class MyAppGlideModule extends AppGlideModule {
+
+        @Override
+        public void registerComponents(Context context, Glide glide, Registry registry) {
+            // Register FirebaseImageLoader to handle StorageReference
+            registry.append(StorageReference.class, InputStream.class,
+                    new FirebaseImageLoader.Factory());
+        }
+    }
 /*
 ====================================================================================================
 *   Clase imagAdapter para cargar imagenes en gallery
@@ -487,13 +504,25 @@ public class GalleryActivity extends AppCompatActivity {
                 //Aqui solo recuperamos una foto para mostrar en mainview
                 //for (int i = 0; i < 1; i++) {
                 final String name = fotos[0];
-                //Bitmap bmp = BitmapFactory.decodeFile(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser+"/"+name,options);
-                //view.imgViewFlag.setImageBitmap(bmp);
-                Glide.with(GalleryActivity.this)
-                        .load(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser+"/"+name)
-                        .centerCrop()
-                        .override(150,250)
-                        .into(view.imgViewFlag);
+                final StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://tradinggames-a6047.appspot.com").child(folderuser + "/" + name);
+                final long ONE_MEGABYTE = 1024*1024;
+
+                storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        // Got the download URL for 'users/me/profile.png'
+                        Glide.with(GalleryActivity.this)
+                                .load(uri.toString())
+                                .apply(new RequestOptions().override(240, 300).centerCrop())//.override(150,200)
+                                //.load(storageRef)
+                                .into(view.imgViewFlag);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle any errors
+                    }
+                });
             }
 
             if(sesion.equals("1")){
@@ -550,10 +579,10 @@ public class GalleryActivity extends AppCompatActivity {
 
             SQLiteDatabase db = DBaseMethods.base.getWritableDatabase();
 
-            db.execSQL("DELETE FROM " + modelBase.FeedEntryUsuario.TABLE_NAME);
-            db.execSQL("DELETE FROM " + modelBase.FeedEntryArticle.TABLE_NAME);
-            db.execSQL("DELETE FROM " + modelBase.FeedEntryMatch.TABLE_NAME);
-            db.close();
+            //db.execSQL("DELETE FROM " + modelBase.FeedEntryUsuario.TABLE_NAME);
+            //db.execSQL("DELETE FROM " + modelBase.FeedEntryArticle.TABLE_NAME);
+            //db.execSQL("DELETE FROM " + modelBase.FeedEntryMatch.TABLE_NAME);
+            //db.close();
         }
 
         //cargar articulo a la base ddatos
@@ -786,7 +815,9 @@ public class GalleryActivity extends AppCompatActivity {
                         storageRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
                             @Override
                             public void onSuccess(byte[] bytes) {
-                                Glide.with(GalleryActivity.this).load(storageRef).diskCacheStrategy(DiskCacheStrategy.ALL).into(imgSelected);
+                                Glide.with(GalleryActivity.this).load(storageRef)
+                                        //.diskCacheStrategy(DiskCacheStrategy.ALL)
+                                        .into(imgSelected);
                             }
                         }).addOnFailureListener(new OnFailureListener() {
                             @Override
