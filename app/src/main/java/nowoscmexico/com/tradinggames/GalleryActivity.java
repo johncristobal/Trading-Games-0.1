@@ -13,7 +13,9 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
@@ -418,155 +420,8 @@ public class GalleryActivity extends AppCompatActivity {
                     new FirebaseImageLoader.Factory());
         }
     }
-/*
-====================================================================================================
-*   Clase imagAdapter para cargar imagenes en gallery
-* */
-    public class ImageAdapter extends BaseAdapter {
-        private Context context;
-        private int itemBackground;
-        private Activity activity;
-        private ArrayList<ArticuloDao> imageIDsbase;
 
-        public ImageAdapter(Activity activity,ArrayList<ArticuloDao> img)
-        {
-            this.activity = activity;
-            imageIDsbase = img;
-            //context = c;
-            // sets a grey background; wraps around the images
-            TypedArray a =obtainStyledAttributes(R.styleable.MyGallery);
-            itemBackground = a.getResourceId(R.styleable.MyGallery_android_galleryItemBackground, 0);
-            a.recycle();
-        }
-
-        // returns the number of images
-        @Override
-        public int getCount() {
-            return imageIDsbase.size();
-        }
-        // returns the ID of an item
-        @Override
-        public Object getItem(int position) {
-            return position;
-        }
-        // returns the ID of an item
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        public class ViewHolder
-        {
-            public ImageView imgViewFlag;
-            public ImageView imgViewStar;
-        }
-
-        // returns an ImageView view
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-
-            final ViewHolder view;
-            final int intt = position;
-
-            LayoutInflater inflator = activity.getLayoutInflater();
-
-            if(convertView==null)
-            {
-                view = new ViewHolder();
-                convertView = inflator.inflate(R.layout.swipe, null);
-
-                view.imgViewFlag = (ImageView) convertView.findViewById(R.id.imageView);
-                view.imgViewStar = (ImageView) convertView.findViewById(R.id.imageViewstart);
-
-                convertView.setTag(view);
-            }
-            else
-            {
-                view = (ViewHolder) convertView.getTag();
-                //return convertView;
-            }
-
-            //Coloca foto que obtengo de la lista de objeotsç
-            //-----------------------------Checar aqui orque ya no es image resource....es bitmap directamente--------------
-            //view.imgViewFlag.setImageResource(Integer.parseInt(imageIDsbase.get(position).getFoto()));
-
-            /*view.imgViewFlag.setImageBitmap(imageIDsbase.get(position).getIamgentemp());
-            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(450, 250);
-            view.imgViewFlag.setLayoutParams(layoutParams);*/
-
-            //BitmapFactory.Options options = new BitmapFactory.Options();
-            //options.inSampleSize = 5;
-
-            final String folderuser = imageIDsbase.get(position).getIdusuario();
-            String[] fotos = imageIDsbase.get(position).getFoto().split(",");
-            //Evitr craah en caso que no traiga fotos
-            if (fotos.length >= 1) {
-                //Aqui solo recuperamos una foto para mostrar en mainview
-                //for (int i = 0; i < 1; i++) {
-                final String name = fotos[0];
-                final StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://tradinggames-a6047.appspot.com").child(folderuser + "/" + name);
-                final long ONE_MEGABYTE = 1024*1024;
-
-                storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                    @Override
-                    public void onSuccess(Uri uri) {
-                        // Got the download URL for 'users/me/profile.png'
-                        Glide.with(GalleryActivity.this)
-                                .load(uri.toString())
-                                .apply(new RequestOptions().override(240, 300).centerCrop())//.override(150,200)
-                                //.load(storageRef)
-                                .into(view.imgViewFlag);
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        // Handle any errors
-                    }
-                });
-            }
-
-            if(sesion.equals("1")){
-                view.imgViewStar.setVisibility(View.VISIBLE);
-            }else{
-                view.imgViewStar.setVisibility(View.INVISIBLE);
-            }
-
-            view.imgViewStar.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(sesion.equals("1")){
-                        //Add and delete from the DB table match
-                        //if not in list
-                        if(!flag){
-                            flag=true;
-                            view.imgViewStar.setImageResource(android.R.drawable.btn_star_big_on);
-                            Toast.makeText(activity,"Juego agregado a lista de Match.\n"+imageIDsbase.get(intt).getFoto(),Toast.LENGTH_SHORT).show();
-                        }else{
-                            flag=false;
-                            view.imgViewStar.setImageResource(android.R.drawable.btn_star);
-                            //Toast.makeText(context,"Juego eliminado de lista de Match.\n"+result[pos],Toast.LENGTH_SHORT).show();
-                        }
-                        //else
-                        //Toast.makeText(context,"Juego elimiando de lista de Match.\n"+result[pos],Toast.LENGTH_SHORT).show();
-                    }else {
-                        Intent intent = new Intent(context, UserActivity.class);
-                        //intent.putExtra("nombre",gameSelected);
-                        intent.putExtra("activity","match");
-                        context.startActivity(intent);
-                    }
-                }
-            });
-
-            return convertView;
-
-            /*ImageView imageView = new ImageView(context);
-            imageView.setImageResource(imageIDs[position]);
-            imageView.setLayoutParams(new Gallery.LayoutParams(200, 200));
-            imageView.setBackgroundResource(itemBackground);
-            return imageView;*/
-        }
-    }
-
+//=================================GEt data from firebase===========================================
     //public void saygoodbye(){
    public class Sendthelast extends AsyncTask<Void, Void, Void>{
         ProgressDialog progress = new ProgressDialog(GalleryActivity.this);
@@ -706,47 +561,6 @@ public class GalleryActivity extends AppCompatActivity {
                                                 progress.dismiss();
 
                                             adapter.notifyDataSetChanged();
-
-                                            /*File imageFile = new File(storageDir, imageFileName);
-                                            savedImagePath = imageFile.getAbsolutePath();
-                                            try {
-                                                OutputStream fOut = new FileOutputStream(imageFile);
-                                                image.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
-                                                fOut.close();
-                                            } catch (Exception e) {
-                                                e.printStackTrace();
-                                            }*/
-
-                                            /*
-                                            storageRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-                                                @Override
-                                                public void onSuccess(byte[] bytes) {
-                                                    Glide.with(GalleryActivity.this).load(storageRef).diskCacheStrategy(DiskCacheStrategy.ALL).into(kuryerImg);
-                                                }
-                                            }).addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-
-                                                }
-                                            });*/
-                                            /*storageRef.getFile(imageFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                                                @Override
-                                                public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                                                    //Local temp file has been created
-                                                    contadorArticulos++;
-
-                                                    if (contadorArticulos >= 3)
-                                                        progress.dismiss();
-
-                                                    adapter.notifyDataSetChanged();
-                                                }
-                                            }).addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception exception) {
-                                                    // Handle any errors
-                                                    Log.w("file", exception.toString());
-                                                }
-                                            });*/
                                         }
                                     }
                                 }
@@ -773,7 +587,6 @@ public class GalleryActivity extends AppCompatActivity {
                     public void onCancelled(DatabaseError databaseError) {}
                 });
 
-                //juegosws = lista;
                 }
             catch(Exception e){
                 e.printStackTrace();
@@ -793,43 +606,32 @@ public class GalleryActivity extends AppCompatActivity {
                 gallery.setAdapter(adapter);
                 gallery.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-                        //Toast.makeText(getBaseContext(), "pic" + (position + 1) + " selected",Toast.LENGTH_SHORT).show();
-
-                        //load imagen to show bigger
-                    /*BitmapFactory.Options options = new BitmapFactory.Options();
-                    options.inSampleSize = 5;
-
-                    Bitmap bmp = BitmapFactory.decodeFile(lista.get(position).getFoto(), options);
-                    imgSelected.setImageBitmap(bmp);*/
 
                     final String folderuser = lista.get(position).getIdusuario();
                     String[] fotos = lista.get(position).getFoto().split(",");
                     //Evitr craah en caso que no traiga fotos
                     if (fotos.length >= 1) {
                         //Aqui solo recuperamos una foto para mostrar en mainview
-                        //for (int i = 0; i < 1; i++) {
                         final String name = fotos[0];
-
-                        final StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://tradinggames-a6047.appspot.com/").child(folderuser + "/" + name);
+                        final StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://tradinggames-a6047.appspot.com").child(folderuser + "/" + name);
                         final long ONE_MEGABYTE = 1024*1024;
-                        storageRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+
+                        storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                             @Override
-                            public void onSuccess(byte[] bytes) {
-                                Glide.with(GalleryActivity.this).load(storageRef)
-                                        //.diskCacheStrategy(DiskCacheStrategy.ALL)
+                            public void onSuccess(Uri uri) {
+                                // Got the download URL for 'users/me/profile.png'
+                                Glide.with(GalleryActivity.this)
+                                        .load(uri.toString())
+                                        .apply(new RequestOptions().override(240, 300).centerCrop().diskCacheStrategy(DiskCacheStrategy.ALL))//.override(150,200)
+                                        //.load(storageRef)
                                         .into(imgSelected);
                             }
                         }).addOnFailureListener(new OnFailureListener() {
                             @Override
-                            public void onFailure(@NonNull Exception e) {
-
+                            public void onFailure(@NonNull Exception exception) {
+                                // Handle any errors
                             }
                         });
-                        //Bitmap bmp = BitmapFactory.decodeFile(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser+"/"+name,options);
-                        //view.imgViewFlag.setImageBitmap(bmp);
-                        //Glide.with(GalleryActivity.this)
-                        //        .load(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+folderuser+"/"+name)
-                        //        .into(imgSelected);
                     }
 
                     //set texto into background
@@ -853,8 +655,6 @@ public class GalleryActivity extends AppCompatActivity {
                         context.startActivity(intent);
                     }
                 });
-                //progress.dismiss();
-                //}
             }
             catch (Exception e){
                 e.printStackTrace();
@@ -912,6 +712,137 @@ public class GalleryActivity extends AppCompatActivity {
         }
     };
 
-        //sendthelast.execute();
-    //}
+
+/*
+====================================================================================================
+*   Clase imagAdapter para cargar imagenes en gallery
+* */
+
+   public class ImageAdapter extends BaseAdapter {
+        private Context context;
+        private int itemBackground;
+        private Activity activity;
+        private ArrayList<ArticuloDao> imageIDsbase;
+
+        public ImageAdapter(Activity activity,ArrayList<ArticuloDao> img)
+        {
+            this.activity = activity;
+            imageIDsbase = img;
+            //context = c;
+            // sets a grey background; wraps around the images
+            TypedArray a =obtainStyledAttributes(R.styleable.MyGallery);
+            itemBackground = a.getResourceId(R.styleable.MyGallery_android_galleryItemBackground, 0);
+            a.recycle();
+        }
+
+        // returns the number of images
+        @Override
+        public int getCount() {
+            return imageIDsbase.size();
+        }
+        // returns the ID of an item
+        @Override
+        public Object getItem(int position) {
+            return position;
+        }
+        // returns the ID of an item
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        public class ViewHolder
+        {
+            public ImageView imgViewFlag;
+            public ImageView imgViewStar;
+        }
+
+        // returns an ImageView view
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            final ViewHolder view;
+            final int intt = position;
+
+            LayoutInflater inflator = activity.getLayoutInflater();
+
+            if(convertView==null)
+            {
+                view = new ViewHolder();
+                convertView = inflator.inflate(R.layout.swipe, null);
+
+                view.imgViewFlag = (ImageView) convertView.findViewById(R.id.imageView);
+                view.imgViewStar = (ImageView) convertView.findViewById(R.id.imageViewstart);
+
+                convertView.setTag(view);
+            }
+            else
+            {
+                view = (ViewHolder) convertView.getTag();
+                //return convertView;
+            }
+
+            final String folderuser = imageIDsbase.get(position).getIdusuario();
+            String[] fotos = imageIDsbase.get(position).getFoto().split(",");
+            //Evitr craah en caso que no traiga fotos
+            if (fotos.length >= 1) {
+                //Aqui solo recuperamos una foto para mostrar en mainview
+                //for (int i = 0; i < 1; i++) {
+                final String name = fotos[0];
+                final StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://tradinggames-a6047.appspot.com").child(folderuser + "/" + name);
+                final long ONE_MEGABYTE = 1024*1024;
+
+                storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        // Got the download URL for 'users/me/profile.png'
+                        Glide.with(GalleryActivity.this)
+                                .load(uri.toString())
+                                .apply(new RequestOptions().override(240, 300).centerCrop().diskCacheStrategy(DiskCacheStrategy.ALL))//.override(150,200)
+                                //.load(storageRef)
+                                .into(view.imgViewFlag);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle any errors
+                    }
+                });
+            }
+
+            if(sesion.equals("1")){
+                view.imgViewStar.setVisibility(View.VISIBLE);
+            }else{
+                view.imgViewStar.setVisibility(View.INVISIBLE);
+            }
+
+            view.imgViewStar.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(sesion.equals("1")){
+                        //Add and delete from the DB table match
+                        //if not in list
+                        if(!flag){
+                            flag=true;
+                            view.imgViewStar.setImageResource(android.R.drawable.btn_star_big_on);
+                            Toast.makeText(activity,"Juego agregado a lista de Match.\n"+imageIDsbase.get(intt).getFoto(),Toast.LENGTH_SHORT).show();
+                        }else{
+                            flag=false;
+                            view.imgViewStar.setImageResource(android.R.drawable.btn_star);
+                            //Toast.makeText(context,"Juego eliminado de lista de Match.\n"+result[pos],Toast.LENGTH_SHORT).show();
+                        }
+                        //else
+                        //Toast.makeText(context,"Juego elimiando de lista de Match.\n"+result[pos],Toast.LENGTH_SHORT).show();
+                    }else {
+                        Intent intent = new Intent(context, UserActivity.class);
+                        //intent.putExtra("nombre",gameSelected);
+                        intent.putExtra("activity","match");
+                        context.startActivity(intent);
+                    }
+                }
+            });
+
+            return convertView;
+        }
+    }
 }

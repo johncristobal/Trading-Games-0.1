@@ -618,7 +618,6 @@ public class AddGame extends AppCompatActivity {
         bmp = BitmapFactory.decodeFile(filePath,options);
 
         //Bitmap thumbnail = Bitmap.createScaledBitmap(bmp, bmp.getWidth()/2, bmp.getHeight()/2, false);
-
         if(tag.equals("0")) {
             imagenup1.setImageBitmap(bmp);
             imagenes[Integer.parseInt(tag)] = true;
