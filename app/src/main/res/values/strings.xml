@@ -27,7 +27,7 @@
     <string name="title_activity_simple_view_g">SimpleViewG</string>
     <string name="title_activity_user">UserActivity</string>
 
-    <string name="sharedName">nowoscmexico.com.tradinggames_1</string>
+    <string name="sharedName">nowoscmexico.com.tradinggames</string>
     <string name="title_activity_match">MatchActivity</string>
     <string name="title_activity_games">GamesActivity</string>
     <string name="title_activity_add_game">AddGame</string>

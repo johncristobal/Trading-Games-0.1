@@ -155,7 +155,7 @@ public class UpdateGame extends AppCompatActivity {
                         Glide.with(UpdateGame.this)
                                 .load(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + File.separator + _iduser + "/" + fotos[i])
                                 .into(imagenup2);
-                        imagenup1.setTag("2");
+                        imagenup2.setTag("2");
 
                         break;
                     case 2:
@@ -163,14 +163,14 @@ public class UpdateGame extends AppCompatActivity {
                         Glide.with(UpdateGame.this)
                                 .load(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + File.separator + _iduser + "/" + fotos[i])
                                 .into(imagenup3);
-                        imagenup1.setTag("3");
+                        imagenup3.setTag("3");
                         break;
                     case 3:
                         imagenes[i] = true;
                         Glide.with(UpdateGame.this)
                                 .load(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + File.separator + _iduser + "/" + fotos[i])
                                 .into(imagenup4);
-                        imagenup1.setTag("4");
+                        imagenup4.setTag("4");
 
                         break;
 

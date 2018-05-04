@@ -434,10 +434,10 @@ public class GalleryActivity extends AppCompatActivity {
 
             SQLiteDatabase db = DBaseMethods.base.getWritableDatabase();
 
-            //db.execSQL("DELETE FROM " + modelBase.FeedEntryUsuario.TABLE_NAME);
-            //db.execSQL("DELETE FROM " + modelBase.FeedEntryArticle.TABLE_NAME);
-            //db.execSQL("DELETE FROM " + modelBase.FeedEntryMatch.TABLE_NAME);
-            //db.close();
+            db.execSQL("DELETE FROM " + modelBase.FeedEntryUsuario.TABLE_NAME);
+            db.execSQL("DELETE FROM " + modelBase.FeedEntryArticle.TABLE_NAME);
+            db.execSQL("DELETE FROM " + modelBase.FeedEntryMatch.TABLE_NAME);
+            db.close();
         }
 
         //cargar articulo a la base ddatos

@@ -30,6 +30,7 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -77,8 +78,6 @@ public class AddGame extends AppCompatActivity {
     public EditText descripcion;
     public Spinner categoria;
     public String [] categorias= {"Terror", "Deportes", "Ciencia Ficcion", "Suspenso", "Aventura", "Musical"};
-
-    public Drawable temp,temp2,temp3,temp4;//,temp5,temp6;
 
     private ImageView imagenup1,imagenup2,imagenup3,imagenup4;//,imagenup5,imagenup6;
 
@@ -146,6 +145,22 @@ public class AddGame extends AppCompatActivity {
         Button b4 = (Button)findViewById(R.id.button4);
         b4.setTypeface(typeface);
 
+        categoria.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, categorias));
+
+        //Se utiliza este metodo para elegir el elemento del spinner y despues asignarlo a categoria.
+        categoria.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                catego= (adapterView.getItemAtPosition(i)).toString();
+                //Se muestra el msj con el elemento que se seleccionó.
+                Toast.makeText(adapterView.getContext(), (String)adapterView.getItemAtPosition(i), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
         //imagenup5 = (ImageView)findViewById(R.id.imageViewfoto5);
         //imagenup6 = (ImageView)findViewById(R.id.imageViewfoto6);
         /*
@@ -209,10 +224,6 @@ public class AddGame extends AppCompatActivity {
         // Instance of ImageAdapter Class
         //gridView.setAdapter(new GridAdapter(mThumbIds,this));
 
-        temp = imagenup1.getDrawable();
-        temp2 = imagenup2.getDrawable();
-        temp3 = imagenup3.getDrawable();
-        temp4 = imagenup4.getDrawable();
         //temp5 = imagenup5.getDrawable();
         //temp6 = imagenup6.getDrawable();
 
@@ -269,25 +280,6 @@ public class AddGame extends AppCompatActivity {
         * Validar categoria
         * */
         //Se llena el spinner con el array de categorias.
-        categoria.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, categorias));
-
-        //Se utiliza este metodo para elegir el elemento del spinner y despues asignarlo a categoria.
-        categoria.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                catego= (adapterView.getItemAtPosition(i)).toString();
-                //Se muestra el msj con el elemento que se seleccionó.
-                Toast.makeText(adapterView.getContext(), (String)adapterView.getItemAtPosition(i), Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-
-
-
         /*
         * Subir foto a firebase...recuperar path de donde se guardo para enviarla aqui como parametro
         * */
@@ -512,12 +504,13 @@ public class AddGame extends AppCompatActivity {
             try {
                 photoFile = createImageFile(iduser,tag,name);
             } catch (IOException ex) {
+                ex.printStackTrace();
                 // Error occurred while creating the File...
             }
             // Continue only if the File was successfully created
             if (photoFile != null) {
                 //Uri photoURI = FileProvider.getUriForFile(VehiclePictures.this, "miituo.com.miituo", photoFile);
-                Uri photoURI = Uri.fromFile(photoFile);
+                Uri photoURI = FileProvider.getUriForFile(this, "nowoscmexico.com.tradinggames.fileprovider", photoFile);
                 takepic.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takepic, REQUEST_CAMERA);
             }
@@ -646,7 +639,12 @@ public class AddGame extends AppCompatActivity {
         //String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         //String imageFileName = username;
 
-        File image = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+username+"_"+gamaname+"_"+tag+".png");
+        File path = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+iduser);
+        if(!path.exists()){
+            path.mkdirs();
+        }
+
+        File image = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+iduser+"/"+username+"_"+gamaname+"_"+tag+".png");
         /*File image = File.createTempFile(
                 username+tag,  // prefix
                 ".png",         // suffix
@@ -660,10 +658,11 @@ public class AddGame extends AppCompatActivity {
         SharedPreferences preferences = getSharedPreferences(getString(R.string.sharedName), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("nombrefoto",mCurrentPhotoPath);
-        editor.commit();
+        editor.apply();
         return image;
     }
 
+//========================================thread to send data to firebase===========================
     public class sendthelast extends AsyncTask <Void, Void, Void> {
         ProgressDialog progress = new ProgressDialog(AddGame.this);
         String ErrorCode = "";
