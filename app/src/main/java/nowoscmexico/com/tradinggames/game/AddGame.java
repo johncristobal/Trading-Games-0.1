@@ -510,7 +510,7 @@ public class AddGame extends AppCompatActivity {
             // Continue only if the File was successfully created
             if (photoFile != null) {
                 //Uri photoURI = FileProvider.getUriForFile(VehiclePictures.this, "miituo.com.miituo", photoFile);
-                Uri photoURI = FileProvider.getUriForFile(this, "nowoscmexico.com.tradinggames.fileprovider", photoFile);
+                Uri photoURI = FileProvider.getUriForFile(this, "nowoscmexico.com.tradinggames_1.fileprovider", photoFile);
                 takepic.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takepic, REQUEST_CAMERA);
             }
@@ -633,7 +633,7 @@ public class AddGame extends AppCompatActivity {
             imagenup6.setImageBitmap(thumbnail);*/
     }
 
-//***********************save iage to path folder app*********************************
+//***********************save iage to path folder app***********************************************
     private File createImageFile(String username, String tag,String gamaname) throws IOException {
         // Create an image file name
         //String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());

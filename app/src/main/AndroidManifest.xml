@@ -84,7 +84,7 @@
 
         <provider
             android:name="android.support.v4.content.FileProvider"
-            android:authorities="nowoscmexico.com.tradinggames.fileprovider"
+            android:authorities="nowoscmexico.com.tradinggames_1.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
