@@ -135,7 +135,7 @@ public class DBaseMethods {
                 case modelBase.FeedEntryArticle.TABLE_NAME:
                     ArrayList<Object> proyectos = new ArrayList<>();
                     String query = "select * from "+ modelBase.FeedEntryArticle.TABLE_NAME;
-                    SQLiteDatabase db = base.getWritableDatabase();
+                    SQLiteDatabase db = base.getReadableDatabase();
 
                     Cursor cursor = db.rawQuery(query,null);
                     if (cursor.moveToFirst()){

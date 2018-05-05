@@ -494,9 +494,6 @@ public class AddGame extends AppCompatActivity {
 //***********************Abrir camara para tomar foto***********************************************
     private void cameraIntent()
     {
-        //Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        //startActivityForResult(intent, REQUEST_CAMERA);
-
         Intent takepic=new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         //startActivityForResult(i, FRONT_VEHICLE);
         if (takepic.resolveActivity(getPackageManager()) != null) {
@@ -513,6 +510,8 @@ public class AddGame extends AppCompatActivity {
                 Uri photoURI = FileProvider.getUriForFile(this, "nowoscmexico.com.tradinggames_1.fileprovider", photoFile);
                 takepic.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takepic, REQUEST_CAMERA);
+            }else{
+                Toast.makeText(this,"Tuvimos un problema al tomar la imagen. Intente mas tarde.",Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -607,7 +606,7 @@ public class AddGame extends AppCompatActivity {
         String filePath = mCurrentPhotoPath;//photoFile.getPath();
         //Bitmap bmp = BitmapFactory.decodeFile(filePath);
         BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inSampleSize = 2;
+        options.inSampleSize = 4;
         bmp = BitmapFactory.decodeFile(filePath,options);
 
         //Bitmap thumbnail = Bitmap.createScaledBitmap(bmp, bmp.getWidth()/2, bmp.getHeight()/2, false);
@@ -701,8 +700,8 @@ public class AddGame extends AppCompatActivity {
                 //Firstly save data into localabtabase
                 //DBaseMethods.ThreadDBInsert insert = new DBaseMethods.ThreadDBInsert();
                 //String res = insert.execute(modelBase.FeedEntryArticle.TABLE_NAME, name, desc,catego, fotofull, datestring,iduser).get();
-                //String res = insertarLocal(modelBase.FeedEntryArticle.TABLE_NAME, name, desc, catego, fotofull, datestring,iduser);
-                String res = "1";
+                String res = insertarLocal(modelBase.FeedEntryArticle.TABLE_NAME, name, desc, catego, fotofull, datestring,iduser);
+                //String res = "1";
                 if(res.equals("-1")){
                     Toast.makeText(AddGame.this,"Error al guardar información. \n Intente más tarde.", Toast.LENGTH_SHORT).show();
                 }else{

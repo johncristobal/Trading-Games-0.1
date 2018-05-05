@@ -39,6 +39,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
@@ -146,31 +147,35 @@ public class UpdateGame extends AppCompatActivity {
                         imagenes[i] = true;
                         Glide.with(UpdateGame.this)
                                 .load(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + File.separator + _iduser + "/" + fotos[i])
+                                .apply(new RequestOptions().override(150, 200).centerCrop())//.override(150,200)
                                 .into(imagenup1);
 
-                        imagenup1.setTag("1");
+                        //imagenup1.setTag("1");
                         break;
                     case 1:
                         imagenes[i] = true;
                         Glide.with(UpdateGame.this)
                                 .load(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + File.separator + _iduser + "/" + fotos[i])
+                                .apply(new RequestOptions().override(150, 200).centerCrop())//.override(150,200)
                                 .into(imagenup2);
-                        imagenup2.setTag("2");
+                        //imagenup2.setTag("2");
 
                         break;
                     case 2:
                         imagenes[i] = true;
                         Glide.with(UpdateGame.this)
                                 .load(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + File.separator + _iduser + "/" + fotos[i])
+                                .apply(new RequestOptions().override(150, 200).centerCrop())//.override(150,200)
                                 .into(imagenup3);
-                        imagenup3.setTag("3");
+                        //imagenup3.setTag("3");
                         break;
                     case 3:
                         imagenes[i] = true;
                         Glide.with(UpdateGame.this)
                                 .load(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + File.separator + _iduser + "/" + fotos[i])
+                                .apply(new RequestOptions().override(150, 200).centerCrop())//.override(150,200)
                                 .into(imagenup4);
-                        imagenup4.setTag("4");
+                        //imagenup4.setTag("4");
 
                         break;
 
