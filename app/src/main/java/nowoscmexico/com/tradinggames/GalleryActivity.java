@@ -817,7 +817,8 @@ public class GalleryActivity extends AppCompatActivity {
                 });
             }
 
-            if(sesion.equals("1")){
+            //match star to save games
+            /*if(sesion.equals("1")){
                 view.imgViewStar.setVisibility(View.VISIBLE);
             }else{
                 view.imgViewStar.setVisibility(View.INVISIBLE);
@@ -847,7 +848,7 @@ public class GalleryActivity extends AppCompatActivity {
                         context.startActivity(intent);
                     }
                 }
-            });
+            });*/
 
             return convertView;
         }
