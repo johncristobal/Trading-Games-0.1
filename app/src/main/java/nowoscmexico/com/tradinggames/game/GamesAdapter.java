@@ -43,11 +43,11 @@ import nowoscmexico.com.tradinggames.R;
 public class GamesAdapter extends BaseAdapter {
 
     Context context;
-    ArrayList<Object> games;
+    ArrayList<ArticuloDao> games;
     private static LayoutInflater inflater = null;
     private Typeface tipo;
 
-    public GamesAdapter(Context c, ArrayList<Object> p, Typeface t){
+    public GamesAdapter(Context c, ArrayList<ArticuloDao> p, Typeface t){
         context = c;
         games = p;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

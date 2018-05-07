@@ -16,7 +16,7 @@ public class modelBase extends SQLiteOpenHelper {
     // If you change the database schema, you must increment the database version.
     public Context contex;
     //public static final int DATABASE_VERSION = 22;
-    public static final String DATABASE_NAME = "TrendinGames.db";
+    public static final String DATABASE_NAME = "TrendingGames.db";
 
     /* Inner class that defines the table contents */
     public static class FeedEntryUsuario implements BaseColumns {

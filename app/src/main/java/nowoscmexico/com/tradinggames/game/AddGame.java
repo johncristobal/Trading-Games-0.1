@@ -68,6 +68,7 @@ import java.util.Map;
 import nowoscmexico.com.tradinggames.DataBase.ArticuloDao;
 import nowoscmexico.com.tradinggames.DataBase.modelBase;
 import nowoscmexico.com.tradinggames.DataBase.DBaseMethods;
+import nowoscmexico.com.tradinggames.GalleryActivity;
 import nowoscmexico.com.tradinggames.R;
 
 public class AddGame extends AppCompatActivity {
@@ -80,6 +81,8 @@ public class AddGame extends AppCompatActivity {
     public String [] categorias= {"Terror", "Deportes", "Ciencia Ficcion", "Suspenso", "Aventura", "Musical"};
 
     private ImageView imagenup1,imagenup2,imagenup3,imagenup4;//,imagenup5,imagenup6;
+
+    public boolean banderainserta = false;
 
     public byte[] dataimagen;
     private String userChoosenTask, iduser;
@@ -153,7 +156,7 @@ public class AddGame extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 catego= (adapterView.getItemAtPosition(i)).toString();
                 //Se muestra el msj con el elemento que se seleccionó.
-                Toast.makeText(adapterView.getContext(), (String)adapterView.getItemAtPosition(i), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(adapterView.getContext(), (String)adapterView.getItemAtPosition(i), Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -688,8 +691,6 @@ public class AddGame extends AppCompatActivity {
         protected Void doInBackground(Void... params) {
             //before launch alert, we have to send the confirmReport
             try {
-                //res = api.ConfirmReportLast("ReportOdometer/Confirmreport");
-
                 String fotofull = saveImages(iduser);
 
                 //get date to save gmae
@@ -698,10 +699,9 @@ public class AddGame extends AppCompatActivity {
                 String datestring = (dateFormat.format(date)); //2016/11/16 12:08:43
 
                 //Firstly save data into localabtabase
-                //DBaseMethods.ThreadDBInsert insert = new DBaseMethods.ThreadDBInsert();
-                //String res = insert.execute(modelBase.FeedEntryArticle.TABLE_NAME, name, desc,catego, fotofull, datestring,iduser).get();
-                String res = insertarLocal(modelBase.FeedEntryArticle.TABLE_NAME, name, desc, catego, fotofull, datestring,iduser);
-                //String res = "1";
+                //String res = insertarLocal(modelBase.FeedEntryArticle.TABLE_NAME, name, desc, catego, fotofull, datestring,iduser);
+                //GalleryActivity.lista.add(new ArticuloDao());
+                String res = "1";
                 if(res.equals("-1")){
                     Toast.makeText(AddGame.this,"Error al guardar información. \n Intente más tarde.", Toast.LENGTH_SHORT).show();
                 }else{
@@ -763,45 +763,7 @@ public class AddGame extends AppCompatActivity {
                         .show();
             }*/
 
-            progress.dismiss();
-
-            if(!ws.equals("0") || !ws.equals("")){
-                new android.app.AlertDialog.Builder(AddGame.this)
-                        .setTitle("Nivel completo!")
-                        .setMessage("Tu juego está en línea ahora.")
-                        .setCancelable(false)
-                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                //progresslast.dismiss();
-                                //finalizamos....
-                                //IinfoClient.getInfoClientObject().getPolicies().setReportState(13);
-
-                                Intent i = new Intent(AddGame.this,GamesActivity.class);
-                                startActivity(i);
-                            }
-                        })
-                        .show();
-
-            }else{
-                new android.app.AlertDialog.Builder(AddGame.this)
-                        .setTitle("Game Over!")
-                        .setMessage("No pudimos completar la operación. Intenta más tarde.")
-                        .setCancelable(false)
-                        //.setIcon(R.drawable.)
-                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                //progresslast.dismiss();
-                                //finalizamos....
-                                //IinfoClient.getInfoClientObject().getPolicies().setReportState(13);
-
-                                Intent i = new Intent(AddGame.this,GamesActivity.class);
-                                startActivity(i);
-                            }
-                        })
-                        .show();
-            }
+            //postgresdismis here
         }
 
     private String insertarFB(String tableName, String name, String desc, String catego, String fotofull, String datestring, String iduse) {
@@ -823,9 +785,15 @@ public class AddGame extends AppCompatActivity {
                     //Log.w("key",keyArticle);
                     String keyArticle = myRef.child("articulo").push().getKey();
                     ArticuloDao article = new ArticuloDao(keyArticle,name,keyArticle,desc,catego,fotofull,datestring,iduse);
+                    if(!banderainserta) {
+                        GalleryActivity.lista.add(article);
+                        banderainserta = true;
+                    }
                     Map<String, Object> postValuesArticle = article.toMap();
                     myRef.child("articulo").child(keyArticle).updateChildren(postValuesArticle);
 
+                    //se agrego esta liena y que la linea anterior magicamente agrega un articulo mas a la lista
+                    GalleryActivity.lista.remove(GalleryActivity.lista.size()-1);
                     //now...lets try upload an image to firebase...
                     // Create a storage reference from our app
                     //use the keyarticle to set the reference with the article....create the bucket
@@ -840,17 +808,21 @@ public class AddGame extends AppCompatActivity {
                     for(int i=0; i<todasfotos.length;i++){
                         //here a have the filename from the pictures....
                         //gt each image from stotraga
-                        File image = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+todasfotos[i]);
+                        File image = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+iduser+"/"+todasfotos[i]);
                         Uri uri = Uri.fromFile(image);
 
+                        Bitmap bmp = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        bmp.compress(Bitmap.CompressFormat.JPEG, 50, baos);
+                        byte[] data = baos.toByteArray();
                         // Create file metadata including the content type
                         StorageMetadata metadata = new StorageMetadata.Builder()
                                 .setContentType("image/png")
                                 .build();
 
                         StorageReference riversRef = storageRef.child(iduser+"/"+image.getName());
-                        //UploadTask uploadTask = riversRef.putBytes(image,metadata);
-                        UploadTask uploadTask = riversRef.putFile(uri,metadata);
+                        UploadTask uploadTask = riversRef.putBytes(data,metadata);
+                        //UploadTask uploadTask = riversRef.putFile(uri,metadata);
 
                         // Register observers to listen for when the download is done or if it fails
                         uploadTask.addOnFailureListener(new OnFailureListener() {
@@ -858,6 +830,46 @@ public class AddGame extends AppCompatActivity {
                             public void onFailure(@NonNull Exception exception) {
                                 Log.e("Error","Algo fallo");
                                 exception.printStackTrace();
+
+                                progress.dismiss();
+
+                                if(!ws.equals("0") || !ws.equals("")){
+                                    new android.app.AlertDialog.Builder(AddGame.this)
+                                            .setTitle("Nivel completo!")
+                                            .setMessage("Tu juego está en línea ahora.")
+                                            .setCancelable(false)
+                                            .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    //progresslast.dismiss();
+                                                    //finalizamos....
+                                                    //IinfoClient.getInfoClientObject().getPolicies().setReportState(13);
+
+                                                    Intent i = new Intent(AddGame.this,GamesActivity.class);
+                                                    startActivity(i);
+                                                }
+                                            })
+                                            .show();
+
+                                }else{
+                                    new android.app.AlertDialog.Builder(AddGame.this)
+                                            .setTitle("Game Over!")
+                                            .setMessage("No pudimos completar la operación. Intenta más tarde.")
+                                            .setCancelable(false)
+                                            //.setIcon(R.drawable.)
+                                            .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    //progresslast.dismiss();
+                                                    //finalizamos....
+                                                    //IinfoClient.getInfoClientObject().getPolicies().setReportState(13);
+
+                                                    Intent i = new Intent(AddGame.this,GamesActivity.class);
+                                                    startActivity(i);
+                                                }
+                                            })
+                                            .show();
+                                }
                                 // Handle unsuccessful uploads
                             }
                         }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -866,76 +878,52 @@ public class AddGame extends AppCompatActivity {
                                 // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
                                 //Uri downloadUrl = taskSnapshot.getDownloadUrl();
                                 Uri downloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
+
+                                progress.dismiss();
+
+                                if(!ws.equals("0") || !ws.equals("")){
+                                    new android.app.AlertDialog.Builder(AddGame.this)
+                                            .setTitle("Nivel completo!")
+                                            .setMessage("Tu juego está en línea ahora.")
+                                            .setCancelable(false)
+                                            .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    //progresslast.dismiss();
+                                                    //finalizamos....
+                                                    //IinfoClient.getInfoClientObject().getPolicies().setReportState(13);
+
+                                                    Intent i = new Intent(AddGame.this,GamesActivity.class);
+                                                    startActivity(i);
+                                                }
+                                            })
+                                            .show();
+
+                                }else{
+                                    new android.app.AlertDialog.Builder(AddGame.this)
+                                            .setTitle("Game Over!")
+                                            .setMessage("No pudimos completar la operación. Intenta más tarde.")
+                                            .setCancelable(false)
+                                            //.setIcon(R.drawable.)
+                                            .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    //progresslast.dismiss();
+                                                    //finalizamos....
+                                                    //IinfoClient.getInfoClientObject().getPolicies().setReportState(13);
+
+                                                    Intent i = new Intent(AddGame.this,GamesActivity.class);
+                                                    startActivity(i);
+                                                }
+                                            })
+                                            .show();
+                                }
                             }
                         });
                     }
-
-                    // Create a reference to "mountains.jpg"
-                    //StorageReference mountainsRef = storageRef.child("mountains.jpg");
-
-                    //Uri uri = Uri.parse("android.resource://nowoscmexico.com.tradinggames_1/drawable/fifa.jpg");
-                /*String filename = "yy2.png";
-                String path = Environment.getExternalStorageDirectory()+"/Pictures/" + filename;
-                File f = new File(path);  //
-                Uri uri = Uri.fromFile(f);
-                */
-                    // Create a reference to 'images/mountains.jpg'
-                    //StorageReference mountainImagesRef = storageRef.child("images/mountains.jpg").putFile(,metadata);
-
-                    //UploadTask uploadTask = mountainsRef.putBytes(data);
-
                     return keyArticle;
             }
 
-            //myRef.child("usuarios").child("2").setValue(user);
-
-            //String key = myRef.child("usuarios").push().getKey();
-            //UsuarioDao user2 = new UsuarioDao("2","nombre","telefono","correo","pass","0");
-
-        /*ArticuloDao dao = new ArticuloDao("1","titulo","descripcion","cate","path","tiempo","11");
-        myRef.child("articulo").child("1").setValue(dao);
-        String keyart = myRef.child("articulo").push().getKey();
-
-        Log.w("key",key);
-        Log.w("keyart",keyart);*/
-
-
-        /*myRef.child("usuarios").child("1").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                UsuarioDao value = dataSnapshot.getValue(UsuarioDao.class);
-                Log.d("DB", "Value is: " + value.getId());
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });*/
-
-            // Read from the database
-        /*myRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // This method is called once with the initial value and again
-                // whenever data at this location is updated.
-                try {
-                    UsuarioDao value = dataSnapshot.getValue(UsuarioDao.class);
-                    Log.d("DB", "Value is: " + value.getId());
-                }
-                catch(Exception e){
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-                // Failed to read value
-                Log.w("DB", "Failed to read value.", error.toException());
-            }
-        });*/
-
-            //return "1";
         }catch(Exception e){
             e.printStackTrace();
             return "0";
@@ -944,7 +932,6 @@ public class AddGame extends AppCompatActivity {
         return "1";
     }
 
-    @NonNull
     private String insertarLocal(String tableName, String name, String desc, String catego, String fotofull, String datestring, String iduser) {
         String val = tableName;
         Log.w("Here",val);
@@ -969,11 +956,11 @@ public class AddGame extends AppCompatActivity {
                 //Just change name table and the values....
                 long newRowId = db.insert(val, null, values);
 
-                try {
+                /*try {
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
-                }
+                }*/
 
                 return "" + newRowId;
 
@@ -983,7 +970,5 @@ public class AddGame extends AppCompatActivity {
 
         return "";
     }
-
     };
-
 }

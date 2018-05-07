@@ -21,6 +21,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 import nowoscmexico.com.tradinggames.DataBase.modelBase;
+import nowoscmexico.com.tradinggames.GalleryActivity;
 import nowoscmexico.com.tradinggames.menuClass;
 import nowoscmexico.com.tradinggames.DataBase.DBaseMethods;
 import nowoscmexico.com.tradinggames.R;
@@ -83,7 +84,7 @@ public class GamesActivity extends AppCompatActivity {
                 //intent.putExtra("activity","games");
                 //startActivity(intent);
             }else{
-                GamesAdapter adapter = new GamesAdapter(this, elements,typeface);
+                GamesAdapter adapter = new GamesAdapter(this, GalleryActivity.lista,typeface);
                 lista.setAdapter(adapter);
             }
 

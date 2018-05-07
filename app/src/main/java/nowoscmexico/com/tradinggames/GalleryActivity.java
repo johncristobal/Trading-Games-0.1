@@ -107,7 +107,7 @@ public class GalleryActivity extends AppCompatActivity {
     public int contadorArticulos;
 
     public ArrayList<ImageView> imagenes;
-    ArrayList<ArticuloDao> lista = new ArrayList<>();
+    public static ArrayList<ArticuloDao> lista;//lista con solo mis articulos idusuario
     public ArticuloDao daito;
     ImageAdapter adapter;
     public int flagcorrido;
@@ -430,13 +430,16 @@ public class GalleryActivity extends AppCompatActivity {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference();
 
+        public ArrayList<ArticuloDao> listalocal = new ArrayList<>();
+        public ArrayList<ArticuloDao> listalocalmios = new ArrayList<>();
+
         public void borrarDB(){
 
             SQLiteDatabase db = DBaseMethods.base.getWritableDatabase();
 
             db.execSQL("DELETE FROM " + modelBase.FeedEntryUsuario.TABLE_NAME);
             db.execSQL("DELETE FROM " + modelBase.FeedEntryArticle.TABLE_NAME);
-            db.execSQL("DELETE FROM " + modelBase.FeedEntryMatch.TABLE_NAME);
+            db.execSQL(String.format("DELETE FROM %s", modelBase.FeedEntryMatch.TABLE_NAME));
             db.close();
         }
 
@@ -526,11 +529,13 @@ public class GalleryActivity extends AppCompatActivity {
                             Log.d(TAG, "onChildAdded:" + dataSnapshot.getChildrenCount());
                             //Recupero objeto articulo de firebase y cast a ArticuloDao
                             final ArticuloDao comment = dataSnapshot.getValue(ArticuloDao.class);
-                            lista.add(comment);
+                            listalocal.add(comment);
 
                             //salvo en base local
-                            if(comment.getIdusuario().equals(idusuario))
+                            if(comment.getIdusuario().equals(idusuario)) {
                                 cargararticulo(comment);
+                                listalocalmios.add(comment);
+                            }
 
                             final String folderuser = comment.getIdusuario();
                             String[] fotos = comment.getFoto().split(",");
@@ -544,10 +549,10 @@ public class GalleryActivity extends AppCompatActivity {
                                         //COn el nombre de la imgaen...recuoero imagen de storage firebase
 
                                         //StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://tradinggames-a6047.appspot.com/").child("s2YFT93wtFTXE75rjRkSvvdO6Y62/s2YFT93wtFTXE75rjRkSvvdO6Y62_mario kart 64_1.png");
-                                        final StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://tradinggames-a6047.appspot.com/").child(folderuser + "/" + name);
+                                        //final StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://tradinggames-a6047.appspot.com/").child(folderuser + "/" + name);
                                         final long ONE_MEGABYTE = 1024*1024;
                                         //imagenes.add(imageView);
-                                        final File storageDir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + File.separator + folderuser);
+                                        //final File storageDir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + File.separator + folderuser);
 
                                         //File storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)+ "/YOUR_FOLDER_NAME");
                                         boolean success = true;
@@ -601,14 +606,16 @@ public class GalleryActivity extends AppCompatActivity {
                 //if(contadorArticulos == numArticulos) {
                 gallery = (Gallery) findViewById(R.id.gallery1);
 
-                adapter = new ImageAdapter(GalleryActivity.this, lista);
+                lista = listalocalmios;
+
+                adapter = new ImageAdapter(GalleryActivity.this, listalocal);
                 //adapter.notifyDataSetChanged();
                 gallery.setAdapter(adapter);
                 gallery.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
 
-                    final String folderuser = lista.get(position).getIdusuario();
-                    String[] fotos = lista.get(position).getFoto().split(",");
+                    final String folderuser = listalocal.get(position).getIdusuario();
+                    String[] fotos = listalocal.get(position).getFoto().split(",");
                     //Evitr craah en caso que no traiga fotos
                     if (fotos.length >= 1) {
                         //Aqui solo recuperamos una foto para mostrar en mainview
@@ -635,10 +642,10 @@ public class GalleryActivity extends AppCompatActivity {
                     }
 
                     //set texto into background
-                    videojuego.setText(lista.get(position).getTitulo());
-                    gameSelected = lista.get(position).getFoto() + "";
+                    videojuego.setText(listalocal.get(position).getTitulo());
+                    gameSelected = listalocal.get(position).getFoto() + "";
 
-                    daito = lista.get(position);
+                    daito = listalocal.get(position);
                     }
                 });
 
