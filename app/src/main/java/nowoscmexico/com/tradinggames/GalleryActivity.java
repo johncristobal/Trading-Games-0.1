@@ -111,6 +111,7 @@ public class GalleryActivity extends AppCompatActivity {
     public ArticuloDao daito;
     ImageAdapter adapter;
     public int flagcorrido;
+    public ProgressDialog progress;// = new ProgressDialog(GalleryActivity.this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,6 +123,7 @@ public class GalleryActivity extends AppCompatActivity {
 
         context = this;
 
+        progress = new ProgressDialog(this);
         imagenes = new ArrayList<>();
 
         flagcorrido = 0;
@@ -424,7 +426,6 @@ public class GalleryActivity extends AppCompatActivity {
 //=================================GEt data from firebase===========================================
     //public void saygoodbye(){
    public class Sendthelast extends AsyncTask<Void, Void, Void>{
-        ProgressDialog progress = new ProgressDialog(GalleryActivity.this);
         String ErrorCode = "";
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -562,8 +563,8 @@ public class GalleryActivity extends AppCompatActivity {
                                         if (success) {
                                             contadorArticulos++;
 
-                                            if (contadorArticulos >= 5)
-                                                progress.dismiss();
+                                            //if (contadorArticulos >= 5)
+                                            //    progress.dismiss();
 
                                             adapter.notifyDataSetChanged();
                                         }
@@ -632,7 +633,11 @@ public class GalleryActivity extends AppCompatActivity {
                                         .apply(new RequestOptions().override(240, 300).centerCrop().diskCacheStrategy(DiskCacheStrategy.ALL))//.override(150,200)
                                         //.load(storageRef)
                                         .into(imgSelected);
+
+
                             }
+
+
                         }).addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception exception) {
@@ -808,11 +813,21 @@ public class GalleryActivity extends AppCompatActivity {
                                 .apply(new RequestOptions().override(240, 300).centerCrop().diskCacheStrategy(DiskCacheStrategy.ALL))//.override(150,200)
                                 //.load(storageRef)
                                 .into(view.imgViewFlag);
+
+                        contadorArticulos++;
+
+                        if (contadorArticulos >= 5)
+                            progress.dismiss();
+
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception exception) {
                         // Handle any errors
+                        contadorArticulos++;
+
+                        if (contadorArticulos >= 5)
+                            progress.dismiss();
                     }
                 });
             }
