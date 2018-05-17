@@ -152,6 +152,7 @@ public class GalleryActivity extends AppCompatActivity {
         toggle.syncState();
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setItemIconTintList(null);
         //navigationView.setNavigationItemSelectedListener(this);
 
         //Check sesion...if logged, then show elements
@@ -779,7 +780,7 @@ public class GalleryActivity extends AppCompatActivity {
                 convertView = inflator.inflate(R.layout.swipe, null);
 
                 view.imgViewFlag = (ImageView) convertView.findViewById(R.id.imageView);
-                view.imgViewStar = (ImageView) convertView.findViewById(R.id.imageViewstart);
+                //view.imgViewStar = (ImageView) convertView.findViewById(R.id.imageViewstart);
 
                 convertView.setTag(view);
             }

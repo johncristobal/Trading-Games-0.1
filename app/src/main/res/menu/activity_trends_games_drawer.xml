@@ -1,30 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <group android:checkableBehavior="single">
+    <group>
         <item
             android:id="@+id/trend"
-            android:icon="@drawable/ic_menu_camera"
+            android:icon="@drawable/dados"
             android:title="Trending" />
 
         <item
             android:id="@+id/searchgame"
-            android:icon="@drawable/ic_menu_share"
+            android:icon="@mipmap/search"
             android:title="Buscar" />
 
         <item
             android:id="@+id/startsesion"
-            android:icon="@drawable/ic_travel"
+            android:icon="@mipmap/user"
             android:title="Iniciar sesiòn" />
 
         <item
             android:id="@+id/mismatch"
-            android:icon="@drawable/ic_travel"
+            android:icon="@mipmap/star"
             android:title="Mis match" />
 
         <item
             android:id="@+id/misgames"
-            android:icon="@drawable/ic_travel"
+            android:icon="@mipmap/games2"
             android:title="Mis Juegos" />
     </group>
 

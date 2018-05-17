@@ -794,6 +794,7 @@ public class AddGame extends AppCompatActivity {
 
                     //se agrego esta liena y que la linea anterior magicamente agrega un articulo mas a la lista
                     GalleryActivity.lista.remove(GalleryActivity.lista.size()-1);
+
                     //now...lets try upload an image to firebase...
                     // Create a storage reference from our app
                     //use the keyarticle to set the reference with the article....create the bucket

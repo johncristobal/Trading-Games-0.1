@@ -16,7 +16,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_weight="1"
         android:background="@drawable/backorange"
-        android:scaleType="fitCenter"></ImageView>
+        android:scaleType="fitCenter"/>
 
 
     <Gallery

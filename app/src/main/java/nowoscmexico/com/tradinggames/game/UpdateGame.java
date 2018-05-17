@@ -411,9 +411,9 @@ public class UpdateGame extends AppCompatActivity {
                             Map<String, Object> postValuesArticle = article.toMap();
                             myRef.child("articulo").child(idfirebase).updateChildren(postValuesArticle);
 
-                            //now...lets try upload an image to firebase...
-                            // Create a storage reference from our app
-                            //use the keyarticle to set the reference with the article....create the bucket
+                            //aqui tengo que actualizar el articulo en GalleryActivity.lista
+                            //busco el articulo con idfirabase
+                            //lo elimino y subo el nuevo article
 
                             String fotos = fotofull;
                             String iduser = iduse;

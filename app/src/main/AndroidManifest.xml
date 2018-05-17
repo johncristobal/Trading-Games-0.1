@@ -80,7 +80,7 @@
         <activity
             android:name=".game.UpdateGame"
             android:label="@string/title_activity_update_game"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar"/>
 
         <provider
             android:name="android.support.v4.content.FileProvider"
