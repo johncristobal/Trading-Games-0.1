@@ -10,13 +10,13 @@
         android:layout_width="110dp"
         android:id="@+id/imageView"/>
 
-    <ImageView
+    <!--ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:srcCompat="@android:drawable/btn_star_big_off"
         android:id="@+id/imageViewstart"
         android:layout_alignBottom="@+id/imageView"
-        android:layout_alignEnd="@+id/imageView" />
+        android:layout_alignEnd="@+id/imageView" /-->
 
 
 </RelativeLayout>
