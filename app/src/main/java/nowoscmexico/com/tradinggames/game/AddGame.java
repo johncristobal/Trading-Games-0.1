@@ -432,7 +432,7 @@ public class AddGame extends AppCompatActivity {
             Toast.makeText(this,"Ponle un nombre para poder guardar la foto",Toast.LENGTH_SHORT).show();
         }else {
             //Directament abrimos camara
-            cameraIntent();
+            permisionCamera();
 
             /*final CharSequence[] items = {getString(R.string.tomafoto), getString(R.string.galeria),
                     "Cancel"};
@@ -494,6 +494,19 @@ public class AddGame extends AppCompatActivity {
         }
     }
 
+    public void permisionCamera(){
+        if (Build.VERSION.SDK_INT < 23) {
+
+            cameraIntent23();
+        } else {
+            if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
+            } else {
+                cameraIntent();
+            }
+        }
+    }
+
 //***********************Abrir camara para tomar foto***********************************************
     private void cameraIntent()
     {
@@ -511,6 +524,31 @@ public class AddGame extends AppCompatActivity {
             if (photoFile != null) {
                 //Uri photoURI = FileProvider.getUriForFile(VehiclePictures.this, "miituo.com.miituo", photoFile);
                 Uri photoURI = FileProvider.getUriForFile(this, "nowoscmexico.com.tradinggames_1.fileprovider", photoFile);
+                takepic.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takepic, REQUEST_CAMERA);
+            }else{
+                Toast.makeText(this,"Tuvimos un problema al tomar la imagen. Intente mas tarde.",Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void cameraIntent23()
+    {
+        Intent takepic=new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        //startActivityForResult(i, FRONT_VEHICLE);
+        if (takepic.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            try {
+                photoFile = createImageFile(iduser,tag,name);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                // Error occurred while creating the File...
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                //Uri photoURI = FileProvider.getUriForFile(VehiclePictures.this, "miituo.com.miituo", photoFile);
+                //Uri photoURI = FileProvider.getUriForFile(this, "nowoscmexico.com.tradinggames_1.fileprovider", photoFile);
+                Uri photoURI = Uri.fromFile(photoFile);
                 takepic.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takepic, REQUEST_CAMERA);
             }else{
@@ -540,7 +578,7 @@ public class AddGame extends AppCompatActivity {
                     else if(userChoosenTask.equals(getString(R.string.galeria)))
                         galleryIntent();*/
                 } else {
-                    Toast.makeText(this,"Permiso denegado",Toast.LENGTH_LONG);
+                    Toast.makeText(this,"Permiso denegado",Toast.LENGTH_LONG).show();
                 }
             break;
         }
@@ -708,6 +746,7 @@ public class AddGame extends AppCompatActivity {
                     //Si se guardo localmente,,,,intentammos guardar WS
                     //Create task to send Data to DB --- WS
                     //WSTask task = new WSTask(AddGame.this);
+                    ws = "";
                     ws = insertarFB(modelBase.FeedEntryArticle.TABLE_NAME, name, desc, catego,fotofull,datestring,iduser);
 
                     //Validar si ws ejecutado correctamente...

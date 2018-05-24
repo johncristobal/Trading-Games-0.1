@@ -229,10 +229,22 @@ public class UpdateGame extends AppCompatActivity {
         if(imagenes[Integer.parseInt(tag)]){    //this means its true...has an image
             pictureSelectWithImage(v);
         }else{//open camera and get new image
-            cameraIntent();
+            permisionCamera();
         }
     }
 
+    public void permisionCamera(){
+        if (Build.VERSION.SDK_INT < 23) {
+
+            cameraIntent23();
+        } else {
+            if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
+            } else {
+                cameraIntent();
+            }
+        }
+    }
     //send datao to update
     public void updateGame(View v){
         name = nombre.getText().toString();
@@ -417,6 +429,31 @@ public class UpdateGame extends AppCompatActivity {
     }
 
 //***********************Abrir camara para tomar foto***********************************************
+    private void cameraIntent23()
+    {
+        Intent takepic=new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        //startActivityForResult(i, FRONT_VEHICLE);
+        if (takepic.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            try {
+                photoFile = createImageFile(iduser,tag,name);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                // Error occurred while creating the File...
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                //Uri photoURI = FileProvider.getUriForFile(VehiclePictures.this, "miituo.com.miituo", photoFile);
+                //Uri photoURI = FileProvider.getUriForFile(this, "nowoscmexico.com.tradinggames_1.fileprovider", photoFile);
+                Uri photoURI = Uri.fromFile(photoFile);
+                takepic.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takepic, REQUEST_CAMERA);
+            }else{
+                Toast.makeText(this,"Tuvimos un problema al tomar la imagen. Intente mas tarde.",Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
     private void cameraIntent()
     {
         //Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -466,7 +503,7 @@ public class UpdateGame extends AppCompatActivity {
                     if (items[item].equals(getString(R.string.nuevafoto))) {
                         userChoosenTask = getString(R.string.nuevafoto);
                         if (result)
-                            cameraIntent();
+                            permisionCamera();
                     } else if (items[item].equals(getString(R.string.eliminarfoto))) {
                         userChoosenTask = getString(R.string.eliminarfoto);
                         if (result) {
@@ -711,7 +748,7 @@ public class UpdateGame extends AppCompatActivity {
                             for(int i=0; i<todasfotos.length;i++){
                                 //here a have the filename from the pictures....
                                 //gt each image from stotraga
-                                File image = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+todasfotos[i]);
+                                File image = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+iduser+"/"+todasfotos[i]);
                                 Uri uri = Uri.fromFile(image);
 
                                 // Create file metadata including the content type
