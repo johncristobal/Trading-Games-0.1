@@ -26,6 +26,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -142,39 +143,55 @@ public class UpdateGame extends AppCompatActivity {
         String [] fotos = foto.split(",");
         if(fotos.length>0) {
             for (int i = 0; i < fotos.length; i++){
+
+                SharedPreferences preferences = getSharedPreferences(getString(R.string.sharedName), Context.MODE_PRIVATE);
+                mCurrentPhotoPath = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + File.separator + _iduser + "/" + fotos[i];//preferences.getString("nombrefoto", "null");
+
+                String filePath = mCurrentPhotoPath;//photoFile.getPath();
+                //Bitmap bmp = BitmapFactory.decodeFile(filePath);
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inSampleSize = 4;
+                Bitmap bmp = BitmapFactory.decodeFile(filePath,options);
+
                 switch (i){
                     case 0:
+                        imagenup1.setImageBitmap(bmp);
                         imagenes[i] = true;
-                        Glide.with(UpdateGame.this)
+                        /*Glide.with(UpdateGame.this)
                                 .load(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + File.separator + _iduser + "/" + fotos[i])
                                 .apply(new RequestOptions().override(150, 200).centerCrop())//.override(150,200)
-                                .into(imagenup1);
+                                .into(imagenup1);*/
 
                         //imagenup1.setTag("1");
                         break;
                     case 1:
                         imagenes[i] = true;
-                        Glide.with(UpdateGame.this)
+                        imagenup2.setImageBitmap(bmp);
+                        /*Glide.with(UpdateGame.this)
                                 .load(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + File.separator + _iduser + "/" + fotos[i])
                                 .apply(new RequestOptions().override(150, 200).centerCrop())//.override(150,200)
-                                .into(imagenup2);
+                                .into(imagenup2);*/
                         //imagenup2.setTag("2");
 
                         break;
                     case 2:
                         imagenes[i] = true;
-                        Glide.with(UpdateGame.this)
+                        imagenup3.setImageBitmap(bmp);
+
+                        /*Glide.with(UpdateGame.this)
                                 .load(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + File.separator + _iduser + "/" + fotos[i])
                                 .apply(new RequestOptions().override(150, 200).centerCrop())//.override(150,200)
-                                .into(imagenup3);
+                                .into(imagenup3);*/
                         //imagenup3.setTag("3");
                         break;
                     case 3:
                         imagenes[i] = true;
-                        Glide.with(UpdateGame.this)
+                        imagenup4.setImageBitmap(bmp);
+
+                        /*Glide.with(UpdateGame.this)
                                 .load(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + File.separator + _iduser + "/" + fotos[i])
                                 .apply(new RequestOptions().override(150, 200).centerCrop())//.override(150,200)
-                                .into(imagenup4);
+                                .into(imagenup4);*/
                         //imagenup4.setTag("4");
 
                         break;
@@ -244,6 +261,275 @@ public class UpdateGame extends AppCompatActivity {
         }catch(Exception e){
             e.printStackTrace();
         }
+    }
+
+    public boolean sinimagenes(){
+
+        int cont = 0;
+        for(int i=0;i<imagenes.length;i++){
+            if(!imagenes[i]){
+                cont++;
+            }
+        }
+        //no hay ninguna imagen...debe subir al menos una
+        if(cont == 4){
+            return false;
+        }
+        else{
+            return true;
+        }
+    }
+
+//***********************Recuperamos foto tomada de la camara y mostramos*********************************
+    private void onCaptureImageResult(Intent data) {
+        /*Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
+        File destination = new File(Environment.getExternalStorageDirectory(),
+                System.currentTimeMillis() + ".jpg");
+        FileOutputStream fo;
+        try {
+            destination.createNewFile();
+            fo = new FileOutputStream(destination);
+            fo.write(bytes.toByteArray());
+            fo.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }*/
+
+        SharedPreferences preferences = getSharedPreferences(getString(R.string.sharedName), Context.MODE_PRIVATE);
+        mCurrentPhotoPath = preferences.getString("nombrefoto", "null");
+
+        String filePath = mCurrentPhotoPath;//photoFile.getPath();
+        //Bitmap bmp = BitmapFactory.decodeFile(filePath);
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 4;
+        Bitmap thumbnail = BitmapFactory.decodeFile(filePath,options);
+
+        /*String filePath = mCurrentPhotoPath;//photoFile.getPath();
+        Bitmap bmp = BitmapFactory.decodeFile(filePath);
+
+        Bitmap thumbnail = Bitmap.createScaledBitmap(bmp, bmp.getWidth()/2, bmp.getHeight()/2, false);*/
+
+        if(tag.equals("0")) {
+            imagenes[Integer.parseInt(tag)] = true;
+            imagenup1.setImageBitmap(thumbnail);
+        }
+        else if(tag.equals("1")) {
+            imagenes[Integer.parseInt(tag)] = true;
+            imagenup2.setImageBitmap(thumbnail);
+        }
+        else if(tag.equals("2")) {
+            imagenes[Integer.parseInt(tag)] = true;
+            imagenup3.setImageBitmap(thumbnail);
+        }
+        else if(tag.equals("3")) {
+            imagenes[Integer.parseInt(tag)] = true;
+            imagenup4.setImageBitmap(thumbnail);
+        }
+        /*(else if(tag.equals("5"))
+            imagenup5.setImageBitmap(thumbnail);
+        else if(tag.equals("6"))
+            imagenup6.setImageBitmap(thumbnail);*/
+    }
+
+//***********************save iage to path folder app***********************************************
+    private File createImageFile(String username, String tag,String gamaname) throws IOException {
+        // Create an image file name
+        //String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        //String imageFileName = username;
+
+        File image = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+iduser+"/"+username+"_"+gamaname+"_"+tag+".png");
+        /*File image = File.createTempFile(
+                username+tag,  // prefix
+                ".png",         // suffix
+                storageDir      // directory
+        );*/
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = image.getAbsolutePath();
+
+        //save name jajaja
+        SharedPreferences preferences = getSharedPreferences(getString(R.string.sharedName), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("nombrefoto",mCurrentPhotoPath);
+        editor.apply();
+        return image;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case AddGame.Utility.MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if(userChoosenTask.equals(getString(R.string.tomafoto)))
+                        cameraIntent();
+                    else if(userChoosenTask.equals(getString(R.string.eliminarfoto))) {
+                        //galleryIntent();
+                        //lo mismo que borrar que esta mas abajo...
+                        //borrarfoto();
+                    }
+                } else {
+                    //code for deny
+                }
+                break;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == SELECT_FILE)
+                onSelectFromGalleryResult(data);
+            else if (requestCode == REQUEST_CAMERA)
+                onCaptureImageResult(data);
+        }
+    }
+
+//***********************Recuperamos foto seleccionadad y mostramos*********************************
+    @SuppressWarnings("deprecation")
+    private void onSelectFromGalleryResult(Intent data) {
+        Bitmap bm=null;
+        if (data != null) {
+            try {
+                bm = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(), data.getData());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        if(tag.equals("1"))
+            imagenup1.setImageBitmap(bm);
+        else if(tag.equals("2"))
+            imagenup2.setImageBitmap(bm);
+        else if(tag.equals("3"))
+            imagenup3.setImageBitmap(bm);
+        else if(tag.equals("4"))
+            imagenup4.setImageBitmap(bm);
+        /*else if(tag.equals("5"))
+            imagenup5.setImageBitmap(bm);
+        else if(tag.equals("6"))
+            imagenup6.setImageBitmap(bm);*/
+    }
+
+//***********************Abrir camara para tomar foto***********************************************
+    private void cameraIntent()
+    {
+        //Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        //startActivityForResult(intent, REQUEST_CAMERA);
+
+        Intent takepic=new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        //startActivityForResult(i, FRONT_VEHICLE);
+        if (takepic.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            try {
+                photoFile = createImageFile(iduser,tag,name);
+            } catch (IOException ex) {
+                // Error occurred while creating the File...
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                //Uri photoURI = FileProvider.getUriForFile(VehiclePictures.this, "miituo.com.miituo", photoFile);
+                Uri photoURI = FileProvider.getUriForFile(this, "nowoscmexico.com.tradinggames_1.fileprovider", photoFile);
+                //Uri photoURI = Uri.fromFile(photoFile);
+                takepic.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takepic, REQUEST_CAMERA);
+            }
+        }
+    }
+
+/*
+* open galley or camera to add picture...
+* */
+    public void pictureSelectWithImage(View v){
+        tag  = v.getTag().toString();
+
+        Log.w("Tag",tag);
+
+        name = nombre.getText().toString();
+
+        if(name.equals("")){
+            Toast.makeText(this,"Ponle un nombre para poder guardar la foto",Toast.LENGTH_SHORT).show();
+        }else {
+            final CharSequence[] items = {getString(R.string.nuevafoto), getString(R.string.eliminarfoto),
+                    "Cancelar"};
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Agregar imagen");
+            builder.setItems(items, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int item) {
+                    boolean result = AddGame.Utility.checkPermission(UpdateGame.this);
+                    if (items[item].equals(getString(R.string.nuevafoto))) {
+                        userChoosenTask = getString(R.string.nuevafoto);
+                        if (result)
+                            cameraIntent();
+                    } else if (items[item].equals(getString(R.string.eliminarfoto))) {
+                        userChoosenTask = getString(R.string.eliminarfoto);
+                        if (result) {
+                            borrarFoto(tag);
+
+                            //borrar foto de la vista
+                            //eliminarla de firebase
+                            //eliminarla del path con comas
+                        }
+                    } else if (items[item].equals("Cancelar")) {
+                        dialog.dismiss();
+                    }
+                }
+            });
+            builder.show();
+        }
+    }
+
+    public void borrarFoto(String t){
+        imagenes[Integer.parseInt(t)] = false;
+
+        int i = Integer.parseInt(t);
+
+        switch (i){
+            case 0:
+                Glide.with(UpdateGame.this)
+                        .load(R.drawable.camicon)
+                        .into(imagenup1);
+                break;
+            case 1:
+                Glide.with(UpdateGame.this)
+                        .load(R.drawable.camicon)
+                        .into(imagenup2);
+                break;
+            case 2:
+                Glide.with(UpdateGame.this)
+                        .load(R.drawable.camicon)
+                        .into(imagenup3);
+                break;
+            case 3:
+                Glide.with(UpdateGame.this)
+                        .load(R.drawable.camicon)
+                        .into(imagenup4);
+                break;
+
+            default:break;
+        }
+    }
+
+    //--------------recupera nombre de fotos con ','----------------------------------------------------
+    private String saveImages(String iduser) {
+
+        String todaslasfotos = "";
+
+        for(int i=1;i<=imagenes.length;i++){
+            //get the image -- save as iduser+i.png into App folder
+
+            int index = i-1;
+            if(imagenes[index])
+                todaslasfotos += iduser+"_"+name+"_"+i+".png,";
+        }
+
+        return todaslasfotos;
     }
 
     public void saygoodbye(){
@@ -399,7 +685,7 @@ public class UpdateGame extends AppCompatActivity {
                     //Thread.sleep(3000);
 
                     switch (table){
-                    /*Agrega articulo a DB*/
+                        /*Agrega articulo a DB*/
                         case modelBase.FeedEntryArticle.TABLE_NAME:
 
                             //String keyArticle = myRef.child("articulo").push().getKey();
@@ -450,7 +736,7 @@ public class UpdateGame extends AppCompatActivity {
                                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                                         // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
                                         //Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                                        Uri downloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
+                                        //Uri downloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
                                     }
                                 });
                             }
@@ -571,308 +857,5 @@ public class UpdateGame extends AppCompatActivity {
         };
 
         sendthelast.execute();
-    }
-
-    public boolean sinimagenes(){
-
-        int cont = 0;
-        for(int i=0;i<imagenes.length;i++){
-            if(!imagenes[i]){
-                cont++;
-            }
-        }
-        //no hay ninguna imagen...debe subir al menos una
-        if(cont == 4){
-            return false;
-        }
-        else{
-            return true;
-        }
-    }
-
-//***********************Recuperamos foto tomada de la camara y mostramos*********************************
-    private void onCaptureImageResult(Intent data) {
-        /*Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
-        File destination = new File(Environment.getExternalStorageDirectory(),
-                System.currentTimeMillis() + ".jpg");
-        FileOutputStream fo;
-        try {
-            destination.createNewFile();
-            fo = new FileOutputStream(destination);
-            fo.write(bytes.toByteArray());
-            fo.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }*/
-
-        SharedPreferences preferences = getSharedPreferences(getString(R.string.sharedName), Context.MODE_PRIVATE);
-        mCurrentPhotoPath = preferences.getString("nombrefoto", "null");
-
-        String filePath = mCurrentPhotoPath;//photoFile.getPath();
-        //Bitmap bmp = BitmapFactory.decodeFile(filePath);
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inSampleSize = 5;
-        Bitmap thumbnail = BitmapFactory.decodeFile(filePath,options);
-
-        /*String filePath = mCurrentPhotoPath;//photoFile.getPath();
-        Bitmap bmp = BitmapFactory.decodeFile(filePath);
-
-        Bitmap thumbnail = Bitmap.createScaledBitmap(bmp, bmp.getWidth()/2, bmp.getHeight()/2, false);*/
-
-        if(tag.equals("1")) {
-            imagenes[Integer.parseInt(tag)] = true;
-            imagenup1.setImageBitmap(thumbnail);
-        }
-        else if(tag.equals("2")) {
-            imagenes[Integer.parseInt(tag)] = true;
-            imagenup2.setImageBitmap(thumbnail);
-        }
-        else if(tag.equals("3")) {
-            imagenes[Integer.parseInt(tag)] = true;
-            imagenup3.setImageBitmap(thumbnail);
-        }
-        else if(tag.equals("4")) {
-            imagenes[Integer.parseInt(tag)] = true;
-            imagenup4.setImageBitmap(thumbnail);
-        }
-        /*(else if(tag.equals("5"))
-            imagenup5.setImageBitmap(thumbnail);
-        else if(tag.equals("6"))
-            imagenup6.setImageBitmap(thumbnail);*/
-    }
-
-//***********************save iage to path folder app***********************************************
-    private File createImageFile(String username, String tag,String gamaname) throws IOException {
-        // Create an image file name
-        //String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        //String imageFileName = username;
-
-        File image = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+File.separator+username+"_"+gamaname+"_"+tag+".png");
-        /*File image = File.createTempFile(
-                username+tag,  // prefix
-                ".png",         // suffix
-                storageDir      // directory
-        );*/
-
-        // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = image.getAbsolutePath();
-
-        //save name jajaja
-        SharedPreferences preferences = getSharedPreferences(getString(R.string.sharedName), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("nombrefoto",mCurrentPhotoPath);
-        editor.commit();
-        return image;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        switch (requestCode) {
-            case AddGame.Utility.MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    if(userChoosenTask.equals(getString(R.string.tomafoto)))
-                        cameraIntent();
-                    else if(userChoosenTask.equals(getString(R.string.eliminarfoto))) {
-                        //galleryIntent();
-                        //lo mismo que borrar que esta mas abajo...
-                        //borrarfoto();
-                    }
-                } else {
-                    //code for deny
-                }
-                break;
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == SELECT_FILE)
-                onSelectFromGalleryResult(data);
-            else if (requestCode == REQUEST_CAMERA)
-                onCaptureImageResult(data);
-        }
-    }
-
-//***********************Recuperamos foto seleccionadad y mostramos*********************************
-    @SuppressWarnings("deprecation")
-    private void onSelectFromGalleryResult(Intent data) {
-        Bitmap bm=null;
-        if (data != null) {
-            try {
-                bm = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(), data.getData());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        if(tag.equals("1"))
-            imagenup1.setImageBitmap(bm);
-        else if(tag.equals("2"))
-            imagenup2.setImageBitmap(bm);
-        else if(tag.equals("3"))
-            imagenup3.setImageBitmap(bm);
-        else if(tag.equals("4"))
-            imagenup4.setImageBitmap(bm);
-        /*else if(tag.equals("5"))
-            imagenup5.setImageBitmap(bm);
-        else if(tag.equals("6"))
-            imagenup6.setImageBitmap(bm);*/
-    }
-
-//***********************Abrir camara para tomar foto***********************************************
-    private void cameraIntent()
-    {
-        //Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        //startActivityForResult(intent, REQUEST_CAMERA);
-
-        Intent takepic=new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        //startActivityForResult(i, FRONT_VEHICLE);
-        if (takepic.resolveActivity(getPackageManager()) != null) {
-            // Create the File where the photo should go
-            try {
-                photoFile = createImageFile(iduser,tag,name);
-            } catch (IOException ex) {
-                // Error occurred while creating the File...
-            }
-            // Continue only if the File was successfully created
-            if (photoFile != null) {
-                //Uri photoURI = FileProvider.getUriForFile(VehiclePictures.this, "miituo.com.miituo", photoFile);
-                Uri photoURI = Uri.fromFile(photoFile);
-                takepic.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(takepic, REQUEST_CAMERA);
-            }
-        }
-    }
-
-    public static class Utility {
-        public static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 123;
-        @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-        public static boolean checkPermission(final Context context)
-        {
-            int currentAPIVersion = Build.VERSION.SDK_INT;
-            if(currentAPIVersion>=android.os.Build.VERSION_CODES.M)
-            {
-                if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                    if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) context, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(context);
-                        alertBuilder.setCancelable(true);
-                        alertBuilder.setTitle("Permission necessary");
-                        alertBuilder.setMessage("External storage permission is necessary");
-                        alertBuilder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                            @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-                            public void onClick(DialogInterface dialog, int which) {
-                                ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
-                            }
-                        });
-                        AlertDialog alert = alertBuilder.create();
-                        alert.show();
-                    } else {
-                        ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
-                    }
-                    return false;
-                } else {
-                    return true;
-                }
-            } else {
-                return true;
-            }
-        }
-    }
-
-/*
-* open galley or camera to add picture...
-* */
-    public void pictureSelectWithImage(View v){
-        tag  = v.getTag().toString();
-
-        Log.w("Tag",tag);
-
-        name = nombre.getText().toString();
-
-        if(name.equals("")){
-            Toast.makeText(this,"Ponle un nombre para poder guardar la foto",Toast.LENGTH_SHORT).show();
-        }else {
-            final CharSequence[] items = {getString(R.string.nuevafoto), getString(R.string.eliminarfoto),
-                    "Cancelar"};
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Agregar imagen");
-            builder.setItems(items, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int item) {
-                    boolean result = AddGame.Utility.checkPermission(UpdateGame.this);
-                    if (items[item].equals(getString(R.string.nuevafoto))) {
-                        userChoosenTask = getString(R.string.nuevafoto);
-                        if (result)
-                            cameraIntent();
-                    } else if (items[item].equals(getString(R.string.eliminarfoto))) {
-                        userChoosenTask = getString(R.string.eliminarfoto);
-                        if (result) {
-                            borrarFoto(tag);
-
-                            //borrar foto de la vista
-                            //eliminarla de firebase
-                            //eliminarla del path con comas
-                        }
-                    } else if (items[item].equals("Cancelar")) {
-                        dialog.dismiss();
-                    }
-                }
-            });
-            builder.show();
-        }
-    }
-
-    public void borrarFoto(String t){
-        imagenes[Integer.parseInt(t)] = false;
-
-        int i = Integer.parseInt(t);
-
-        switch (i){
-            case 0:
-                Glide.with(UpdateGame.this)
-                        .load(R.drawable.camicon)
-                        .into(imagenup1);
-                break;
-            case 1:
-                Glide.with(UpdateGame.this)
-                        .load(R.drawable.camicon)
-                        .into(imagenup2);
-                break;
-            case 2:
-                Glide.with(UpdateGame.this)
-                        .load(R.drawable.camicon)
-                        .into(imagenup3);
-                break;
-            case 3:
-                Glide.with(UpdateGame.this)
-                        .load(R.drawable.camicon)
-                        .into(imagenup4);
-                break;
-
-            default:break;
-        }
-    }
-
-    //--------------recupera nombre de fotos con ','----------------------------------------------------
-    private String saveImages(String iduser) {
-
-        String todaslasfotos = "";
-
-        for(int i=1;i<=imagenes.length;i++){
-            //get the image -- save as iduser+i.png into App folder
-
-            int index = i-1;
-            if(imagenes[index])
-                todaslasfotos += iduser+"_"+name+"_"+i+".png,";
-        }
-
-        return todaslasfotos;
     }
 }

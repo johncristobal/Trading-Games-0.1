@@ -113,7 +113,7 @@ public class WSTask extends AsyncTask<String,Void,String>{
                             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                                 // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
                                 //Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                                Uri downloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
+                                //Uri downloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
                             }
                         });
                     }
