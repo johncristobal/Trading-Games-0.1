@@ -181,14 +181,9 @@ public class GamesAdapter extends BaseAdapter {
             @Override
             public void onClick(View view) {
 
+                GamesActivity.daoSend = dao;
                 Intent i = new Intent(context,UpdateGame.class);
-                i.putExtra("nombre",dao.getTitulo());
-                i.putExtra("descripcion",dao.getDescripcion());
-                i.putExtra("categoria",dao.getCategoria());
-                i.putExtra("foto",dao.getFoto());
-                i.putExtra("id",dao.getId());
-                i.putExtra("idfirebase",dao.getIdfirebase());
-                i.putExtra("idusuario",dao.getIdusuario());
+                i.putExtra("indexlistta",pos);
 
                 context.startActivity(i);
 

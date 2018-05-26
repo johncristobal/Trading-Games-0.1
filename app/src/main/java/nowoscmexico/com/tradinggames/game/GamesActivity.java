@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import nowoscmexico.com.tradinggames.DataBase.ArticuloDao;
 import nowoscmexico.com.tradinggames.DataBase.modelBase;
 import nowoscmexico.com.tradinggames.GalleryActivity;
 import nowoscmexico.com.tradinggames.menuClass;
@@ -30,6 +31,8 @@ public class GamesActivity extends AppCompatActivity {
 
     public ListView lista;
     public static Context context;
+
+    public static ArticuloDao daoSend;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

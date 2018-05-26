@@ -80,6 +80,7 @@ public class UpdateGame extends AppCompatActivity {
 
     public byte[] dataimagen;
     private String userChoosenTask, iduser;
+    public int indiceLista;
     private int REQUEST_CAMERA = 10;
     private int SELECT_FILE = 20;
 
@@ -127,13 +128,14 @@ public class UpdateGame extends AppCompatActivity {
         iduser = shared.getString("idusuario","null");
 
         Intent intent = getIntent();
-        String tit = intent.getStringExtra("nombre");
-        String foto = intent.getStringExtra("foto");
-        String _descripcion = intent.getStringExtra("descripcion");
-        String _categoria = intent.getStringExtra("categoria");
-        _id = intent.getStringExtra("id");
-        idfirebase = intent.getStringExtra("idfirebase");
-        String _iduser = intent.getStringExtra("idusuario");
+        String tit = GamesActivity.daoSend.getTitulo();
+        String foto = GamesActivity.daoSend.getFoto();
+        String _descripcion = GamesActivity.daoSend.getDescripcion();
+        String _categoria = GamesActivity.daoSend.getCategoria();
+        _id = GamesActivity.daoSend.getId();
+        idfirebase = GamesActivity.daoSend.getIdfirebase();
+        String _iduser = GamesActivity.daoSend.getIdusuario();
+        indiceLista = intent.getIntExtra("indexlistta",0);
 
         //categoria......pendiente
 
@@ -734,9 +736,11 @@ public class UpdateGame extends AppCompatActivity {
                             Map<String, Object> postValuesArticle = article.toMap();
                             myRef.child("articulo").child(idfirebase).updateChildren(postValuesArticle);
 
-                            //aqui tengo que actualizar el articulo en GalleryActivity.lista
+                            //aqui tengo que actualizar el articulo en
                             //busco el articulo con idfirabase
                             //lo elimino y subo el nuevo article
+                            GalleryActivity.lista.remove(indiceLista);
+                            GalleryActivity.lista.add(indiceLista,article);
 
                             String fotos = fotofull;
                             String iduser = iduse;
