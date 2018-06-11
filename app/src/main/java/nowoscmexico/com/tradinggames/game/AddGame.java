@@ -824,15 +824,15 @@ public class AddGame extends AppCompatActivity {
                     //Log.w("key",keyArticle);
                     String keyArticle = myRef.child("articulo").push().getKey();
                     ArticuloDao article = new ArticuloDao(keyArticle,name,keyArticle,desc,catego,fotofull,datestring,iduse);
-                    if(!banderainserta) {
+                    /*if(!banderainserta) {
                         GalleryActivity.lista.add(article);
                         banderainserta = true;
-                    }
+                    }*/
                     Map<String, Object> postValuesArticle = article.toMap();
                     myRef.child("articulo").child(keyArticle).updateChildren(postValuesArticle);
 
                     //se agrego esta liena y que la linea anterior magicamente agrega un articulo mas a la lista
-                    GalleryActivity.lista.remove(GalleryActivity.lista.size()-1);
+                    //GalleryActivity.lista.remove(GalleryActivity.lista.size()-1);
 
                     //now...lets try upload an image to firebase...
                     // Create a storage reference from our app

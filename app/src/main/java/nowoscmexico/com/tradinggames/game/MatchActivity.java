@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import nowoscmexico.com.tradinggames.menuClass;
 import nowoscmexico.com.tradinggames.R;
 
+import static nowoscmexico.com.tradinggames.MainActivity.listaMatch;
+
 public class MatchActivity extends AppCompatActivity {
 
     public NavigationView navigationView;
@@ -65,7 +67,7 @@ public class MatchActivity extends AppCompatActivity {
         elements.add("game2");
         elements.add("game3");
 
-        MatchAdapter adapter = new MatchAdapter(this,elements);
+        MatchAdapter adapter = new MatchAdapter(this,listaMatch);
         lista.setAdapter(adapter);
 
     }

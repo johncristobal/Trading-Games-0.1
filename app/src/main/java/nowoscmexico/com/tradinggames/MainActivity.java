@@ -21,6 +21,9 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.ArrayList;
+
+import nowoscmexico.com.tradinggames.DataBase.ArticuloDao;
 import nowoscmexico.com.tradinggames.DataBase.modelBase;
 import nowoscmexico.com.tradinggames.tuto.TutorialActivity;
 import nowoscmexico.com.tradinggames.DataBase.DBaseMethods;
@@ -34,6 +37,9 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
 
+    public static ArrayList<ArticuloDao> listaMatch;
+    public static ArrayList<String> listaMatchkey;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,6 +47,9 @@ public class MainActivity extends AppCompatActivity {
 
         base = new modelBase(getApplicationContext(),Integer.parseInt(getResources().getString(R.string.dbversion)));
         DBaseMethods.base = base;
+
+        listaMatch = new ArrayList<>();
+        listaMatchkey = new ArrayList<>();
 
         mAuth = FirebaseAuth.getInstance();
 

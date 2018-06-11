@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import nowoscmexico.com.tradinggames.DataBase.ArticuloDao;
 import nowoscmexico.com.tradinggames.R;
 
 /**
@@ -19,10 +20,10 @@ import nowoscmexico.com.tradinggames.R;
 public class MatchAdapter extends BaseAdapter {
 
     Context context;
-    ArrayList<Object> matchs;
+    ArrayList<ArticuloDao> matchs;
     private static LayoutInflater inflater = null;
 
-    public MatchAdapter(Context c, ArrayList<Object> p){
+    public MatchAdapter(Context c, ArrayList<ArticuloDao> p){
         context = c;
         matchs = p;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -55,7 +56,8 @@ public class MatchAdapter extends BaseAdapter {
         TextView name = (TextView) vi.findViewById(R.id.textViewCustomName);
         TextView cate = (TextView) vi.findViewById(R.id.textViewCustomCategoria);
 
-        name.setText(matchs.get(i).toString());
+        name.setText(matchs.get(i).getTitulo());
+        cate.setText(matchs.get(i).getCategoria());
         /*PlatilloDao fond = (PlatilloDao)platillos.get(i);
         name.setText(fond.getNombre());
         cate.setText(fond.getPrecio()+"");

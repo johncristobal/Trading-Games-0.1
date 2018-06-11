@@ -1,8 +1,13 @@
 package nowoscmexico.com.tradinggames.game;
 
+/*
+ * Ssuper mega importante nota
+ * Xada que se agrega, entra aqui en automativo, so...debese salidr que si ya existe, adios*/
+
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
@@ -13,6 +18,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.PersistableBundle;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -51,15 +57,22 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import nowoscmexico.com.tradinggames.DataBase.ArticuloDao;
 import nowoscmexico.com.tradinggames.DataBase.DBaseMethods;
@@ -67,6 +80,9 @@ import nowoscmexico.com.tradinggames.DataBase.modelBase;
 import nowoscmexico.com.tradinggames.GalleryActivity;
 import nowoscmexico.com.tradinggames.user.UserActivity;
 import nowoscmexico.com.tradinggames.R;
+
+import static nowoscmexico.com.tradinggames.GalleryActivity.daito;
+import static nowoscmexico.com.tradinggames.MainActivity.listaMatch;
 
 public class SimpleViewG extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,BaseSliderView.OnSliderClickListener, ViewPagerEx.OnPageChangeListener {
@@ -76,8 +92,10 @@ public class SimpleViewG extends AppCompatActivity
 
     private SliderLayout mDemoSlider;
 
-    public String foto,usuario;
+    public String foto,usuario_del_juego,user_own;
     public int finalI;
+
+    private SharedPreferences sharedPreferences;
 
     public List<TextSliderView> listatext;
     public HashMap<String,String> url_maps = new HashMap<String, String>();
@@ -89,12 +107,11 @@ public class SimpleViewG extends AppCompatActivity
 
         mDemoSlider = (SliderLayout)findViewById(R.id.slider);
 
-        Intent intent = getIntent();
-        String tit = intent.getStringExtra("nombre");
-        foto = intent.getStringExtra("foto");
-        String descripcion = intent.getStringExtra("descripcion");
-        String categoria = intent.getStringExtra("categoria");
-        usuario = intent.getStringExtra("usuario");
+        String tit = daito.getTitulo();//intent.getStringExtra("nombre");
+        foto = daito.getFoto();//intent.getStringExtra("foto");
+        String descripcion = daito.getDescripcion();//intent.getStringExtra("descripcion");
+        String categoria = daito.getCategoria();//intent.getStringExtra("categoria");
+        usuario_del_juego = daito.getIdusuario();//intent.getStringExtra("usuario");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(tit);
@@ -102,6 +119,9 @@ public class SimpleViewG extends AppCompatActivity
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        sharedPreferences = getSharedPreferences(getString(R.string.sharedName), Context.MODE_PRIVATE);
+        user_own = sharedPreferences.getString("idusuario","null");
 
         /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -173,78 +193,6 @@ public class SimpleViewG extends AppCompatActivity
         //cargarFotos();
     }
 
-    public void cargarFotos(){
-        //upload images to server
-        final ProgressDialog progress = new ProgressDialog(SimpleViewG.this);
-        progress.setTitle("Información");
-        progress.setMessage("Actualizando noticias...");
-        //progress.setIcon(R.drawable.miituo);
-        progress.setIndeterminate(true);
-        progress.setCancelable(false);
-        progress.show();
-
-        try {
-            final String folderuser = usuario;
-            String[] fotos = foto.split(",");
-
-            final int tamanio = fotos.length;
-            //Evitr craah en caso que no traiga fotos
-            if (fotos.length >= 1) {
-                //Aqui solo recuperamos una foto para mostrar en mainview
-                for (int i = 0; i < fotos.length; i++) {
-                    final String name = fotos[i];
-                    final File f = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+ File.separator+folderuser+"/"+name);
-                    //url_maps.put("tit"+i, getExternalFilesDir(Environment.DIRECTORY_PICTURES)+ File.separator+folderuser+"/"+name);
-
-                    final StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://tradinggames-a6047.appspot.com").child(folderuser + "/" + name);
-
-                    storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                        @Override
-                        public void onSuccess(Uri uri) {
-                            // Got the download URL for 'users/me/profile.png'
-                            url_maps.put("tit"+ finalI, uri.toString());
-                            finalI++;
-
-                            TextSliderView textSliderView = new TextSliderView(SimpleViewG.this);
-                            // initialize a SliderLayout
-                            final String storageDir = url_maps.get(name);
-
-                            textSliderView
-                                    //.description(name)
-                                    .image("https://firebasestorage.googleapis.com/v0/b/tradinggames-a6047.appspot.com/o/GVVIIFiLN1TN0rgxBsM8QhYQ7uD2%2FGVVIIFiLN1TN0rgxBsM8QhYQ7uD2_mario_0.png?alt=media&token=e60a18d1-4c6c-4c1f-a1fd-ffe9a00c4bb6")
-                                    //.image(uri.toString())
-                                    .setScaleType(BaseSliderView.ScaleType.Fit)
-                                    .setOnSliderClickListener(SimpleViewG.this);
-
-                            //add your extra information
-                            textSliderView.bundle(new Bundle());
-                            textSliderView.getBundle()
-                                    .putString("extra",name);
-
-                            listatext.add(textSliderView);
-                            mDemoSlider.addSlider(textSliderView);
-                            if(tamanio == finalI)
-                                progress.dismiss();
-                                /*Glide.with(GalleryActivity.this)
-                                        .load(uri.toString())
-                                        .apply(new RequestOptions().override(240, 300).centerCrop().diskCacheStrategy(DiskCacheStrategy.ALL))//.override(150,200)
-                                        //.load(storageRef)
-                                        .into(imgSelected);*/
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-                            // Handle any errors
-                        }
-                    });
-                }
-            }
-        }
-        catch(Exception e){
-            e.printStackTrace();
-        }
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -277,11 +225,16 @@ public class SimpleViewG extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.match) {
+            //game match, get and save id match local list
+            //String idusuariomatch = daito.getIdusuario();
+
+            sendMatchFirebase sendMath = new sendMatchFirebase();
+            sendMath.execute();
+
             return true;
         }
         if (id == 16908332){
-            //Toast.makeText(this,"Bavk to the last page. This upon tha activity",Toast.LENGTH_SHORT).show();
             onBackPressed();
             return true;
         }
@@ -350,7 +303,6 @@ public class SimpleViewG extends AppCompatActivity
     }
 
 //=================================GEt data from firebase===========================================
-    //public void saygoodbye(){
     public class Sendthelast extends AsyncTask<Void, Void, Void> {
         ProgressDialog progress = new ProgressDialog(SimpleViewG.this);
         String ErrorCode = "";
@@ -404,7 +356,7 @@ public class SimpleViewG extends AppCompatActivity
         protected Void doInBackground(Void... params) {
             //before launch alert, we have to send the confirmReport
             try {
-                final String folderuser = usuario;
+                final String folderuser = usuario_del_juego;
                 final String[] fotos = foto.split(",");
 
                 tamanio = fotos.length;
@@ -479,120 +431,6 @@ public class SimpleViewG extends AppCompatActivity
 
                             }
                         });
-
-                        /*storageRef.getFile(f).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                            @Override
-                            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                                // Local temp file has been created
-                                url_maps.put("tit"+ finalI, f.getAbsolutePath());
-                                finalI++;
-
-                                TextSliderView textSliderView = new TextSliderView(SimpleViewG.this);
-                                // initialize a SliderLayout
-                                final String storageDir = url_maps.get(name);
-
-                                textSliderView
-                                        //.description(name)
-                                        .image(f.getAbsolutePath())
-                                        .setScaleType(BaseSliderView.ScaleType.Fit)
-                                        .setOnSliderClickListener(SimpleViewG.this);
-
-                                //add your extra information
-                                textSliderView.bundle(new Bundle());
-                                textSliderView.getBundle()
-                                        .putString("extra",name);
-
-                                listatext.add(textSliderView);
-                                mDemoSlider.addSlider(textSliderView);
-                                if(tamanio == finalI) {
-
-                                    mDemoSlider.setPresetTransformer(SliderLayout.Transformer.Accordion);
-                                    mDemoSlider.setPresetIndicator(SliderLayout.PresetIndicators.Center_Bottom);
-                                    mDemoSlider.setCustomAnimation(new DescriptionAnimation());
-                                    //mDemoSlider.setDuration(4000);
-                                    mDemoSlider.addOnPageChangeListener(SimpleViewG.this);
-                                    mDemoSlider.stopAutoCycle();
-
-                                    //when clic on list, change type transformer
-
-                                    mDemoSlider.setPresetTransformer("RotateUp");
-                                    progress.dismiss();
-                                }
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception exception) {
-                                // Handle any errors
-
-                            }
-                        });*/
-
-                       /*storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                            @Override
-                            public void onSuccess(Uri uri) {
-                                // Got the download URL for 'users/me/profile.png'
-                                url_maps.put("tit"+ finalI, uri.toString());
-                                finalI++;
-
-                                TextSliderView textSliderView = new TextSliderView(SimpleViewG.this);
-                                // initialize a SliderLayout
-                                final String storageDir = url_maps.get(name);
-
-                                textSliderView
-                                        //.description(name)
-                                        .image(uri.toString())
-                                        .setScaleType(BaseSliderView.ScaleType.Fit)
-                                        .setOnSliderClickListener(SimpleViewG.this);
-
-                                //add your extra information
-                                textSliderView.bundle(new Bundle());
-                                textSliderView.getBundle()
-                                        .putString("extra",name);
-
-                                listatext.add(textSliderView);
-                                mDemoSlider.addSlider(textSliderView);
-                                if(tamanio == finalI) {
-
-                                    mDemoSlider.setPresetTransformer(SliderLayout.Transformer.Accordion);
-                                    mDemoSlider.setPresetIndicator(SliderLayout.PresetIndicators.Center_Bottom);
-                                    mDemoSlider.setCustomAnimation(new DescriptionAnimation());
-                                    //mDemoSlider.setDuration(4000);
-                                    mDemoSlider.addOnPageChangeListener(SimpleViewG.this);
-                                    mDemoSlider.stopAutoCycle();
-
-                                    //when clic on list, change type transformer
-
-                                    mDemoSlider.setPresetTransformer("RotateUp");
-                                    progress.dismiss();
-                                }
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception exception) {
-                                // Handle any errors
-                            }
-                        });*/
-
-                        /*storageRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-                            @Override
-                            public void onSuccess(byte[] bytes) {
-                                try {
-                                    // Data for "images/island.jpg" is returns, use this as needed
-                                    BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(f));
-                                    bos.write(bytes);
-                                    bos.flush();
-                                    bos.close();
-                                }catch(Exception e){
-                                    e.printStackTrace();
-                                }
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception exception) {
-                                // Handle any errors
-                                Log.e("Error",exception.toString());
-                            }
-                        });*/
                     }
                 }
             }
@@ -605,26 +443,7 @@ public class SimpleViewG extends AppCompatActivity
         @Override
         protected void onPostExecute(Void aVoid) {
             try {
-                //if(contadorArticulos == numArticulos) {
-                /*for(String name : url_maps.keySet()){
-                    TextSliderView textSliderView = new TextSliderView(SimpleViewG.this);
-                    // initialize a SliderLayout
-                    final String storageDir = url_maps.get(name);
 
-                    textSliderView
-                            //.description(name)
-                            .image(storageDir)
-                            .setScaleType(BaseSliderView.ScaleType.Fit)
-                            .setOnSliderClickListener(SimpleViewG.this);
-
-                    //add your extra information
-                    textSliderView.bundle(new Bundle());
-                    textSliderView.getBundle()
-                            .putString("extra",name);
-
-                    mDemoSlider.addSlider(textSliderView);
-                }*/
-                //progress.dismiss();
             }
             catch (Exception e){
                 e.printStackTrace();
@@ -680,5 +499,278 @@ public class SimpleViewG extends AppCompatActivity
             }
             return savedImagePath;
         }
+    };
+
+//========================================send match to firebase===========================
+    public class sendMatchFirebase extends AsyncTask <Void, Void, Void> {
+        ProgressDialog progress = new ProgressDialog(SimpleViewG.this);
+        String ErrorCode = "";
+
+        @Override
+        protected void onPreExecute() {
+            progress.setTitle("Match...");
+            progress.setMessage("buscando información...");
+            progress.setIndeterminate(true);
+            progress.setCancelable(false);
+            progress.show();
+        }
+
+        @Override
+        protected void onCancelled() {
+            progress.dismiss();
+            Toast msg = Toast.makeText(getApplicationContext(), ErrorCode, Toast.LENGTH_LONG);
+            msg.show();
+
+            super.onCancelled();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            //before launch alert, we have to send the confirmReport
+            try {
+                //get date to save gmae
+                //Firstly save data into localabtabase
+                //String res = insertarLocal(modelBase.FeedEntryArticle.TABLE_NAME, name, desc, catego, fotofull, datestring,iduser);
+                //GalleryActivity.lista.add(new ArticuloDao());
+                String res = "1";
+                if(res.equals("-1")){
+                    Toast.makeText(SimpleViewG.this,"Error al guardar información. \n Intente más tarde.", Toast.LENGTH_SHORT).show();
+                }else{
+                    //Si se guardo localmente,,,,intentammos guardar WS
+                    //Create task to send Data to DB --- WS
+                    //WSTask task = new WSTask(AddGame.this);
+                    String ws = "";
+                    ws = insertarFB();
+
+                    //Validar si ws ejecutado correctamente...
+                    //String ws = "1";
+                    /*
+                    QUE REGRESARA firebase en caso de error???
+                     */
+                }
+
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+
+            progress.dismiss();
+        }
+
+        private String insertarFB() {
+
+            try {
+                String table = modelBase.FeedEntryArticle.TABLE_NAME;
+                Log.w("Here",table);
+
+                FirebaseDatabase database = FirebaseDatabase.getInstance();
+                final DatabaseReference myRef = database.getReference();
+
+                //Thread.sleep(3000);
+
+                switch (table){
+                    /*Agrega articulo a DB*/
+                    case modelBase.FeedEntryArticle.TABLE_NAME:
+
+                        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                        Date date = new Date();
+                        String datestring = (dateFormat.format(date)); //2016/11/16 12:08:43
+
+                        //String keyArticle = myRef.child("articulo").push().getKey();
+                        //Log.w("key",keyArticle);
+                        String llavematch = myRef.child("match").child(user_own).push().getKey();
+                        String keyArticle = daito.getIdfirebase();
+                        String name = daito.getTitulo();
+                        String desc = daito.getDescripcion();
+                        String catego = daito.getCategoria();
+                        String iduse = daito.getIdusuario();
+                        ArticuloDao article = new ArticuloDao(keyArticle,name,keyArticle,desc,catego,"",datestring,iduse);
+                        //salvo lista para visualizar en mis match
+                        //quizas necesite base local o desde main recuperralos...think about it
+                        //listaMatch.add(article);
+                        Map<String, Object> postValuesArticle = article.toMap();
+                        myRef.child("match").child(user_own).child(keyArticle).updateChildren(postValuesArticle);
+
+                        //ahora buscar iduse dentro del json match de firebase
+                        final DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference().child("match").child(iduse);
+                        rootRef.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                if (dataSnapshot.exists()) {
+                                    // Do stuff
+                                    Log.e("jeuego","existe");
+                                    rootRef.addChildEventListener(new ChildEventListener() {
+                                        @Override
+                                        public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                                            final ArticuloDao comment = dataSnapshot.getValue(ArticuloDao.class);
+                                            Log.e("jeuego",comment.getIdfirebase());
+
+                                            //Aqui es donde verifico listaMatchKeys con los que llegan...
+                                            //si alguno empata, entonces es match...
+
+                                        }
+
+                                        @Override
+                                        public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                                        }
+
+                                        @Override
+                                        public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+                                        }
+
+                                        @Override
+                                        public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                        }
+                                    });
+                                } else {
+                                    // Do stuff
+                                    Log.e("jeuego","No existe");
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+
+                        /*Query recentPostsQuery = rootRef.child(iduse).limitToFirst(100);
+                        recentPostsQuery.addChildEventListener(new ChildEventListener() {
+                            static final String TAG = "CHILD";
+
+                            @Override
+                            public void onChildAdded(DataSnapshot dataSnapshot, String s){
+
+                                try {
+                                    Log.d(TAG, "onChildAdded:" + dataSnapshot.getChildrenCount());
+                                    //Recupero objeto articulo de firebase y cast a ArticuloDao
+                                    final ArticuloDao comment = dataSnapshot.getValue(ArticuloDao.class);
+                                    Log.e("jeuego",comment.getIdfirebase());
+
+                                }catch(Exception e){
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            @Override
+                            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                                Log.e("onChildChanged",s);
+                            }
+
+                            @Override
+                            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                                Log.e("onChildChanged",dataSnapshot.getKey());
+
+                            }
+
+                            @Override
+                            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                                Log.e("onChildChanged",s);
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                                Log.e("onChildChanged",databaseError.getDetails());
+
+                            }
+                        });*/
+
+                        /*rootRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot snapshot) {
+                                if (snapshot.hasChild("null")) {
+                                    // run some code
+                                    Log.e("yES","Childexist");
+
+                                    Log.d("Tag", "onChildAdded:" + snapshot.getChildrenCount());
+                                    Object datos = snapshot.getChildrenCount();
+                                    final ArticuloDao comment = snapshot.child("null").getValue(ArticuloDao.class);
+                                    //Log.e("jeuego",comment.getIdfirebase());
+
+
+
+                                }
+                                else{
+
+                                    Log.e("No","there is not a match then");
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                Log.e("No","Childexist not");
+
+                            }
+                        });*/
+
+                        /*Query recentPostsQuery = myRef.child("match").child("null").limitToFirst(100);
+                        recentPostsQuery.addChildEventListener(new ChildEventListener() {
+                            public static final String TAG = "CHILD";
+
+                            @Override
+                            public void onChildAdded(DataSnapshot dataSnapshot, String s){
+
+                                try {
+                                    Log.d(TAG, "onChildAdded:" + dataSnapshot.getChildrenCount());
+                                    //Recupero objeto articulo de firebase y cast a ArticuloDao
+                                    final ArticuloDao comment = dataSnapshot.getValue(ArticuloDao.class);
+
+                                    Log.e("jeuego",comment.getIdfirebase());
+
+
+                                }catch(Exception e){
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            @Override
+                            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                                Log.e("onChildChanged",s);
+                            }
+
+                            @Override
+                            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                                Log.e("onChildChanged",dataSnapshot.getKey());
+
+                            }
+
+                            @Override
+                            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                                Log.e("onChildChanged",s);
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                                Log.e("onChildChanged",databaseError.getDetails());
+
+                            }
+                        });*/
+
+                        return llavematch;
+                }
+
+            }catch(Exception e){
+                e.printStackTrace();
+                return "0";
+            }
+
+            return "1";
+        }
+
     };
 }

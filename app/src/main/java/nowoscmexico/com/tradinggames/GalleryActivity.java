@@ -71,6 +71,9 @@ import nowoscmexico.com.tradinggames.user.UserActivity;
 import nowoscmexico.com.tradinggames.DataBase.ArticuloDao;
 import nowoscmexico.com.tradinggames.game.SimpleViewG;
 
+import static nowoscmexico.com.tradinggames.MainActivity.listaMatch;
+import static nowoscmexico.com.tradinggames.MainActivity.listaMatchkey;
+
 public class GalleryActivity extends AppCompatActivity {
 
     //Esto me parece tiene que entrar en un dao para que se pueda guardar nombre...blablabla
@@ -108,7 +111,7 @@ public class GalleryActivity extends AppCompatActivity {
 
     public ArrayList<ImageView> imagenes;
     public static ArrayList<ArticuloDao> lista;//lista con solo mis articulos idusuario
-    public ArticuloDao daito;
+    public static ArticuloDao daito;
     ImageAdapter adapter;
     public int flagcorrido;
     public ProgressDialog progress;// = new ProgressDialog(GalleryActivity.this);
@@ -483,11 +486,80 @@ public class GalleryActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... params) {
-            //before launch alert, we have to send the confirmReport
+            //get match items if user logged
             try {
+                if(!idusuario.equals("null")){
+                    //firstly - get favorites games list from match
+                    //si eres null, entonces no tienes match
+                    final DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference().child("match").child(idusuario);
+                    rootRef.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.exists()) {
+                                // Do stuff
+                                Log.e("jeuego","existe");
+
+                                listaMatch.clear();
+                                listaMatchkey.clear();
+
+                                for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+                                    // TODO: handle the post
+                                    final ArticuloDao comment = postSnapshot.getValue(ArticuloDao.class);
+                                    Log.e("jeuego",comment.getIdfirebase());
+
+                                    listaMatch.add(comment);
+                                    listaMatchkey.add(comment.getIdfirebase());
+                                }
+
+                                /*rootRef.addChildEventListener(new ChildEventListener() {
+                                    @Override
+                                    public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                                        final ArticuloDao comment = dataSnapshot.getValue(ArticuloDao.class);
+                                        Log.e("jeuego",comment.getIdfirebase());
+
+                                        listaMatch.add(comment);
+                                        listaMatchkey.add(comment.getIdfirebase());
+                                    }
+
+                                    @Override
+                                    public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                                    }
+
+                                    @Override
+                                    public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+                                    }
+
+                                    @Override
+                                    public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                });
+                            } else {
+                                // Do stuff
+                                Log.e("jeuego","Aun no tienes match guardados");
+                            }*/
+                            }else {
+                                // Do stuff
+                                Log.e("jeuego","Aun no tienes match guardados");
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+
                 //get articulos from firebase
                 Query recentPostsQuery = myRef.child("articulo").limitToFirst(100);
-
                 recentPostsQuery.addChildEventListener(new ChildEventListener() {
                     public static final String TAG = "CHILD";
 
@@ -498,9 +570,13 @@ public class GalleryActivity extends AppCompatActivity {
                             Log.d(TAG, "onChildAdded:" + dataSnapshot.getChildrenCount());
                             //Recupero objeto articulo de firebase y cast a ArticuloDao
                             final ArticuloDao comment = dataSnapshot.getValue(ArticuloDao.class);
+
+                            //valido si key comment existe en match usuario
+                            //si existe => no lo muestro //no existe => lo muestro
+
                             listalocal.add(comment);
 
-                            //salvo en base local
+                            //salvo en base local mis juegos
                             if(comment.getIdusuario().equals(idusuario)) {
                                 cargararticulo(comment);
                                 listalocalmios.add(comment);
@@ -512,14 +588,12 @@ public class GalleryActivity extends AppCompatActivity {
                             if (fotos.length >= 1) {
                                 //Aqui solo recuperamos una foto para mostrar en mainview
                                 try {
-                                    for (int i = 0; i < fotos.length; i++) {
-                                        final String name = fotos[i];
-
+                                    for (final String name : fotos) {
                                         //COn el nombre de la imgaen...recuoero imagen de storage firebase
 
                                         //StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://tradinggames-a6047.appspot.com/").child("s2YFT93wtFTXE75rjRkSvvdO6Y62/s2YFT93wtFTXE75rjRkSvvdO6Y62_mario kart 64_1.png");
                                         //final StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://tradinggames-a6047.appspot.com/").child(folderuser + "/" + name);
-                                        final long ONE_MEGABYTE = 1024*1024;
+                                        final long ONE_MEGABYTE = 1024 * 1024;
                                         //imagenes.add(imageView);
                                         //final File storageDir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + File.separator + folderuser);
 
@@ -601,8 +675,6 @@ public class GalleryActivity extends AppCompatActivity {
                                         .apply(new RequestOptions().override(240, 300).centerCrop().diskCacheStrategy(DiskCacheStrategy.ALL))//.override(150,200)
                                         //.load(storageRef)
                                         .into(imgSelected);
-
-
                             }
 
 
@@ -627,11 +699,6 @@ public class GalleryActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View view) {
                         Intent intent = new Intent(context, SimpleViewG.class);
-                        intent.putExtra("nombre", daito.getTitulo());
-                        intent.putExtra("foto", daito.getFoto());
-                        intent.putExtra("descripcion", daito.getDescripcion());
-                        intent.putExtra("categoria", daito.getCategoria());
-                        intent.putExtra("usuario", daito.getIdusuario());
                         context.startActivity(intent);
                     }
                 });
@@ -852,7 +919,7 @@ public class GalleryActivity extends AppCompatActivity {
 
    public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.gallery, menu);
+        //getMenuInflater().inflate(R.menu.gallery, menu);
         return true;
 
    }
