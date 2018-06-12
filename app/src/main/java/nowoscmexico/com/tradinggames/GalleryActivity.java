@@ -573,8 +573,9 @@ public class GalleryActivity extends AppCompatActivity {
 
                             //valido si key comment existe en match usuario
                             //si existe => no lo muestro //no existe => lo muestro
-
-                            listalocal.add(comment);
+                            if(!listaMatchkey.contains(comment.getIdfirebase())){
+                                listalocal.add(comment);
+                            }
 
                             //salvo en base local mis juegos
                             if(comment.getIdusuario().equals(idusuario)) {
