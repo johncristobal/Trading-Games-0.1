@@ -178,7 +178,7 @@ public class GalleryActivity extends AppCompatActivity {
         * Probar glide sin hilos ni nada....puramente...
         * */
 
-        /**************************
+        /*************************************************
          * Go for the games WS
          */
 
@@ -239,7 +239,6 @@ public class GalleryActivity extends AppCompatActivity {
             //}).start();
 
             //loadImagen();
-
 
             Sendthelast last = new Sendthelast();
             last.execute();
@@ -559,7 +558,7 @@ public class GalleryActivity extends AppCompatActivity {
                 }
 
                 //get articulos from firebase
-                Query recentPostsQuery = myRef.child("articulo").limitToFirst(100);
+                Query recentPostsQuery = myRef.child("articulo").orderByKey();//.limitToLast(100);//orderByChild("time");//.limitToLast(100);
                 recentPostsQuery.addChildEventListener(new ChildEventListener() {
                     public static final String TAG = "CHILD";
 
@@ -657,41 +656,40 @@ public class GalleryActivity extends AppCompatActivity {
                 gallery.setAdapter(adapter);
                 gallery.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+                        final String folderuser = listalocal.get(position).getIdusuario();
+                        String[] fotos = listalocal.get(position).getFoto().split(",");
+                        //Evitr craah en caso que no traiga fotos
+                        if (fotos.length >= 1) {
+                            //Aqui solo recuperamos una foto para mostrar en mainview
+                            final String name = fotos[0];
+                            final StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://tradinggames-a6047.appspot.com").child(folderuser + "/" + name);
+                            final long ONE_MEGABYTE = 1024*1024;
 
-                    final String folderuser = listalocal.get(position).getIdusuario();
-                    String[] fotos = listalocal.get(position).getFoto().split(",");
-                    //Evitr craah en caso que no traiga fotos
-                    if (fotos.length >= 1) {
-                        //Aqui solo recuperamos una foto para mostrar en mainview
-                        final String name = fotos[0];
-                        final StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://tradinggames-a6047.appspot.com").child(folderuser + "/" + name);
-                        final long ONE_MEGABYTE = 1024*1024;
-
-                        storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                            @Override
-                            public void onSuccess(Uri uri) {
-                                // Got the download URL for 'users/me/profile.png'
-                                Glide.with(GalleryActivity.this)
-                                        .load(uri.toString())
-                                        .apply(new RequestOptions().override(240, 300).centerCrop().diskCacheStrategy(DiskCacheStrategy.ALL))//.override(150,200)
-                                        //.load(storageRef)
-                                        .into(imgSelected);
-                            }
+                            storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    // Got the download URL for 'users/me/profile.png'
+                                    Glide.with(GalleryActivity.this)
+                                            .load(uri.toString())
+                                            .apply(new RequestOptions().override(240, 300).centerCrop().diskCacheStrategy(DiskCacheStrategy.ALL))//.override(150,200)
+                                            //.load(storageRef)
+                                            .into(imgSelected);
+                                }
 
 
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception exception) {
-                                // Handle any errors
-                            }
-                        });
-                    }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception exception) {
+                                    // Handle any errors
+                                }
+                            });
+                        }
 
-                    //set texto into background
-                    videojuego.setText(listalocal.get(position).getTitulo());
-                    gameSelected = listalocal.get(position).getFoto() + "";
+                        //set texto into background
+                        videojuego.setText(listalocal.get(position).getTitulo());
+                        gameSelected = listalocal.get(position).getFoto() + "";
 
-                    daito = listalocal.get(position);
+                        daito = listalocal.get(position);
                     }
                 });
 

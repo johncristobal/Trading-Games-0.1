@@ -10,7 +10,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="150dp"
         android:id="@+id/gridRelative"
         android:visibility="visible">
 
@@ -21,11 +21,12 @@
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:numColumns="2"
-            android:nestedScrollingEnabled="false"
             android:columnWidth="10dp"
             android:background="#d7d7d7"
             android:verticalSpacing="5dp"
             android:horizontalSpacing="5dp"
+            android:scrollbarAlwaysDrawHorizontalTrack="false"
+            android:scrollbarAlwaysDrawVerticalTrack="true"
             android:padding="10dp" />
     </RelativeLayout>
 
